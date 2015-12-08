@@ -1,7 +1,7 @@
 {
     "name": "lastcall/crawler",
     "description": "Static site crawler/processor",
-    "license": "GPL",
+    "license": "MIT",
     "authors": [
         {
             "name": "Rob Bayliss",
