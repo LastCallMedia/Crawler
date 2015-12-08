@@ -1,0 +1,35 @@
+{
+    "name": "lastcall/crawler",
+    "description": "Static site crawler/processor",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Rob Bayliss",
+            "email": "rob@lastcallmedia.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "LastCall\\Crawler\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "LastCall\\Crawler\\Test\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8",
+        "doctrine/dbal": "^2.5"
+    },
+    "require": {
+        "php": ">=5.5.0",
+        "guzzlehttp/guzzle": "^6.1",
+        "symfony/stopwatch": "^3.0",
+        "symfony/filesystem": "^3.0",
+        "psr/log": "^1.0",
+        "symfony/console": "^3.0",
+        "symfony/event-dispatcher": "^3.0",
+        "symfony/dom-crawler": "^3.0"
+    }
+}

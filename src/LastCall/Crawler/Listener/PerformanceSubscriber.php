@@ -1,0 +1,58 @@
+<?php
+
+namespace LastCall\Crawler\Listener;
+
+
+use LastCall\Crawler\Crawler;
+use LastCall\Crawler\Event\CrawlerEvent;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
+
+class PerformanceSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            Crawler::SENDING => 'onSending',
+            Crawler::SUCCESS => 'onComplete',
+            Crawler::FAIL => 'onComplete',
+            Crawler::EXCEPTION => 'onComplete',
+        ];
+    }
+
+    private $interval = 5;
+    private $sent = 0;
+    private $completed = 0;
+    private $timer;
+
+    public function __construct(OutputInterface $output)
+    {
+        $this->output = $output;
+        $this->timer = new Stopwatch();
+    }
+
+    public function onSending(CrawlerEvent $event) {
+        $this->sent++;
+        $this->timer->start('crawler.request');
+    }
+
+    public function onComplete(CrawlerEvent $event) {
+        $this->completed++;
+        $this->timer->lap('crawler.request');
+
+        if($this->completed % $this->interval == 0) {
+            $event = $this->timer->getEvent('crawler.request');
+            $duration = $event->getDuration();
+            $segments = count($event->getPeriods());
+            $rate = $segments ? round($duration / $segments) : 0;
+
+            $memory = $event->getMemory() / 1024 / 1024;
+
+            $this->output->writeln(sprintf('Processed %s in %ss (%sms, %smb)', $segments,
+              round($duration / 1000), $rate, $memory));
+        }
+
+    }
+
+}
