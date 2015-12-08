@@ -31,5 +31,6 @@
         "symfony/console": "^3.0",
         "symfony/event-dispatcher": "^3.0",
         "symfony/dom-crawler": "^3.0"
-    }
+    },
+    "bin": ["bin/crawler"]
 }
