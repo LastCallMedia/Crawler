@@ -22,7 +22,6 @@ class Configuration extends AbstractConfiguration
         $this->client = new Client(['allow_redirects' => FALSE]);
         $this->queueDriver = new ArrayDriver();
         $this->urlHandler = new URLHandler($baseUrl);
-        $this->dispatcher = new EventDispatcher();
     }
 
     public function setClient(Client $client)
@@ -58,17 +57,6 @@ class Configuration extends AbstractConfiguration
         return $this->requestQueue;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-        return $this;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
     public function setBaseUrl($baseUrl)
     {
         $this->baseUrl = $baseUrl;
@@ -96,21 +84,5 @@ class Configuration extends AbstractConfiguration
 
     public function addListener($eventName, callable $callback) {
         $this->listeners[$eventName][] = $callback;
-    }
-
-    public function dispatch($eventName, Event $event = null)
-    {
-        if(!$this->finalized) {
-            foreach($this->subscribers as $subscriber) {
-                $this->dispatcher->addSubscriber($subscriber);
-            }
-            foreach($this->listeners as $en => $listeners) {
-                foreach($listeners as $listener) {
-                    $this->dispatcher->addListener($en, $listener);
-                }
-            }
-            $this->finalized = TRUE;
-        }
-        return $this->dispatcher->dispatch($eventName, $event);
     }
 }

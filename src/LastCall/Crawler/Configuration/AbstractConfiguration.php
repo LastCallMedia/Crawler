@@ -28,11 +28,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     protected $queueDriver;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
      * @var \Symfony\Component\EventDispatcher\EventSubscriberInterface[]
      */
     protected $subscribers = array();
@@ -57,11 +52,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         return $this->queueDriver;
     }
 
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
     public function getBaseUrl()
     {
         return $this->baseUrl;
@@ -74,10 +64,5 @@ abstract class AbstractConfiguration implements ConfigurationInterface
 
     public function getListeners() {
         return $this->listeners;
-    }
-
-    public function dispatch($eventName, Event $event = null)
-    {
-        return $this->dispatcher->dispatch($eventName, $event);
     }
 }

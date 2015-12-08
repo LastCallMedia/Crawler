@@ -43,14 +43,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($queue, $config->getQueueDriver());
     }
 
-    public function testDispatcher() {
-        $config = new Configuration();
-        $this->assertInstanceOf(EventDispatcherInterface::class, $config->getDispatcher());
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class)->reveal();
-        $config->setDispatcher($dispatcher);
-        $this->assertSame($dispatcher, $config->getDispatcher());
-    }
-
     public function testSubscribers() {
         $config = new Configuration();
         $this->assertEquals([], $config->getSubscribers());

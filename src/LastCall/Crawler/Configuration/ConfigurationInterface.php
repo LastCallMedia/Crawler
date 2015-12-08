@@ -24,11 +24,6 @@ interface ConfigurationInterface
     public function getQueueDriver();
 
     /**
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher();
-
-    /**
      * @return string
      */
     public function getBaseUrl();
@@ -42,6 +37,4 @@ interface ConfigurationInterface
      * @return array
      */
     public function getListeners();
-
-    public function dispatch($eventName, Event $event = NULL);
 }
