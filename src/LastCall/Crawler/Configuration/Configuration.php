@@ -52,11 +52,6 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    public function getRequestQueue()
-    {
-        return $this->requestQueue;
-    }
-
     public function setBaseUrl($baseUrl)
     {
         $this->baseUrl = $baseUrl;
