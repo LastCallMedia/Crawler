@@ -14,8 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class Configuration extends AbstractConfiguration
 {
 
-    private $finalized;
-
     public function __construct($baseUrl = NULL)
     {
         $this->baseUrl = $baseUrl;

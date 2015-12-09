@@ -34,7 +34,7 @@ class PerformanceSubscriber implements EventSubscriberInterface
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     private $output;
-    
+
     public static function getSubscribedEvents()
     {
         return [

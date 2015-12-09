@@ -3,8 +3,6 @@
 namespace LastCall\Crawler\Configuration;
 
 
-use Symfony\Component\EventDispatcher\Event;
-
 interface ConfigurationInterface
 {
 
