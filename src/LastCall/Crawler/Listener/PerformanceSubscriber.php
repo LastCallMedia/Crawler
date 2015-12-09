@@ -11,6 +11,30 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class PerformanceSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var int
+     */
+    private $interval = 5;
+    /**
+     * @var int
+     */
+    private $sent = 0;
+
+    /**
+     * @var int
+     */
+    private $completed = 0;
+
+    /**
+     * @var \Symfony\Component\Stopwatch\Stopwatch
+     */
+    private $timer;
+
+    /**
+     * @var \Symfony\Component\Console\Output\OutputInterface
+     */
+    private $output;
+    
     public static function getSubscribedEvents()
     {
         return [
@@ -20,11 +44,6 @@ class PerformanceSubscriber implements EventSubscriberInterface
             Crawler::EXCEPTION => 'onComplete',
         ];
     }
-
-    private $interval = 5;
-    private $sent = 0;
-    private $completed = 0;
-    private $timer;
 
     public function __construct(OutputInterface $output)
     {

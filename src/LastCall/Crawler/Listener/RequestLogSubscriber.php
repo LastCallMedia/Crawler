@@ -12,6 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RequestLogSubscriber implements EventSubscriberInterface
 {
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
     /**
      * {@inheritDoc}
      */
