@@ -35,7 +35,8 @@
     "suggests": {
         "doctrine/dbal": "Allow database backed queues",
         "symfony/stopwatch": "Track performance metrics",
-        "symfony/monolog-bridge": "Stream logs to the console"
+        "symfony/monolog-bridge": "Stream logs to the console",
+        "symfony/css-selector": "Use CSS selectors to traverse the dom"
     },
     "bin": [ "bin/crawler" ]
 }
