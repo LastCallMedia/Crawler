@@ -23,7 +23,7 @@ class SetupCommand extends ConfigurableCommand
         /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
         $helper = $this->getHelper('crawler');
         $config = $helper->getConfiguration($input->getArgument('config'), $output);
-        $crawler = $helper->getCrawler($config);
+        $crawler = $helper->getCrawler($config, FALSE);
         $crawler->setup();
         $io = new SymfonyStyle($input, $output);
         $io->success('Setup complete');

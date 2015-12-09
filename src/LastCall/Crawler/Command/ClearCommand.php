@@ -24,7 +24,7 @@ class ClearCommand extends ConfigurableCommand
         /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
         $helper = $this->getHelper('crawler');
         $config = $helper->getConfiguration($input->getArgument('config'), $output);
-        $crawler = $helper->getCrawler($config);
+        $crawler = $helper->getCrawler($config, FALSE);
         $crawler->teardown();
         $crawler->setUp();
         $io->success('Cleared');
