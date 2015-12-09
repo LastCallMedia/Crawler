@@ -37,5 +37,5 @@
         "symfony/stopwatch": "Track performance metrics",
         "symfony/monolog-bridge": "Stream logs to the console"
     },
-    "bin": ["bin/crawler"]
+    "bin": [ "bin/crawler" ]
 }
