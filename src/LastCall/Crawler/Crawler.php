@@ -130,8 +130,8 @@ class Crawler
                 yield $promise;
             }
             catch(\Exception $e) {
-                $this->dispatcher->dispatch(self::EXCEPTION,
-                    new CrawlerExceptionEvent($this, $request, $e));
+                $event = new CrawlerExceptionEvent($this, $request, $e);
+                $this->dispatcher->dispatch(self::EXCEPTION, $event);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
         }
@@ -141,12 +141,13 @@ class Crawler
     {
         return function (ResponseInterface $response) use ($request, $job) {
             $this->queue->complete($job);
-            $event = new CrawlerResponseEvent($this, $request, $response);
+
             try {
+                $event = new CrawlerResponseEvent($this, $request, $response);
                 $this->dispatcher->dispatch(self::SUCCESS, $event);
             } catch (\Exception $e) {
-                $this->dispatcher->dispatch(self::EXCEPTION,
-                    new CrawlerExceptionEvent($this, $request, $e, $response));
+                $event = new CrawlerExceptionEvent($this, $request, $e, $response);
+                $this->dispatcher->dispatch(self::EXCEPTION, $event);
                 throw $e;
             }
             return $response;
@@ -160,14 +161,13 @@ class Crawler
             // Delegate processing of the item out to the session.
             if ($reason instanceof BadResponseException) {
                 $response = $reason->getResponse();
-                $event = new CrawlerResponseEvent($this, $request, $response);
 
                 try {
+                    $event = new CrawlerResponseEvent($this, $request, $response);
                     $this->dispatcher->dispatch(self::FAIL, $event);
                 } catch (\Exception $e) {
-                    $this->dispatcher->dispatch(self::EXCEPTION,
-                        new CrawlerExceptionEvent($this, $request, $e,
-                          $response));
+                    $event =  new CrawlerExceptionEvent($this, $request, $e, $response);
+                    $this->dispatcher->dispatch(self::EXCEPTION, $event);
                     throw $e;
                 }
 
