@@ -36,7 +36,7 @@ class CrawlerHelper extends Helper
             throw new \InvalidArgumentException(sprintf('File does not exist: %s', $filename));
         }
         $configuration = require $filename;
-        if(!$configuration) {
+        if($configuration === 1) {
             throw new \RuntimeException('Configuration was not returned.');
         }
         if(!$configuration instanceof ConfigurationInterface) {

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rfbayliss
- * Date: 12/9/15
- * Time: 8:44 AM
- */
 
 namespace LastCall\Crawler\Test;
 
