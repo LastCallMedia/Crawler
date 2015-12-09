@@ -10,6 +10,16 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class ProfilerHelper extends Helper
 {
+    /**
+     * @var \Symfony\Component\Stopwatch\Stopwatch
+     */
+    private $stopwatch;
+
+    /**
+     * @var \Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher
+     */
+    private $dispatcher;
+
     public function getName() {
         return 'profiler';
     }
