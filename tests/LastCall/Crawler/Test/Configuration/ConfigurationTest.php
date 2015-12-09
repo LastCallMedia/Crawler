@@ -47,10 +47,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = new Configuration();
         $this->assertEquals([], $config->getSubscribers());
         $subscriber = $this->prophesize(EventSubscriberInterface::class)->reveal();
-        $config->setSubscribers([$subscriber]);
-        $this->assertSame($subscriber, $config->getSubscribers()[0]);
         $config->addSubscriber($subscriber);
-        $this->assertSame($subscriber, $config->getSubscribers()[1]);
+        $this->assertSame($subscriber, $config->getSubscribers()[0]);
     }
 
     public function testListeners() {

@@ -28,20 +28,10 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    public function getClient()
-    {
-        return $this->client;
-    }
-
     public function setUrlHandler(URLHandler $handler)
     {
         $this->urlHandler = $handler;
         return $this;
-    }
-
-    public function getUrlHandler()
-    {
-        return $this->urlHandler;
     }
 
     public function setQueueDriver(DriverInterface $driver)
@@ -56,11 +46,6 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    public function getBaseUrl()
-    {
-        return $this->baseUrl;
-    }
-
     public function setSubscribers(array $subscribers)
     {
         $this->subscribers = $subscribers;
@@ -68,11 +53,6 @@ class Configuration extends AbstractConfiguration
 
     public function addSubscriber(EventSubscriberInterface $subscriber) {
         $this->subscribers[] = $subscriber;
-    }
-
-    public function getSubscribers()
-    {
-        return $this->subscribers;
     }
 
     public function addListener($eventName, callable $callback) {
