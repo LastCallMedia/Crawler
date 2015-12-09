@@ -1,6 +1,6 @@
 <?php
 
-namespace LastCall\Crawler\Test;
+namespace LastCall\Crawler\Test\Url;
 
 use LastCall\Crawler\Url\CachedUrlHandler;
 use LastCall\Crawler\Url\URLHandler;
