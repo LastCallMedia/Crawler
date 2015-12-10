@@ -6,16 +6,9 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
-use LastCall\Crawler\Event\CrawlerEvent;
-use LastCall\Crawler\Event\CrawlerExceptionEvent;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Promise\PromiseIterator;
 use LastCall\Crawler\Queue\Job;
-use LastCall\Crawler\Queue\RequestQueue;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This file contains the crawler, which is the engine that powers the rest of
@@ -50,28 +43,22 @@ class Crawler
      */
     protected $configuration;
 
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher;
-
     protected $queue;
 
     /**
      * @param array|\LastCall\Crawler\Configuration\ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config, EventDispatcherInterface $dispatcher = NULL)
+    public function __construct(ConfigurationInterface $config)
     {
-        $this->dispatcher = $dispatcher ?: new EventDispatcher();
         $this->configuration = $config;
-        $this->queue = new RequestQueue($config->getQueueDriver(), 'request');
-        $this->attachListeners();
+        $this->queue = $config->getQueue();
     }
 
     /**
      * @param $uri
      *
      * @return \LastCall\Crawler\Url\URLHandler
+     * @deprecated
      */
     public function getUrlHandler($uri)
     {
@@ -107,32 +94,18 @@ class Crawler
         return $outer->promise();
     }
 
-    private function attachListeners() {
-        foreach ($this->configuration->getListeners() as $eventName => $listeners) {
-            foreach ($listeners as $listener) {
-                $this->dispatcher->addListener($eventName, $listener);
-            }
-        }
-        foreach ($this->configuration->getSubscribers() as $subscriber) {
-            $this->dispatcher->addSubscriber($subscriber);
-        }
-    }
-
     private function getRequestWorkerFn()
     {
         while($job = $this->queue->pop()) {
             $request = $job->getData();
             try {
-                $event = new CrawlerEvent($request, $this->queue, $this->getUrlHandler($request->getUri()));
-
-                $this->dispatcher->dispatch(self::SENDING, $event);
+                $this->configuration->onRequestSending($request);
                 $promise = $this->configuration->getClient()->sendAsync($job->getData())
                   ->then($this->getRequestFulfilledFn($request, $job), $this->getRequestRejectedFn($request, $job));
                 yield $promise;
             }
             catch(\Exception $e) {
-                $event = new CrawlerExceptionEvent($request, NULL, $e, $this->queue, $this->getUrlHandler($request->getUri()));
-                $this->dispatcher->dispatch(self::EXCEPTION, $event);
+                $this->configuration->onRequestException($request, NULL, $e);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
         }
@@ -144,11 +117,10 @@ class Crawler
             $this->queue->complete($job);
 
             try {
-                $event = new CrawlerResponseEvent($request, $response, $this->queue, $this->getUrlHandler($request->getUri()));
-                $this->dispatcher->dispatch(self::SUCCESS, $event);
+                $this->configuration->onRequestSuccess($request, $response);
             } catch (\Exception $e) {
-                $event = new CrawlerExceptionEvent($request, $response, $e, $this->queue, $this->getUrlHandler($request->getUri()));
-                $this->dispatcher->dispatch(self::EXCEPTION, $event);
+                $this->configuration->onRequestException($request, $response,
+                    $e);
                 throw $e;
             }
             return $response;
@@ -164,11 +136,10 @@ class Crawler
                 $response = $reason->getResponse();
 
                 try {
-                    $event = new CrawlerResponseEvent($request, $response, $this->queue, $this->getUrlHandler($request->getUri()));
-                    $this->dispatcher->dispatch(self::FAIL, $event);
+                    $this->configuration->onRequestFailure($request, $response);
                 } catch (\Exception $e) {
-                    $event =  new CrawlerExceptionEvent($request, $response, $e, $this->queue, $this->getUrlHandler($request->getUri()));
-                    $this->dispatcher->dispatch(self::EXCEPTION, $event);
+                    $this->configuration->onRequestException($request,
+                        $response, $e);
                     throw $e;
                 }
 
@@ -180,10 +151,10 @@ class Crawler
     }
 
     public function setUp() {
-        $this->dispatcher->dispatch(self::SETUP);
+        $this->configuration->onSetup();
     }
 
     public function teardown() {
-        $this->dispatcher->dispatch(self::TEARDOWN);
+        $this->configuration->onTeardown();
     }
 }

@@ -2,7 +2,12 @@
 
 namespace LastCall\Crawler\Configuration;
 
-use Symfony\Component\EventDispatcher\Event;
+use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerExceptionEvent;
+use LastCall\Crawler\Event\CrawlerResponseEvent;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractConfiguration implements ConfigurationInterface
 {
@@ -23,19 +28,16 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     protected $urlHandler;
 
     /**
-     * @var \LastCall\Crawler\Queue\Driver\DriverInterface
+     * @var \LastCall\Crawler\Queue\RequestQueueInterface
      */
-    protected $queueDriver;
-
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventSubscriberInterface[]
-     */
-    protected $subscribers = array();
+    protected $queue;
 
     /**
      * @var array
      */
     protected $listeners = array();
+
+    abstract protected function getDispatcher();
 
     public function getClient()
     {
@@ -47,9 +49,9 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         return $this->urlHandler;
     }
 
-    public function getQueueDriver()
+    public function getQueue()
     {
-        return $this->queueDriver;
+        return $this->queue;
     }
 
     public function getBaseUrl()
@@ -57,12 +59,39 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         return $this->baseUrl;
     }
 
-    public function getSubscribers()
-    {
-        return $this->subscribers;
+    public function onSetup() {
+        $this->dispatcher->dispatch(CrawlerEvents::SETUP);
     }
 
-    public function getListeners() {
-        return $this->listeners;
+    public function onTeardown() {
+        $this->getDispatcher()->dispatch(CrawlerEvents::TEARDOWN);
+    }
+
+    public function onRequestSending(RequestInterface $request) {
+        $urlHandler = $this->urlHandler->forUrl($request->getUri());
+        $event = new CrawlerEvent($request, $this->queue, $urlHandler);
+        $this->getDispatcher()->dispatch(CrawlerEvents::SENDING, $event);
+    }
+
+    public function onRequestFailure(RequestInterface $request, ResponseInterface $response) {
+        $urlHandler = $this->urlHandler->forUrl($request->getUri());
+        $event = new CrawlerResponseEvent($request, $response, $this->queue, $urlHandler);
+        $this->getDispatcher()->dispatch(CrawlerEvents::FAILURE, $event);
+    }
+
+    public function onRequestSuccess(RequestInterface $request, ResponseInterface $response) {
+        $urlHandler = $this->urlHandler->forUrl($request->getUri());
+        $event = new CrawlerResponseEvent($request, $response, $this->queue, $urlHandler);
+        $this->getDispatcher()->dispatch(CrawlerEvents::SUCCESS, $event);
+    }
+
+    public function onRequestException(
+        RequestInterface $request,
+        ResponseInterface $response = NULL,
+        \Exception $exception = NULL
+    ) {
+        $urlHandler = $this->urlHandler->forUrl($request->getUri());
+        $event = new CrawlerExceptionEvent($request, $response, $exception, $this->queue, $urlHandler);
+        $this->getDispatcher()->dispatch(CrawlerEvents::EXCEPTION, $event);
     }
 }

@@ -5,6 +5,8 @@ namespace LastCall\Crawler\Configuration;
 use GuzzleHttp\Client;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
 use LastCall\Crawler\Queue\Driver\DriverInterface;
+use LastCall\Crawler\Queue\RequestQueue;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -14,12 +16,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class Configuration extends AbstractConfiguration
 {
 
-    public function __construct($baseUrl = NULL)
+    public function __construct($baseUrl = NULL, EventDispatcherInterface $dispatcher = NULL)
     {
         $this->baseUrl = $baseUrl;
         $this->client = new Client(['allow_redirects' => FALSE]);
-        $this->queueDriver = new ArrayDriver();
+        $this->queue = new RequestQueue(new ArrayDriver(), 'request');
         $this->urlHandler = new URLHandler($baseUrl);
+        $this->dispatcher = $dispatcher ?: new EventDispatcher();
     }
 
     public function setClient(Client $client)
@@ -34,9 +37,9 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    public function setQueueDriver(DriverInterface $driver)
+    public function setQueue(RequestQueueInterface $queue)
     {
-        $this->queueDriver = $driver;
+        $this->queue = $queue;
         return $this;
     }
 
@@ -46,11 +49,15 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    public function addSubscriber(EventSubscriberInterface $subscriber) {
-        $this->subscribers[] = $subscriber;
+    protected function getDispatcher() {
+        return $this->dispatcher;
     }
 
-    public function addListener($eventName, callable $callback) {
-        $this->listeners[$eventName][] = $callback;
+    public function addSubscriber(EventSubscriberInterface $subscriber) {
+        $this->dispatcher->addSubscriber($subscriber);
+    }
+
+    public function addListener($eventName, callable $listener, $priority = 0) {
+        $this->dispatcher->addListener($eventName, $listener, $priority);
     }
 }

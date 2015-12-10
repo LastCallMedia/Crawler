@@ -3,6 +3,9 @@
 namespace LastCall\Crawler\Configuration;
 
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
 interface ConfigurationInterface
 {
 
@@ -19,20 +22,25 @@ interface ConfigurationInterface
     /**
      * @return \LastCall\Crawler\Queue\Driver\DriverInterface
      */
-    public function getQueueDriver();
+    public function getQueue();
 
     /**
      * @return string
      */
     public function getBaseUrl();
 
-    /**
-     * @return \Symfony\Component\EventDispatcher\EventSubscriberInterface[]
-     */
-    public function getSubscribers();
+    public function onSetup();
 
-    /**
-     * @return array
-     */
-    public function getListeners();
+    public function onTeardown();
+
+    public function onRequestSending(RequestInterface $request);
+
+    public function onRequestSuccess(RequestInterface $request, ResponseInterface $response);
+
+    public function onRequestFailure(RequestInterface $request, ResponseInterface $response);
+
+    public function onRequestException(RequestInterface $request,
+        ResponseInterface $response = NULL,
+        \Exception $exception = NULL
+    );
 }
