@@ -15,6 +15,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testBaseUrl() {
         $config = new Configuration();
         $this->assertNull($config->getBaseUrl());
+        $config->setBaseUrl('http://google.com');
+        $this->assertEquals('http://google.com', $config->getBaseUrl());
         $config = new Configuration('http://google.com');
         $this->assertEquals('http://google.com', $config->getBaseUrl());
     }

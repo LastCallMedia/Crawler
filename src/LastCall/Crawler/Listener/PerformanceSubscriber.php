@@ -14,7 +14,7 @@ class PerformanceSubscriber implements EventSubscriberInterface
     /**
      * @var int
      */
-    private $interval = 5;
+    private $interval;
     /**
      * @var int
      */
@@ -45,8 +45,9 @@ class PerformanceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(OutputInterface $output)
+    public function __construct(OutputInterface $output, $interval = 5)
     {
+        $this->interval = $interval;
         $this->output = $output;
         $this->timer = new Stopwatch();
     }

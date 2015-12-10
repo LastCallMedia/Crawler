@@ -40,25 +40,8 @@ class CrawlerEvent extends Event
         $this->queue = $queue;
     }
 
-    public function setUrlHandler(URLHandler $handler) {
-        $this->urlHandler = $handler;
-    }
-
-    public function setQueue(RequestQueueInterface $queue) {
-        $this->queue = $queue;
-    }
-
     public function getQueue() {
         return $this->queue;
-    }
-
-    /**
-     * @return \LastCall\Crawler\Crawler
-     * @deprecated
-     */
-    public function getCrawler()
-    {
-        return $this->crawler;
     }
 
     public function getRequest()

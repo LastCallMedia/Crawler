@@ -46,11 +46,6 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    public function setSubscribers(array $subscribers)
-    {
-        $this->subscribers = $subscribers;
-    }
-
     public function addSubscriber(EventSubscriberInterface $subscriber) {
         $this->subscribers[] = $subscriber;
     }
