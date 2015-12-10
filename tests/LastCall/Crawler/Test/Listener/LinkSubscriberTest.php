@@ -9,6 +9,8 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\LinkSubscriber;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
+use LastCall\Crawler\Queue\QueueInterface;
+use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,19 +34,24 @@ class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testLinkScan($response, array $links)
     {
-        $crawler = $this->prophesize(Crawler::class);
-        $urlHandler = new URLHandler('http://google.com', 'http://google.com');
-        $crawler->getUrlHandler('http://google.com')->willReturn($urlHandler);
+        $queue = $this->prophesize(QueueInterface::class);
+        $urlHandler = new URLHandler('http://google.com');
 
         foreach($links as $link) {
-            $crawler->addRequest(Argument::that(function(Request $request) use ($link) {
+            $queue->push(Argument::that(function($request) use ($link) {
                 return $link === (string) $request->getUri();
-            }))->shouldBeCalled();
+            }), 'GET' . $link)->shouldBeCalled();
         }
 
         $request = new Request('GET', 'http://google.com');
-        $event = new CrawlerResponseEvent($crawler->reveal(), $request, $response);
+        $event = $this->prophesize(CrawlerResponseEvent::class);
+        $event->getQueue()->willReturn($queue);
+        $event->getUrlHandler()->willReturn($urlHandler);
+        $event->getRequest()->willReturn($request);
+        $event->getResponse()->willReturn($response);
+        $event->getDom()->willReturn(new DomCrawler((string)$response->getBody()));
+
         $subscriber = new LinkSubscriber();
-        $subscriber->onCrawlerSuccess($event);
+        $subscriber->onCrawlerSuccess($event->reveal());
     }
 }

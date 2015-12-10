@@ -123,14 +123,15 @@ class Crawler
         while($job = $this->queue->pop()) {
             $request = $job->getData();
             try {
-                $event = new CrawlerEvent($this, $request);
+                $event = new CrawlerEvent($request, $this->queue, $this->getUrlHandler($request->getUri()));
+
                 $this->dispatcher->dispatch(self::SENDING, $event);
                 $promise = $this->configuration->getClient()->sendAsync($job->getData())
                   ->then($this->getRequestFulfilledFn($request, $job), $this->getRequestRejectedFn($request, $job));
                 yield $promise;
             }
             catch(\Exception $e) {
-                $event = new CrawlerExceptionEvent($this, $request, $e);
+                $event = new CrawlerExceptionEvent($request, NULL, $e, $this->queue, $this->getUrlHandler($request->getUri()));
                 $this->dispatcher->dispatch(self::EXCEPTION, $event);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
@@ -143,10 +144,10 @@ class Crawler
             $this->queue->complete($job);
 
             try {
-                $event = new CrawlerResponseEvent($this, $request, $response);
+                $event = new CrawlerResponseEvent($request, $response, $this->queue, $this->getUrlHandler($request->getUri()));
                 $this->dispatcher->dispatch(self::SUCCESS, $event);
             } catch (\Exception $e) {
-                $event = new CrawlerExceptionEvent($this, $request, $e, $response);
+                $event = new CrawlerExceptionEvent($request, $response, $e, $this->queue, $this->getUrlHandler($request->getUri()));
                 $this->dispatcher->dispatch(self::EXCEPTION, $event);
                 throw $e;
             }
@@ -163,10 +164,10 @@ class Crawler
                 $response = $reason->getResponse();
 
                 try {
-                    $event = new CrawlerResponseEvent($this, $request, $response);
+                    $event = new CrawlerResponseEvent($request, $response, $this->queue, $this->getUrlHandler($request->getUri()));
                     $this->dispatcher->dispatch(self::FAIL, $event);
                 } catch (\Exception $e) {
-                    $event =  new CrawlerExceptionEvent($this, $request, $e, $response);
+                    $event =  new CrawlerExceptionEvent($request, $response, $e, $this->queue, $this->getUrlHandler($request->getUri()));
                     $this->dispatcher->dispatch(self::EXCEPTION, $event);
                     throw $e;
                 }

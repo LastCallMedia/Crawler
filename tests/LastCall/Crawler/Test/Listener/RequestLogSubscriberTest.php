@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Test\Listener;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RequestLogSubscriber;
@@ -24,9 +23,10 @@ class RequestLogSubscriberTest extends \PHPUnit_Framework_TestCase
         $subscriber = new RequestLogSubscriber($logger);
 
         $request = new Request('GET', 'http://google.com');
-        $crawler = $this->prophesize(Crawler::class)->reveal();
-        $event = new CrawlerEvent($crawler, $request);
-        $subscriber->onRequestSending($event);
+
+        $event = $this->prophesize(CrawlerEvent::class);
+        $event->getRequest()->willReturn($request);
+        $subscriber->onRequestSending($event->reveal());
     }
 
     public function testLogsResponse()
@@ -39,9 +39,11 @@ class RequestLogSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request('GET', 'http://google.com');
         $response = new Response(200);
-        $crawler = $this->prophesize(Crawler::class)->reveal();
-        $event = new CrawlerResponseEvent($crawler, $request, $response);
-        $subscriber->onRequestComplete($event);
+        $event = $this->prophesize(CrawlerResponseEvent::class);
+        $event->getRequest()->willReturn($request);
+        $event->getResponse()->willReturn($response);
+
+        $subscriber->onRequestComplete($event->reveal());
     }
 
     public function testLogsAlternateForms()
@@ -55,14 +57,15 @@ class RequestLogSubscriberTest extends \PHPUnit_Framework_TestCase
           ]);
         $subscriber = new RequestLogSubscriber($logger);
 
-
         $uri = new TraceableUri(new Uri('http://google.com/index.html'));
         $request = new Request('GET', $uri->withPath(''));
         $response = new Response(200);
-        $crawler = $this->prophesize(Crawler::class)->reveal();
-        $event = new CrawlerResponseEvent($crawler, $request, $response);
 
-        $subscriber->onRequestComplete($event);
+        $event = $this->prophesize(CrawlerResponseEvent::class);
+        $event->getRequest()->willReturn($request);
+        $event->getResponse()->willReturn($response);
+
+        $subscriber->onRequestComplete($event->reveal());
     }
 
 }

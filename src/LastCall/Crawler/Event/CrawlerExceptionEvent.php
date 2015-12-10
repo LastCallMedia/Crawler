@@ -3,6 +3,8 @@
 namespace LastCall\Crawler\Event;
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -14,12 +16,13 @@ class CrawlerExceptionEvent extends CrawlerEvent
     private $response;
 
     public function __construct(
-      Crawler $crawler,
       RequestInterface $request,
+      ResponseInterface $response = NULL,
       \Exception $exception,
-      ResponseInterface $response = null
+      QueueInterface $queue,
+      URLHandler $handler
     ) {
-        parent::__construct($crawler, $request);
+        parent::__construct($request, $queue, $handler);
         $this->response = $response;
         $this->exception = $exception;
     }

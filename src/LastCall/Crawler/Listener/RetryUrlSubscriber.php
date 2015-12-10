@@ -70,6 +70,7 @@ class RetryUrlSubscriber implements EventSubscriberInterface
     ) {
         $request = $event->getRequest();
         $uri = $request->getUri();
+        $queue = $event->getQueue();
 
         if ($uri instanceof TraceableUri) {
             if ($limitTo) {
@@ -78,14 +79,14 @@ class RetryUrlSubscriber implements EventSubscriberInterface
                 while ($uri = $uri->getPrevious()) {
                     if ($limitTo === (string) $uri) {
                         $newRequest = new Request('GET', $uri);
-                        $event->getCrawler()->addRequest($newRequest);
+                        $queue->push($newRequest, 'GET' . $uri);
 
                         return;
                     }
                 }
             } elseif ($uri = $uri->getPrevious()) {
                 $newRequest = new Request('GET', $uri);
-                $event->getCrawler()->addRequest($newRequest);
+                $queue->push($newRequest, 'GET' . $uri);
             }
         }
     }

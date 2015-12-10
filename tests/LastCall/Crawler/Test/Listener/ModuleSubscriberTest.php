@@ -9,8 +9,10 @@ use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\ModuleSubscriber;
 use LastCall\Crawler\Module\ModuleParser;
+use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use LastCall\Crawler\Queue\QueueInterface;
 
 class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -60,9 +62,10 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private function dispatchEvent(ModuleParser $parser, array $processors = [], LoggerInterface $logger = NULL)
     {
-        $crawler = new Crawler(new Configuration('http://google.com'));
+        $queue = $this->prophesize(QueueInterface::class);
+        $urlHandler = $this->prophesize(URLHandler::class);
         $request = new Request('GET', 'http://google.com');
-        $event = new CrawlerResponseEvent($crawler, $request, new Response());
+        $event = new CrawlerResponseEvent($request, new Response(), $queue->reveal(), $urlHandler->reveal());
         $subscriber = new ModuleSubscriber($parser, $processors, $logger);
         $subscriber->onCrawlerSuccess($event);
     }

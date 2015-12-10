@@ -3,6 +3,8 @@
 namespace LastCall\Crawler\Event;
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
@@ -18,11 +20,12 @@ class CrawlerResponseEvent extends CrawlerEvent
     private $dom;
 
     public function __construct(
-      Crawler $crawler,
       RequestInterface $request,
-      ResponseInterface $response
+      ResponseInterface $response,
+      QueueInterface $queue,
+      URLHandler $handler
     ) {
-        parent::__construct($crawler, $request);
+        parent::__construct($request, $queue, $handler);
         $this->response = $response;
     }
 

@@ -30,12 +30,13 @@ class RedirectSubscriber implements EventSubscriberInterface
             self::$redirectCodes) && $response->hasHeader('Location')
         ) {
             $urlHandler = $event->getUrlHandler();
-            $crawler = $event->getCrawler();
+            $queue = $event->getQueue();
 
             $location = $urlHandler->absolutizeUrl($response->getHeaderLine('Location'));
             if ($urlHandler->includesUrl($location) && $urlHandler->isCrawlable($location)) {
-                $crawler->addRequest(new Request('GET',
-                  $urlHandler->normalizeUrl($location)));
+                $normalUrl = $urlHandler->normalizeUrl($location);
+                $request = new Request('GET', $normalUrl);
+                $queue->push($request);
             }
         }
     }

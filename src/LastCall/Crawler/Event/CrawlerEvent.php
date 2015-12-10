@@ -4,6 +4,8 @@ namespace LastCall\Crawler\Event;
 
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerSession;
+use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -26,12 +28,34 @@ class CrawlerEvent extends Event
      */
     private $urlHandler;
 
-    public function __construct(Crawler $crawler, RequestInterface $request)
+    /**
+     * @var
+     */
+    private $queue;
+
+    public function __construct(RequestInterface $request, QueueInterface $queue, URLHandler $handler)
     {
-        $this->crawler = $crawler;
         $this->request = $request;
+        $this->urlHandler = $handler;
+        $this->queue = $queue;
     }
 
+    public function setUrlHandler(URLHandler $handler) {
+        $this->urlHandler = $handler;
+    }
+
+    public function setQueue(QueueInterface $queue) {
+        $this->queue = $queue;
+    }
+
+    public function getQueue() {
+        return $this->queue;
+    }
+
+    /**
+     * @return \LastCall\Crawler\Crawler
+     * @deprecated
+     */
     public function getCrawler()
     {
         return $this->crawler;
@@ -44,10 +68,6 @@ class CrawlerEvent extends Event
 
     public function getUrlHandler()
     {
-        if (!isset($this->urlHandler)) {
-            $this->urlHandler = $this->crawler->getUrlHandler($this->request->getUri());
-        }
-
         return $this->urlHandler;
     }
 }

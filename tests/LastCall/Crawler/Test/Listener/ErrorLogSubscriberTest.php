@@ -14,15 +14,16 @@ class ErrorLogSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testLogSubscriber()
     {
-        $crawler = $this->prophesize(Crawler::class)->reveal();
         $request = new Request('GET', 'http://google.com');
-        $event = new CrawlerExceptionEvent($crawler, $request, new \Exception('foo'));
-
         $logger = $this->prophesize('Psr\Log\LoggerInterface');
         $logger->error(Argument::type('Exception'),
           ['url' => 'http://google.com'])->shouldBeCalled();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new ErrorLogSubscriber($logger->reveal()));
-        $dispatcher->dispatch(Crawler::EXCEPTION, $event);
+
+        $event = $this->prophesize(CrawlerExceptionEvent::class);
+        $event->getRequest()->willReturn($request);
+        $event->getException()->willReturn(new \Exception('foo'));
+
+        $subscriber = new ErrorLogSubscriber($logger->reveal());
+        $subscriber->onRequestException($event->reveal());
     }
 }
