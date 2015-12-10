@@ -87,6 +87,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testItemIsCompletedOnFailure()
     {
         $configMock = $this->newMockCfg([new Response(400)]);
+
         $configMock->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
         $configMock->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
@@ -131,13 +132,16 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             ->shouldBeCalled();
         $config->onRequestSuccess(Argument::any(), Argument::any())
             ->willThrow(new \Exception('foo'));
-        $config->onRequestException(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class), Argument::type(\Exception::class))
+        $config->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
             ->shouldBeCalled();
 
         $crawler = new Crawler($config->reveal());
         $crawler->start(1, 'http://google.com')->wait();
     }
 
+    /**
+     * @group f
+     */
     public function testExceptionEventIsFiredOnFailureResponseException()
     {
         $config = $this->newMockCfg([new Response(400)]);
@@ -145,7 +149,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             ->shouldBeCalled();
         $config->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
             ->willThrow(new \Exception('foo'));
-        $config->onRequestException(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class), Argument::type(\Exception::class))
+        $config->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
             ->shouldBeCalled();
 
         $crawler = new Crawler($config->reveal());
@@ -157,7 +161,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $config = $this->newMockCfg([new Response(400)]);
         $config->onRequestSending(Argument::any(), Argument::any())
             ->willThrow(new \Exception('foo'));
-        $config->onRequestException(Argument::any(), Argument::any(), Argument::type('Exception'))
+        $config->onRequestException(Argument::any(), Argument::type('Exception'), NULL)
             ->shouldBeCalled();
 
         $crawler = new Crawler($config->reveal());

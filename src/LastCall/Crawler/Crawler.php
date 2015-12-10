@@ -105,7 +105,7 @@ class Crawler
                 yield $promise;
             }
             catch(\Exception $e) {
-                $this->configuration->onRequestException($request, NULL, $e);
+                $this->configuration->onRequestException($request, $e, NULL);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
         }
@@ -119,8 +119,8 @@ class Crawler
             try {
                 $this->configuration->onRequestSuccess($request, $response);
             } catch (\Exception $e) {
-                $this->configuration->onRequestException($request, $response,
-                    $e);
+                $this->configuration->onRequestException($request, $e,
+                    $response);
                 throw $e;
             }
             return $response;
@@ -138,8 +138,8 @@ class Crawler
                 try {
                     $this->configuration->onRequestFailure($request, $response);
                 } catch (\Exception $e) {
-                    $this->configuration->onRequestException($request,
-                        $response, $e);
+                    $this->configuration->onRequestException($request, $e,
+                        $response);
                     throw $e;
                 }
 

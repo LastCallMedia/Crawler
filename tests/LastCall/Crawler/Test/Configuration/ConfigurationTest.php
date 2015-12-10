@@ -109,6 +109,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::EXCEPTION, Argument::type(CrawlerExceptionEvent::class))->shouldBeCalledTimes(1);
         $config = new Configuration(NULL, $dispatcher->reveal());
-        $config->onRequestException(new Request('GET', 'http://google.com'), new Response(), new \Exception('foo'));
+        $config->onRequestException(new Request('GET', 'http://google.com'),
+            new \Exception('foo'), new Response());
     }
 }

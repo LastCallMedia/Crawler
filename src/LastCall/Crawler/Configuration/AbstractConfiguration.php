@@ -60,7 +60,7 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     }
 
     public function onSetup() {
-        $this->dispatcher->dispatch(CrawlerEvents::SETUP);
+        $this->getDispatcher()->dispatch(CrawlerEvents::SETUP);
     }
 
     public function onTeardown() {
@@ -87,8 +87,8 @@ abstract class AbstractConfiguration implements ConfigurationInterface
 
     public function onRequestException(
         RequestInterface $request,
-        ResponseInterface $response = NULL,
-        \Exception $exception = NULL
+        \Exception $exception,
+        ResponseInterface $response = NULL
     ) {
         $urlHandler = $this->urlHandler->forUrl($request->getUri());
         $event = new CrawlerExceptionEvent($request, $response, $exception, $this->queue, $urlHandler);

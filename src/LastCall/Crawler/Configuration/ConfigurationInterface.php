@@ -20,7 +20,7 @@ interface ConfigurationInterface
     public function getUrlHandler();
 
     /**
-     * @return \LastCall\Crawler\Queue\Driver\DriverInterface
+     * @return \LastCall\Crawler\Queue\RequestQueueInterface
      */
     public function getQueue();
 
@@ -39,8 +39,9 @@ interface ConfigurationInterface
 
     public function onRequestFailure(RequestInterface $request, ResponseInterface $response);
 
-    public function onRequestException(RequestInterface $request,
-        ResponseInterface $response = NULL,
-        \Exception $exception = NULL
+    public function onRequestException(
+        RequestInterface $request,
+        \Exception $exception,
+        ResponseInterface $response = NULL
     );
 }
