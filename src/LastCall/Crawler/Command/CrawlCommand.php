@@ -14,7 +14,7 @@ class CrawlCommand extends ConfigurableCommand
 
     public function configure()
     {
-        if(!$this->getName()) {
+        if (!$this->getName()) {
             $this->setName('crawl');
         }
 
@@ -38,7 +38,7 @@ class CrawlCommand extends ConfigurableCommand
         $configuration = $helper->getConfiguration($input->getArgument('config'), $output);
         $crawler = $helper->getCrawler($configuration, $input->getOption('profile'));
 
-        if($input->getOption('reset')) {
+        if ($input->getOption('reset')) {
             $crawler->teardown();
             $crawler->setUp();
         }
@@ -51,7 +51,7 @@ class CrawlCommand extends ConfigurableCommand
         $io = new SymfonyStyle($input, $output);
         $io->success('Crawling complete.');
 
-        if($input->getOption('profile')) {
+        if ($input->getOption('profile')) {
             $this->getHelper('profiler')->renderProfile($io);
         }
     }

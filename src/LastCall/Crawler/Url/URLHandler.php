@@ -3,9 +3,6 @@
 namespace LastCall\Crawler\Url;
 
 use GuzzleHttp\Psr7\Uri;
-use League\Uri\Modifiers\Resolve;
-use League\Uri\Schemes\Http;
-use League\Uri\UriParser;
 use Psr\Http\Message\UriInterface;
 
 /**

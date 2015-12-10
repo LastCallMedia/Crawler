@@ -18,7 +18,7 @@ class CrawlerHelper extends Helper
     }
 
     public function getCrawler(ConfigurationInterface $config, $profile = FALSE) {
-        if($profile && $this->getHelperSet()->has('profiler')) {
+        if ($profile && $this->getHelperSet()->has('profiler')) {
             $profiler = $this->getHelperSet()->get('profiler');
             $dispatcher = $profiler->getTraceableDispatcher(new EventDispatcher());
             return new Crawler($config, $dispatcher);
@@ -32,14 +32,14 @@ class CrawlerHelper extends Helper
      * @return \LastCall\Crawler\Configuration\ConfigurationInterface
      */
     public function getConfiguration($filename, OutputInterface $output) {
-        if(!is_file($filename)) {
+        if (!is_file($filename)) {
             throw new \InvalidArgumentException(sprintf('File does not exist: %s', $filename));
         }
         $configuration = require $filename;
-        if($configuration === 1) {
+        if ($configuration === 1) {
             throw new \RuntimeException('Configuration was not returned.');
         }
-        if(!$configuration instanceof ConfigurationInterface) {
+        if (!$configuration instanceof ConfigurationInterface) {
             throw new \RuntimeException(sprintf('Configuration must implement %s', ConfigurationInterface::class));
         }
         return $configuration;

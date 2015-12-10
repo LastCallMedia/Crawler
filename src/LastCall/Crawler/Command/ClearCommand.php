@@ -11,7 +11,7 @@ class ClearCommand extends ConfigurableCommand
 {
     public function configure()
     {
-        if(!$this->getName()) {
+        if (!$this->getName()) {
             $this->setName('clear');
         }
         $this->setDescription('Clear existing data.');

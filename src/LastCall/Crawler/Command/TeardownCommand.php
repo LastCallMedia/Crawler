@@ -11,7 +11,7 @@ class TeardownCommand extends ConfigurableCommand
 {
     public function configure()
     {
-        if(!$this->getName()) {
+        if (!$this->getName()) {
             $this->setName('teardown');
         }
         $this->setDescription('Tear down any dependencies after the crawler is run');

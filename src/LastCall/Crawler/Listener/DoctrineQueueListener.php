@@ -42,7 +42,7 @@ class DoctrineQueueListener implements EventSubscriberInterface
     }
 
     public function onTeardown() {
-        if($this->connection->getSchemaManager()->tablesExist([$this->tableName])) {
+        if ($this->connection->getSchemaManager()->tablesExist([$this->tableName])) {
             $this->connection->getSchemaManager()->dropTable($this->tableName);
         }
     }

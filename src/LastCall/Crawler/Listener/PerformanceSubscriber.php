@@ -61,7 +61,7 @@ class PerformanceSubscriber implements EventSubscriberInterface
         $this->completed++;
         $this->timer->lap('crawler.request');
 
-        if($this->completed % $this->interval == 0) {
+        if ($this->completed % $this->interval == 0) {
             $event = $this->timer->getEvent('crawler.request');
             $duration = $event->getDuration();
             $segments = count($event->getPeriods());

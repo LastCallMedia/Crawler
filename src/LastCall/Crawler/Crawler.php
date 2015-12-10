@@ -108,12 +108,12 @@ class Crawler
     }
 
     private function attachListeners() {
-        foreach($this->configuration->getListeners() as $eventName => $listeners) {
-            foreach($listeners as $listener) {
+        foreach ($this->configuration->getListeners() as $eventName => $listeners) {
+            foreach ($listeners as $listener) {
                 $this->dispatcher->addListener($eventName, $listener);
             }
         }
-        foreach($this->configuration->getSubscribers() as $subscriber) {
+        foreach ($this->configuration->getSubscribers() as $subscriber) {
             $this->dispatcher->addSubscriber($subscriber);
         }
     }

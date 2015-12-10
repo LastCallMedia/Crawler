@@ -11,7 +11,7 @@ class SetupCommand extends ConfigurableCommand
 {
     public function configure()
     {
-        if(!$this->getName()) {
+        if (!$this->getName()) {
             $this->setName('setup');
         }
         $this->setDescription('Set up any dependencies before the crawler is run');

@@ -33,8 +33,8 @@ class ProfilerHelper extends Helper
     public function renderProfile(OutputStyle $io) {
         $headers = array('Listener', 'Time');
         $rows = array();
-        foreach($this->stopwatch->getSections() as $section) {
-            foreach($section->getEvents() as $eventName => $event) {
+        foreach ($this->stopwatch->getSections() as $section) {
+            foreach ($section->getEvents() as $eventName => $event) {
                 $rows[] = [$eventName, $event->getDuration()];
             }
         }

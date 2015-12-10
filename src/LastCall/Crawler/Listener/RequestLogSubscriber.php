@@ -46,7 +46,7 @@ class RequestLogSubscriber implements EventSubscriberInterface
     {
         $uri = $event->getRequest()->getUri();
         $context = [];
-        if($uri instanceof TraceableUri) {
+        if ($uri instanceof TraceableUri) {
             $context = array(
               'previous' => (string) $uri->getPrevious(),
               'next' => (string) $uri->getNext(),

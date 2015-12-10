@@ -26,7 +26,7 @@ class DoctrineSetupSubscriber implements EventSubscriberInterface
     }
 
     public function onSetup() {
-        foreach($this->doctrine->getManagers() as $om) {
+        foreach ($this->doctrine->getManagers() as $om) {
             $tool = new SchemaTool($om);
             $metadatas = $om->getMetadataFactory()->getAllMetadata();
             $tool->createSchema($metadatas);
@@ -34,7 +34,7 @@ class DoctrineSetupSubscriber implements EventSubscriberInterface
     }
 
     public function onTeardown() {
-        foreach($this->doctrine->getManagers() as $om) {
+        foreach ($this->doctrine->getManagers() as $om) {
             $tool = new SchemaTool($om);
             $metadatas = $om->getMetadataFactory()->getAllMetadata();
             $tool->dropSchema($metadatas);
