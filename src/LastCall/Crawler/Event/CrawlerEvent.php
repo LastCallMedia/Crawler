@@ -14,11 +14,6 @@ class CrawlerEvent extends Event
 {
 
     /**
-     * @var \LastCall\Crawler\Crawler
-     */
-    private $crawler;
-
-    /**
      * @var \Psr\Http\Message\RequestInterface
      */
     private $request;
@@ -29,7 +24,7 @@ class CrawlerEvent extends Event
     private $urlHandler;
 
     /**
-     * @var
+     * @var \LastCall\Crawler\Queue\RequestQueueInterface
      */
     private $queue;
 
