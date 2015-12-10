@@ -4,8 +4,9 @@ namespace LastCall\Crawler\Queue;
 
 use LastCall\Crawler\Queue\Driver\DriverInterface;
 use LastCall\Crawler\Queue\Driver\UniqueJobInterface;
+use Psr\Http\Message\RequestInterface;
 
-class Queue implements QueueInterface
+class RequestQueue implements RequestQueueInterface
 {
 
     /**
@@ -24,17 +25,11 @@ class Queue implements QueueInterface
         $this->channel = $channel;
     }
 
-    public function push($data, $key = null)
+    public function push(RequestInterface $request)
     {
-        $job = new Job($this->channel, $data, $key);
-        if ($key) {
-            if ($this->driver instanceof UniqueJobInterface) {
-                return $this->driver->pushUnique($job, $key);
-            }
-            throw new \InvalidArgumentException('Driver does not handle unique items.');
-        } else {
-            return $this->driver->push($job);
-        }
+        $key = $request->getMethod() . $request->getUri();
+        $job = new Job($this->channel, $request, $key);
+        return $this->driver->push($job);
     }
 
     public function pop($leaseTime = 30)

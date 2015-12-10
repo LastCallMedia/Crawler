@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Listener;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -41,7 +41,7 @@ class LinkSubscriber implements EventSubscriberInterface
     private function scanLinks(
       DomCrawler $dom,
       URLHandler $urlHandler,
-      QueueInterface $queue
+      RequestQueueInterface $queue
     ) {
         // This is the same as the CSS selector a[href].
         // Converted to xpath for performance.
@@ -54,7 +54,7 @@ class LinkSubscriber implements EventSubscriberInterface
                     if ($urlHandler->isCrawlable($url)) {
                         $normalUrl = $urlHandler->normalizeUrl($url);
                         $request = new Request('GET', $normalUrl);
-                        $queue->push($request, 'GET'. $normalUrl);
+                        $queue->push($request);
                     }
                 }
             }

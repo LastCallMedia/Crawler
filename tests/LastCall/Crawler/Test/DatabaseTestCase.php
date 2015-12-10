@@ -33,7 +33,7 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
         $config->setProxyNamespace('DoctrineProxy');
 
         $driver = $config->newDefaultAnnotationDriver(array(
-          __DIR__ . '/../../../../src/LastCall/Crawler/Queue',
+          __DIR__ . '/../../../../src/LastCall/Crawler/RequestQueue',
         ), false);
         $config->setMetadataDriverImpl($driver);
 

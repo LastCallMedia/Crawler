@@ -15,7 +15,7 @@ All commands must be run on a given configuration.  A configuration is an instan
 * A Base URL (string)
 * A Guzzle HTTP Client instance (`GuzzleHttp\Client`)
 * A URL Handler (`LastCall\Crawler\Url\UrlHandler`)
-* A Queue Driver (`LastCall\Crawler\Queue\Driver\DriverInterface`)
+* A RequestQueue Driver (`LastCall\Crawler\RequestQueue\Driver\DriverInterface`)
 * Event listeners (PHP callables that respond to specific crawler events)
 * Event Subscribers (`Symfony\Component\EventDispatcher\EventSubscriberInterface`)
 

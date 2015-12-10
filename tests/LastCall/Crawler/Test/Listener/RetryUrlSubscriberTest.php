@@ -11,19 +11,19 @@ use LastCall\Crawler\Listener\RetryUrlSubscriber;
 use LastCall\Crawler\Url\TraceableUri;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 
 class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testRetriesOnFailure()
     {
-        $queue = $this->prophesize(QueueInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = new URLHandler('http://google.com');
 
         $queue->push(Argument::that(function($request) {
             return 'http://google.com/index.html' === (string) $request->getUri();
-        }, 'GEThttp://google.com/index.html'));
+        }));
 
         $originalUri = new TraceableUri(new Uri('http://google.com/index.html'));
         $uri = $originalUri->withPath('');
@@ -44,10 +44,10 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testRetryOnRedirectToOriginal()
     {
         $urlHandler = new URLHandler('http://google.com');
-        $queue = $this->prophesize(QueueInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->push(Argument::that(function($request) {
             return 'http://google.com/index.html' === (string) $request->getUri();
-        }), 'GEThttp://google.com/index.html')->shouldBeCalled();
+        }))->shouldBeCalled();
 
         $originalUri = new TraceableUri(new Uri('http://google.com/index.html'));
         $uri = $originalUri->withPath('');
@@ -68,7 +68,7 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testNoRetryOnRedirectToAnyOther()
     {
-        $queue = $this->prophesize(QueueInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->push()->shouldNotBeCalled();
 
         $urlHandler = new URLHandler('http://google.com');

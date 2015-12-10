@@ -31,7 +31,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $config->setClient($client);
 
         foreach($requests as $request) {
-            $config->getQueueDriver()->push(new Job('request', $request, $request->getMethod() . $request->getUri()));
+            $config->getQueueDriver()->push(new Job('request', $request));
         }
 
         return $config;

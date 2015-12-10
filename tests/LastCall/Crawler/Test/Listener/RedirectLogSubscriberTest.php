@@ -10,7 +10,7 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RedirectLogSubscriber;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 
 class RedirectLogSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class RedirectLogSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testLogsRedirect()
     {
         $logger = $this->prophesize('Psr\Log\LoggerInterface');
-        $queue = $this->prophesize(QueueInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = new URLHandler('http://google.com');
 
         $request = new Request('GET', 'http://google.com');

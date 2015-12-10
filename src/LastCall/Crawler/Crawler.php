@@ -11,7 +11,7 @@ use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Promise\PromiseIterator;
 use LastCall\Crawler\Queue\Job;
-use LastCall\Crawler\Queue\Queue;
+use LastCall\Crawler\Queue\RequestQueue;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -64,7 +64,7 @@ class Crawler
     {
         $this->dispatcher = $dispatcher ?: new EventDispatcher();
         $this->configuration = $config;
-        $this->queue = new Queue($config->getQueueDriver(), 'request');
+        $this->queue = new RequestQueue($config->getQueueDriver(), 'request');
         $this->attachListeners();
     }
 
@@ -80,7 +80,7 @@ class Crawler
 
     public function addRequest(RequestInterface $request)
     {
-        $this->queue->push($request, $request->getMethod() . $request->getUri());
+        $this->queue->push($request);
     }
 
     public function start($chunk = 5, $baseUrl = null)

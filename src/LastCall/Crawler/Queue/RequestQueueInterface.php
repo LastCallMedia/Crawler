@@ -3,10 +3,12 @@
 namespace LastCall\Crawler\Queue;
 
 
-interface QueueInterface
+use Psr\Http\Message\RequestInterface;
+
+interface RequestQueueInterface
 {
 
-    public function push($data);
+    public function push(RequestInterface $request);
 
     public function pop();
 

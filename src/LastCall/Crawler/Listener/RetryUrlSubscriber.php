@@ -79,14 +79,14 @@ class RetryUrlSubscriber implements EventSubscriberInterface
                 while ($uri = $uri->getPrevious()) {
                     if ($limitTo === (string) $uri) {
                         $newRequest = new Request('GET', $uri);
-                        $queue->push($newRequest, 'GET' . $uri);
+                        $queue->push($newRequest);
 
                         return;
                     }
                 }
             } elseif ($uri = $uri->getPrevious()) {
                 $newRequest = new Request('GET', $uri);
-                $queue->push($newRequest, 'GET' . $uri);
+                $queue->push($newRequest);
             }
         }
     }

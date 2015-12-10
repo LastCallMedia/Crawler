@@ -12,7 +12,7 @@ use LastCall\Crawler\Module\ModuleParser;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
-use LastCall\Crawler\Queue\QueueInterface;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 
 class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,7 +62,7 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private function dispatchEvent(ModuleParser $parser, array $processors = [], LoggerInterface $logger = NULL)
     {
-        $queue = $this->prophesize(QueueInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = $this->prophesize(URLHandler::class);
         $request = new Request('GET', 'http://google.com');
         $event = new CrawlerResponseEvent($request, new Response(), $queue->reveal(), $urlHandler->reveal());
