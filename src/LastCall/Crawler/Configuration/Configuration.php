@@ -15,6 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Configuration extends AbstractConfiguration
 {
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    private $dispatcher;
 
     public function __construct($baseUrl = NULL, EventDispatcherInterface $dispatcher = NULL)
     {

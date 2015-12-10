@@ -32,11 +32,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     protected $queue;
 
-    /**
-     * @var array
-     */
-    protected $listeners = array();
-
     abstract protected function getDispatcher();
 
     public function getClient()
