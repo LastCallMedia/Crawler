@@ -6,8 +6,8 @@ class CachedUrlHandler extends URLHandler
 {
 
     private $cache = [
-      'normalizeUrl' => [],
-      'absolutizeUrl' => [],
+        'normalizeUrl' => [],
+        'absolutizeUrl' => [],
     ];
 
     public function normalizeUrl($url)

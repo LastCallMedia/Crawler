@@ -3,17 +3,20 @@
 namespace LastCall\Crawler\Command;
 
 
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class ClearCommand extends ConfigurableCommand
+class ClearCommand extends Command
 {
     public function configure()
     {
         if (!$this->getName()) {
             $this->setName('clear');
         }
+        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
         $this->setDescription('Clear existing data.');
         parent::configure();
     }

@@ -3,13 +3,14 @@
 namespace LastCall\Crawler\Command;
 
 use LastCall\Crawler\CrawlerSession;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CrawlCommand extends ConfigurableCommand
+class CrawlCommand extends Command
 {
 
     public function configure()
@@ -19,6 +20,7 @@ class CrawlCommand extends ConfigurableCommand
         }
 
         $this->setDescription('Work through items in the request queue.');
+        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
         $this->addOption('chunk', null, InputOption::VALUE_OPTIONAL,
           'The amount of items to process.', 5);
         $this->addOption('profile', 'p', InputOption::VALUE_NONE,
