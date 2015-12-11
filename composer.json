@@ -9,12 +9,12 @@
         }
     ],
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "LastCall\\Crawler\\": "src/"
         }
     },
     "autoload-dev": {
-        "psr-0": {
+        "psr-4": {
             "LastCall\\Crawler\\Test\\": "tests/"
         }
     },

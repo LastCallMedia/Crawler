@@ -13,7 +13,7 @@
 
     <testsuites>
         <testsuite name="Crawler test suite">
-            <directory>./tests/LastCall</directory>
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
 
