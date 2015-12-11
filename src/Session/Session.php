@@ -15,6 +15,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Session implements SessionInterface {
 
+    /**
+     * @var \LastCall\Crawler\Configuration\ConfigurationInterface
+     */
+    private $configuration;
+    
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    private $dispatcher;
+
     public function __construct(ConfigurationInterface $configuration, EventDispatcherInterface $dispatcher) {
         $this->attachListeners($configuration, $dispatcher);
         $this->configuration = $configuration;
