@@ -12,6 +12,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 
 class Session implements SessionInterface
 {
@@ -95,11 +96,19 @@ class Session implements SessionInterface
 
     public function onSetup()
     {
+        $queue = $this->getQueue();
+        if($queue instanceof SetupTeardownInterface) {
+            $queue->onSetup();
+        }
         $this->dispatcher->dispatch(CrawlerEvents::SETUP);
     }
 
     public function onTeardown()
     {
+        $queue = $this->getQueue();
+        if($queue instanceof SetupTeardownInterface) {
+            $queue->onTeardown();
+        }
         $this->dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
 

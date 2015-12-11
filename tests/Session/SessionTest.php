@@ -16,6 +16,7 @@ use Prophecy\Argument;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 
 
 class SessionTest extends \PHPUnit_Framework_TestCase
@@ -183,5 +184,27 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $session = new Session($config->reveal(), $dispatcher->reveal());
         $session->onRequestException(new Request('GET', 'http://google.com'),
             new \Exception('foo'), new Response());
+    }
+
+    public function testSetsUpQueue() {
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $queue->willImplement(SetupTeardownInterface::class);
+        $queue->onSetup()->shouldBeCalled();
+
+        $config = $this->mockConfig([], [], $queue);
+        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $session->onSetup();
+    }
+
+    public function testTearsDownQueue() {
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $queue->willImplement(SetupTeardownInterface::class);
+        $queue->onTeardown()->shouldBeCalled();
+
+        $config = $this->mockConfig([], [], $queue);
+        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $session->onTeardown();
     }
 }
