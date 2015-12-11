@@ -38,6 +38,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         $this->connection->getSchemaManager()->dropAndCreateTable($table);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function pushUnique(Job $job, $key)
     {
         try {
@@ -51,6 +54,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function push(Job $job)
     {
         return $this->doPush($job, uniqid());
@@ -84,6 +90,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         ]) && $job->setIdentifier($key) && ($this->_cache[$job->getQueue()][$key] = true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function pop($channel, $leaseTime = 30)
     {
         $conn = $this->connection;
@@ -117,6 +126,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         return $return;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     private function hydrateRecord(array $record)
     {
         $refl = new \ReflectionClass('LastCall\Crawler\Queue\Job');
@@ -138,6 +150,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         return $job;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function complete(Job $job)
     {
         $ret = $this->connection->update($this->table, [
@@ -150,6 +165,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         return $ret === 1 && $job->setStatus(Job::COMPLETE)->setExpire(0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function release(Job $job)
     {
         $ret = $this->connection->update($this->table, [
@@ -161,6 +179,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         return $ret === 1 && $job->setStatus(Job::FREE)->setExpire(0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function count($channel, $status = Job::FREE)
     {
         $table = $this->table;

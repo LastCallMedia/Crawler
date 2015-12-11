@@ -10,7 +10,7 @@ interface DriverInterface
     /**
      * @param \LastCall\Crawler\Queue\Job $job
      *
-     * @return true|false A boolean indicating whether the job was added or not.
+     * @return boolean A boolean indicating whether the job was added or not.
      */
     public function push(Job $job);
 
@@ -24,14 +24,14 @@ interface DriverInterface
     /**
      * @param \LastCall\Crawler\Queue\Job $job
      *
-     * @return true|false A boolean indicating whether the job was completed.
+     * @return boolean A boolean indicating whether the job was completed.
      */
     public function complete(Job $job);
 
     /**
      * @param \LastCall\Crawler\Queue\Job $job
      *
-     * @return true|false A boolean indicating whether the job was released.
+     * @return boolean A boolean indicating whether the job was released.
      */
     public function release(Job $job);
 

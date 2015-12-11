@@ -14,7 +14,7 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
         return $this->doPush($job, $key);
     }
 
-    public function doPush(Job $job, $key)
+    private function doPush(Job $job, $key)
     {
         $channel = $job->getQueue();
         if (!isset($this->jobs[$channel][$key])) {
@@ -27,11 +27,17 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function push(Job $job)
     {
         return $this->doPush($job, uniqid());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function pop($channel, $leaseTime = 30)
     {
         if (empty($this->jobs[$channel])) {
@@ -48,6 +54,9 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function complete(Job $job)
     {
         $channel = $job->getQueue();
@@ -64,6 +73,9 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function release(Job $job)
     {
         $channel = $job->getQueue();
@@ -80,6 +92,9 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function count($channel, $status = Job::FREE)
     {
         if (empty($this->jobs[$channel])) {
@@ -99,6 +114,9 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
             }, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function inspect($channel)
     {
         if (empty($this->jobs[$channel])) {
