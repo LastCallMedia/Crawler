@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Listener;
 
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -12,8 +13,8 @@ class LogSetupSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents() {
         return array(
-            Crawler::SETUP => 'onSetup',
-            Crawler::TEARDOWN => 'onTeardown',
+            CrawlerEvents::SETUP => 'onSetup',
+            CrawlerEvents::TEARDOWN => 'onTeardown',
         );
     }
 

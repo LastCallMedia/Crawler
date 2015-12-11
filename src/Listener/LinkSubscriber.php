@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Listener;
 
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
@@ -19,7 +20,7 @@ class LinkSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          Crawler::SUCCESS => array('onCrawlerSuccess'),
+          CrawlerEvents::SUCCESS => array('onCrawlerSuccess'),
         );
     }
 

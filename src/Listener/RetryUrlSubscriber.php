@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Listener;
 
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Url\TraceableUri;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,8 +31,8 @@ class RetryUrlSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          Crawler::SUCCESS => 'onCrawlerSuccess',
-          Crawler::FAIL => 'onCrawlerFail',
+          CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
+          CrawlerEvents::FAIL => 'onCrawlerFail',
         );
     }
 

@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Listener;
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Entity\RequestLog;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
@@ -24,9 +25,9 @@ class RequestLogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          Crawler::SENDING => 'onRequestSending',
-          Crawler::FAIL => 'onRequestComplete',
-          Crawler::SUCCESS => 'onRequestComplete',
+          CrawlerEvents::SENDING => 'onRequestSending',
+          CrawlerEvents::FAIL => 'onRequestComplete',
+          CrawlerEvents::SUCCESS => 'onRequestComplete',
         );
     }
 

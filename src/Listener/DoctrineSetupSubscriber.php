@@ -6,6 +6,7 @@ namespace LastCall\Crawler\Listener;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DoctrineSetupSubscriber implements EventSubscriberInterface
@@ -13,8 +14,8 @@ class DoctrineSetupSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            Crawler::TEARDOWN => 'onTeardown',
-            Crawler::SETUP => 'onSetup'
+            CrawlerEvents::TEARDOWN => 'onTeardown',
+            CrawlerEvents::SETUP => 'onSetup'
         );
     }
 

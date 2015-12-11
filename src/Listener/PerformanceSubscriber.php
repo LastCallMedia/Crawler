@@ -3,7 +3,7 @@
 namespace LastCall\Crawler\Listener;
 
 
-use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,10 +38,10 @@ class PerformanceSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Crawler::SENDING => 'onSending',
-            Crawler::SUCCESS => 'onComplete',
-            Crawler::FAIL => 'onComplete',
-            Crawler::EXCEPTION => 'onComplete',
+            CrawlerEvents::SENDING => 'onSending',
+            CrawlerEvents::SUCCESS => 'onComplete',
+            CrawlerEvents::FAIL => 'onComplete',
+            CrawlerEvents::EXCEPTION => 'onComplete',
         ];
     }
 

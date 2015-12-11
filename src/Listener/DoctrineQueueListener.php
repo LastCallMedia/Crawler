@@ -6,14 +6,15 @@ namespace LastCall\Crawler\Listener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Table;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DoctrineQueueListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents() {
         return array(
-            Crawler::SETUP => 'onSetup',
-            Crawler::TEARDOWN => 'onTeardown',
+            CrawlerEvents::SETUP => 'onSetup',
+            CrawlerEvents::TEARDOWN => 'onTeardown',
         );
     }
 

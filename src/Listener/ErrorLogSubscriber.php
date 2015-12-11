@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Listener;
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,7 +22,7 @@ class ErrorLogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          Crawler::EXCEPTION => 'onRequestException',
+          CrawlerEvents::EXCEPTION => 'onRequestException',
         );
     }
 

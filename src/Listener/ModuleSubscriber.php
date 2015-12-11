@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Listener;
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Module\ModuleParser;
 use LastCall\Crawler\Module\ModuleProcessor;
@@ -75,7 +76,7 @@ class ModuleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          Crawler::SUCCESS => 'onCrawlerSuccess',
+          CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
         );
     }
 

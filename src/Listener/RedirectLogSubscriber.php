@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Listener;
 
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Entity\Redirect;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use Psr\Log\LoggerInterface;
@@ -21,7 +22,7 @@ class RedirectLogSubscriber extends RedirectSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-          Crawler::SUCCESS => 'onRequestSuccess',
+          CrawlerEvents::SUCCESS => 'onRequestSuccess',
         );
     }
 
