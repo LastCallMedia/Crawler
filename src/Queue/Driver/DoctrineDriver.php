@@ -6,10 +6,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Schema\Table;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Queue\Job;
 
-class DoctrineDriver implements DriverInterface, UniqueJobInterface
+class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardownInterface
 {
+
+    use \LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 
     private $connection;
 
@@ -21,21 +24,6 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
     {
         $this->connection = $connection;
         $this->table = $table;
-    }
-
-    public function createTable()
-    {
-        $table = new Table($this->table);
-        $table->addColumn('id', 'integer')->setAutoincrement(true);
-        $table->addColumn('identifier', 'binary', ['nullable' => true]);
-        $table->addColumn('queue', 'string');
-        $table->addColumn('status', 'integer');
-        $table->addColumn('expire', 'integer');
-        $table->addColumn('data', 'object');
-
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['identifier', 'queue'], 'queue_identifier');
-        $this->connection->getSchemaManager()->dropAndCreateTable($table);
     }
 
     /**
@@ -209,5 +197,22 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         }
     }
 
+    protected function getConnection()
+    {
+        return $this->connection;
+    }
 
+    protected function getTables()
+    {
+        $table = new Table($this->table);
+        $table->addColumn('id', 'integer')->setAutoincrement(true);
+        $table->addColumn('identifier', 'binary', ['nullable' => true]);
+        $table->addColumn('queue', 'string');
+        $table->addColumn('status', 'integer');
+        $table->addColumn('expire', 'integer');
+        $table->addColumn('data', 'object');
+        $table->setPrimaryKey(['id']);
+
+        return [$table];
+    }
 }

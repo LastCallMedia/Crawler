@@ -187,6 +187,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     protected function assertUrlEquals($expected, $url)
     {
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
-        $this->assertEquals($expected, (string) $url);
+        $this->assertEquals($expected, (string)$url);
     }
 }

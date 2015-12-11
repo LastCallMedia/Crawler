@@ -2,10 +2,11 @@
 
 namespace LastCall\Crawler\Queue;
 
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Queue\Driver\DriverInterface;
 use Psr\Http\Message\RequestInterface;
 
-class RequestQueue implements RequestQueueInterface
+class RequestQueue implements RequestQueueInterface, SetupTeardownInterface
 {
 
     /**
@@ -50,5 +51,19 @@ class RequestQueue implements RequestQueueInterface
     public function count($status = Job::FREE)
     {
         return $this->driver->count($this->channel, $status);
+    }
+
+    public function onSetup()
+    {
+        if ($this->driver instanceof SetupTeardownInterface) {
+            $this->driver->onSetup();
+        }
+    }
+
+    public function onTeardown()
+    {
+        if ($this->driver instanceof SetupTeardownInterface) {
+            $this->driver->onTeardown();
+        }
     }
 }

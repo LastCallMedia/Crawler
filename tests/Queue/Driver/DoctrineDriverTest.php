@@ -18,7 +18,7 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
             'memory' => true,
         ]);
         $driver = new DoctrineDriver($connection);
-        $driver->createTable();
+        $driver->onSetup();
 
         return $driver;
     }

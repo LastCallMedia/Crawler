@@ -12,11 +12,11 @@ class TraceableUriTest extends \PHPUnit_Framework_TestCase
     {
         $uri = new TraceableUri(new Uri('http://google.com/index.html#foo'));
         $uri = $uri->withPath('')->withFragment(false);
-        $this->assertEquals('http://google.com', (string) $uri);
+        $this->assertEquals('http://google.com', (string)$uri);
         $this->assertEquals('http://google.com#foo',
-            (string) $uri->getPrevious());
+            (string)$uri->getPrevious());
         $this->assertEquals('http://google.com/index.html#foo',
-            (string) $uri->getPrevious()->getPrevious());
+            (string)$uri->getPrevious()->getPrevious());
         $this->assertEquals(null,
             $uri->getPrevious()->getPrevious()->getPrevious());
     }

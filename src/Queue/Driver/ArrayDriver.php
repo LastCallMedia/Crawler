@@ -125,5 +125,4 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
 
         return $this->jobs[$channel];
     }
-
 }

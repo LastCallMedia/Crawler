@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RetryUrlSubscriber;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\TraceableUri;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
@@ -25,14 +24,14 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', $uri);
         $response = new Response(404);
 
-        $event = new CrawlerResponseEvent($request, $response,
-            $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
         $subscriber = new RetryUrlSubscriber();
         $subscriber->onCrawlerFail($event);
         $added = $event->getAdditionalRequests();
         $this->assertCount(1, $added);
-        $this->assertEquals('http://google.com/index.html', (string) $added[0]->getUri());
+        $this->assertEquals('http://google.com/index.html',
+            (string)$added[0]->getUri());
     }
 
     public function testRetryOnRedirectToOriginal()
@@ -45,15 +44,15 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $response = new Response(301,
             ['Location' => 'http://google.com/index.html']);
 
-        $event = new CrawlerResponseEvent($request, $response,
-            $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
         $subscriber = new RetryUrlSubscriber();
         $subscriber->onCrawlerSuccess($event);
 
         $added = $event->getAdditionalRequests();
         $this->assertCount(1, $added);
-        $this->assertEquals('http://google.com/index.html', $added[0]->getUri());
+        $this->assertEquals('http://google.com/index.html',
+            $added[0]->getUri());
     }
 
     public function testNoRetryOnRedirectToAnyOther()
@@ -69,8 +68,7 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', $uri);
         $response = new Response(301, ['Location' => 'http://google.com/foo']);
 
-        $event = new CrawlerResponseEvent($request, $response,
-            $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
         $subscriber = new RetryUrlSubscriber();
         $subscriber->onCrawlerSuccess($event);

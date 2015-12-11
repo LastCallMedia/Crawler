@@ -4,13 +4,10 @@ namespace LastCall\Crawler\Test\Listener;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\LinkSubscriber;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,7 +43,7 @@ class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
         $requestsAdded = $event->getAdditionalRequests();
 
         $added = array();
-        foreach($requestsAdded as $requestAdded) {
+        foreach ($requestsAdded as $requestAdded) {
             $added[] = (string)$requestAdded->getUri();
         }
         $this->assertEquals($links, $added);

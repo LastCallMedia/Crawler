@@ -7,7 +7,6 @@ use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\ModuleSubscriber;
 use LastCall\Crawler\Module\ModuleParser;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;

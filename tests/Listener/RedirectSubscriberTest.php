@@ -6,7 +6,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RedirectSubscriber;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 
@@ -19,8 +18,7 @@ class RedirectSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request('GET', 'http://google.com');
         $response = new Response(301, ['Location' => '/foo']);
-        $event = new CrawlerResponseEvent($request, $response,
-            $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
         $subscriber = new RedirectSubscriber();
         $subscriber->onResponse($event);

@@ -80,7 +80,7 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new URLHandler($base, $current);
         $this->assertEquals($expected,
-            (string) $handler->absolutizeUrl($toProcess));
+            (string)$handler->absolutizeUrl($toProcess));
     }
 
     /**
@@ -94,7 +94,7 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     ) {
         $handler = new CachedUrlHandler($base, $current);
         $this->assertEquals($expected,
-            (string) $handler->absolutizeUrl($toProcess));
+            (string)$handler->absolutizeUrl($toProcess));
     }
 
     /**
@@ -108,7 +108,7 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
             ->will(new ReturnArgumentPromise());
         $handler = new URLHandler($base, $current, null, $normalizer->reveal());
         $this->assertEquals($expected,
-            (string) $handler->normalizeUrl($toProcess));
+            (string)$handler->normalizeUrl($toProcess));
     }
 
     /**
@@ -127,7 +127,7 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
         $handler = new CachedUrlHandler($base, $current, null,
             $normalizer->reveal());
         $this->assertEquals($expected,
-            (string) $handler->normalizeUrl($toProcess));
+            (string)$handler->normalizeUrl($toProcess));
     }
 
     public function testIncludesUrl()
