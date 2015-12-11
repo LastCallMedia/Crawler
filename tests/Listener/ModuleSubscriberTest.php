@@ -62,11 +62,10 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
         array $processors = [],
         LoggerInterface $logger = null
     ) {
-        $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = $this->prophesize(URLHandler::class);
         $request = new Request('GET', 'http://google.com');
         $event = new CrawlerResponseEvent($request, new Response(),
-            $queue->reveal(), $urlHandler->reveal());
+            $urlHandler->reveal());
         $subscriber = new ModuleSubscriber($parser, $processors, $logger);
         $subscriber->onCrawlerSuccess($event);
     }

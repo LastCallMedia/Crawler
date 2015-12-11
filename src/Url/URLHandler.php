@@ -53,7 +53,7 @@ class URLHandler
      *
      * @param string|\Psr\Http\Message\UriInterface $url
      *
-     * @return \Psr\Http\Message\UriInterface
+     * @return string|\Psr\Http\Message\UriInterface
      */
     public function absolutizeUrl($url)
     {

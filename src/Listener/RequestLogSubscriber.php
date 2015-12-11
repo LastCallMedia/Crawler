@@ -3,7 +3,6 @@
 namespace LastCall\Crawler\Listener;
 
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Entity\RequestLog;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Url\TraceableUri;

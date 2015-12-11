@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Test\Listener;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\LinkSubscriber;
 use LastCall\Crawler\Queue\RequestQueueInterface;
@@ -35,25 +36,20 @@ class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testLinkScan($response, array $links)
     {
-        $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = new URLHandler('http://google.com');
 
-        foreach ($links as $link) {
-            $queue->push(Argument::that(function ($request) use ($link) {
-                return $link === (string) $request->getUri();
-            }))->shouldBeCalled();
-        }
-
         $request = new Request('GET', 'http://google.com');
-        $event = $this->prophesize(CrawlerResponseEvent::class);
-        $event->getQueue()->willReturn($queue);
-        $event->getUrlHandler()->willReturn($urlHandler);
-        $event->getRequest()->willReturn($request);
-        $event->getResponse()->willReturn($response);
-        $event->getDom()
-            ->willReturn(new DomCrawler((string) $response->getBody()));
+        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
         $subscriber = new LinkSubscriber();
-        $subscriber->onCrawlerSuccess($event->reveal());
+        $subscriber->onCrawlerSuccess($event);
+        $requestsAdded = $event->getAdditionalRequests();
+
+        $added = array();
+        foreach($requestsAdded as $requestAdded) {
+            $added[] = (string)$requestAdded->getUri();
+        }
+        $this->assertEquals($links, $added);
+
     }
 }

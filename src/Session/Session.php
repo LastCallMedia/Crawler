@@ -103,12 +103,19 @@ class Session implements SessionInterface
         $this->dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
 
+    private function dispatch($eventName, CrawlerEvent $event)
+    {
+        $this->dispatcher->dispatch($eventName, $event);
+        foreach ($event->getAdditionalRequests() as $request) {
+            $this->getQueue()->push($request);
+        }
+    }
+
     public function onRequestSending(RequestInterface $request)
     {
         $handler = $this->getHandler($request->getUri());
-        $queue = $this->getQueue();
-        $event = new CrawlerEvent($request, $queue, $handler);
-        $this->dispatcher->dispatch(CrawlerEvents::SENDING, $event);
+        $event = new CrawlerEvent($request, $handler);
+        $this->dispatch(CrawlerEvents::SENDING, $event);
     }
 
     public function onRequestSuccess(
@@ -116,10 +123,8 @@ class Session implements SessionInterface
         ResponseInterface $response
     ) {
         $handler = $this->getHandler($request->getUri());
-        $queue = $this->getQueue();
-        $event = new CrawlerResponseEvent($request, $response, $queue,
-            $handler);
-        $this->dispatcher->dispatch(CrawlerEvents::SUCCESS, $event);
+        $event = new CrawlerResponseEvent($request, $response, $handler);
+        $this->dispatch(CrawlerEvents::SUCCESS, $event);
     }
 
     public function onRequestFailure(
@@ -127,10 +132,8 @@ class Session implements SessionInterface
         ResponseInterface $response
     ) {
         $handler = $this->getHandler($request->getUri());
-        $queue = $this->getQueue();
-        $event = new CrawlerResponseEvent($request, $response, $queue,
-            $handler);
-        $this->dispatcher->dispatch(CrawlerEvents::FAILURE, $event);
+        $event = new CrawlerResponseEvent($request, $response, $handler);
+        $this->dispatch(CrawlerEvents::FAILURE, $event);
     }
 
     public function onRequestException(
@@ -139,10 +142,9 @@ class Session implements SessionInterface
         ResponseInterface $response = null
     ) {
         $handler = $this->getHandler($request->getUri());
-        $queue = $this->getQueue();
         $event = new CrawlerExceptionEvent($request, $response, $exception,
-            $queue, $handler);
-        $this->dispatcher->dispatch(CrawlerEvents::EXCEPTION, $event);
+            $handler);
+        $this->dispatch(CrawlerEvents::EXCEPTION, $event);
     }
 
 

@@ -17,13 +17,12 @@ class RedirectLogSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testLogsRedirect()
     {
         $logger = $this->prophesize('Psr\Log\LoggerInterface');
-        $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = new URLHandler('http://google.com');
 
         $request = new Request('GET', 'http://google.com');
         $response = new Response(302, ['Location' => '/foo']);
 
-        $event = new CrawlerResponseEvent($request, $response, $queue->reveal(),
+        $event = new CrawlerResponseEvent($request, $response,
             $urlHandler);
         $subscriber = new RedirectLogSubscriber($logger->reveal());
         $subscriber->onRequestSuccess($event);
