@@ -67,11 +67,6 @@ class Job
         return $this->queue;
     }
 
-    public function setQueue($queue)
-    {
-        $this->queue = $queue;
-    }
-
     public function getStatus()
     {
         return $this->status;
