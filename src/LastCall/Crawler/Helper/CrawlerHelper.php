@@ -5,6 +5,7 @@ namespace LastCall\Crawler\Helper;
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\Session\Session;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -18,12 +19,13 @@ class CrawlerHelper extends Helper
     }
 
     public function getCrawler(ConfigurationInterface $config, $profile = FALSE) {
+        $dispatcher = new EventDispatcher();
         if ($profile && $this->getHelperSet()->has('profiler')) {
             $profiler = $this->getHelperSet()->get('profiler');
-            $dispatcher = $profiler->getTraceableDispatcher(new EventDispatcher());
-            return new Crawler($config, $dispatcher);
+            $dispatcher = $profiler->getTraceableDispatcher($dispatcher);
         }
-        return new Crawler($config);
+        $session = new Session($config, $dispatcher);
+        return new Crawler($session);
     }
 
     /**

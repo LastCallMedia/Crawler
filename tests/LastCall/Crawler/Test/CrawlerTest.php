@@ -3,21 +3,20 @@
 namespace LastCall\Crawler\Test;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
 use LastCall\Crawler\Queue\Job;
 use LastCall\Crawler\Queue\RequestQueue;
 use Prophecy\Argument;
-use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use LastCall\Crawler\Session\SessionInterface;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,166 +29,153 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         return new Client(['handler' => HandlerStack::create($handler)]);
     }
 
-    protected function mockConfiguration(array $responses = [], array $requests = []) {
-        $handler = new MockHandler($responses);
-        $client = new Client(['handler' => HandlerStack::create($handler)]);
-        $config = new Configuration('http://google.com');
-        $config->setClient($client);
-
-        foreach($requests as $request) {
-            $config->getQueueDriver()->push(new Job('request', $request));
+    protected function getMockSession($queue = NULL, $client = NULL) {
+        if(!$queue) {
+            $queue = $this->getMock(RequestQueueInterface::class);
+        }
+        if(!$client) {
+            $client = $this->prophesize(ClientInterface::class);
         }
 
-        return $config;
-    }
-
-    protected function newMockCfg(array $responses) {
-        $config = $this->prophesize(ConfigurationInterface::class);
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
-        $handler = new MockHandler($responses);
-        $client = new Client(['handler' => HandlerStack::create($handler)]);
-        $config->getQueue()->willReturn($queue);
-        $config->getClient()->willReturn($client);
-
-        return $config;
+        $session = $this->prophesize(SessionInterface::class);
+        $session->getStartUrl(Argument::type('string'))->willReturnArgument(0);
+        $session->getQueue()->willReturn($queue);
+        $session->getClient()->willReturn($client);
+        $session->isFinished()->will(function() use ($queue) {
+            return $queue->count() === 0;
+        });
+        return $session;
     }
 
     public function testTeardownEventIsDispatched() {
-        $config = $this->newMockCfg([]);
-        $config->onTeardown()->shouldBeCalled();
+        $session = $this->getMockSession();
+        $session->onTeardown()->shouldBeCalledTimes(1);
 
-        $crawler = new Crawler($config->reveal());
+        $crawler = new Crawler($session->reveal());
         $crawler->teardown();
     }
 
     public function testSetupEventIsDispatched() {
-        $config = $this->newMockCfg([]);
-        $config->onSetup()->shouldBeCalled();
+        $session = $this->getMockSession();
+        $session->onSetup()->shouldBeCalledTimes(1);
 
-        $crawler = new Crawler($config->reveal());
+        $crawler = new Crawler($session->reveal());
         $crawler->setUp();
     }
 
     public function testItemIsCompletedOnSuccess()
     {
-        $configMock = $this->newMockCfg([new Response()]);
-        $configMock->onRequestSending(Argument::type(RequestInterface::class))
+        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $client = $this->mockClient([new Response(200)]);
+
+        $session = $this->getMockSession($queue, $client);
+
+        $session->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
-        $configMock->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
+        $session->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
             ->shouldBeCalled();
 
-        $config = $configMock->reveal();
-        $crawler = new Crawler($config);
+        $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
-        $this->assertEquals(1, $config->getQueue()->count(Job::COMPLETE));
+        $this->assertEquals(1, $queue->count(Job::COMPLETE));
     }
+
 
     public function testItemIsCompletedOnFailure()
     {
-        $configMock = $this->newMockCfg([new Response(400)]);
+        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $client = $this->mockClient([new Response(400)]);
 
-        $configMock->onRequestSending(Argument::type(RequestInterface::class))
+        $session = $this->getMockSession($queue, $client);
+
+        $session->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
-        $configMock->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
+        $session->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
             ->shouldBeCalled();
 
-        $config = $configMock->reveal();
-        $crawler = new Crawler($config);
+        $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
-        $this->assertEquals(1, $config->getQueue()->count(Job::COMPLETE));
-    }
-
-    public function testSuccessEventIsFiredOnSuccess()
-    {
-        $config = $this->newMockCfg([new Response(200)]);
-        $config->onRequestSending(Argument::type(RequestInterface::class))
-            ->shouldBeCalled();
-
-        $config->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
-            ->shouldBeCalled();
-
-        $crawler = new Crawler($config->reveal());
-        $crawler->start(1, 'http://google.com')->wait();
-    }
-
-    public function testFailureEventIsFiredOnFailure()
-    {
-        $config = $this->newMockCfg([new Response(400)]);
-        $config->onRequestSending(Argument::type(RequestInterface::class))
-            ->shouldBeCalled();
-
-        $config->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
-            ->shouldBeCalled();
-
-        $crawler = new Crawler($config->reveal());
-        $crawler->start(1, 'http://google.com')->wait(FALSE);
+        $this->assertEquals(1, $queue->count(Job::COMPLETE));
     }
 
     public function testExceptionEventIsFiredOnSuccesfulResponseException()
     {
-        $config = $this->newMockCfg([new Response(200)]);
-        $config->onRequestSending(Argument::any(), Argument::any())
+        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $client = $this->mockClient([new Response(200)]);
+        $session = $this->getMockSession($queue, $client);
+
+        $session->onRequestSending(Argument::any(), Argument::any())
             ->shouldBeCalled();
-        $config->onRequestSuccess(Argument::any(), Argument::any())
+        $session->onRequestSuccess(Argument::any(), Argument::any())
             ->willThrow(new \Exception('foo'));
-        $config->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
+        $session->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
             ->shouldBeCalled();
 
-        $crawler = new Crawler($config->reveal());
+        $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
+        $this->assertEquals(1, $queue->count(Job::COMPLETE));
     }
 
-    /**
-     * @group f
-     */
     public function testExceptionEventIsFiredOnFailureResponseException()
     {
-        $config = $this->newMockCfg([new Response(400)]);
-        $config->onRequestSending(Argument::any(), Argument::any())
+        $client = $this->mockClient([new Response(400)]);
+        $queue = new RequestQueue(new ArrayDriver(), 'request');
+
+        $session = $this->getMockSession($queue, $client);
+
+        $session->onRequestSending(Argument::any(), Argument::any())
             ->shouldBeCalled();
-        $config->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
+        $session->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
             ->willThrow(new \Exception('foo'));
-        $config->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
+        $session->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
             ->shouldBeCalled();
 
-        $crawler = new Crawler($config->reveal());
+        $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
+        $this->assertEquals(1, $queue->count(Job::COMPLETE));
     }
+
 
     public function testExceptionEventIsFiredOnSendingException()
     {
-        $config = $this->newMockCfg([new Response(400)]);
-        $config->onRequestSending(Argument::any(), Argument::any())
+        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $client = $this->mockClient([new Response(400)]);
+
+        $session = $this->getMockSession($queue, $client);
+
+        $session->onRequestSending(Argument::any(), Argument::any())
             ->willThrow(new \Exception('foo'));
-        $config->onRequestException(Argument::any(), Argument::type('Exception'), NULL)
+        $session->onRequestException(Argument::any(), Argument::type('Exception'), NULL)
             ->shouldBeCalled();
 
-        $crawler = new Crawler($config->reveal());
+        $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
+
+        // @todo: Should this job be completed?
+//        $this->assertEquals(1, $queue->count(Job::COMPLETE));
     }
 
     public function testQueueIsWorkedUntilEmpty() {
         $responses = array_fill(0, 2, new Response(200));
         $count = 0;
-        $configMock = $this->newMockCfg($responses);
 
-        $configMock->onRequestSending(Argument::type(RequestInterface::class))->shouldBeCalled();
+        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $client = $this->mockClient($responses);
+        $session = $this->getMockSession($queue, $client);
 
-        $configMock->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
-            ->will(function($args) use (&$config, &$count) {
+        $session->onRequestSending(Argument::type(RequestInterface::class))->shouldBeCalled();
+        $session->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
+            ->will(function($args) use (&$queue, &$count) {
                 $request = $args[0];
                 if($request->getUri() == 'http://google.com/1') {
-                    $config->getQueue()->push(new Request('GET', 'http://google.com/2'));
+                    $queue->push(new Request('GET', 'http://google.com/2'));
                 }
                 $count++;
             });
 
-        $config = $configMock->reveal();
-        $crawler = new Crawler($config);
+        $crawler = new Crawler($session->reveal());
+        $crawler->start(5, 'http://google.com/1')->wait();
 
-        $promise = $crawler->start(5, 'http://google.com/1');
-
-        $promise->wait();
         $this->assertEquals(2, $count);
     }
 }

@@ -15,18 +15,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Configuration extends AbstractConfiguration
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
-     */
-    private $dispatcher;
 
-    public function __construct($baseUrl = NULL, EventDispatcherInterface $dispatcher = NULL)
+    public function __construct($baseUrl = NULL)
     {
         $this->baseUrl = $baseUrl;
         $this->client = new Client(['allow_redirects' => FALSE]);
         $this->queue = new RequestQueue(new ArrayDriver(), 'request');
         $this->urlHandler = new URLHandler($baseUrl);
-        $this->dispatcher = $dispatcher ?: new EventDispatcher();
     }
 
     public function setClient(Client $client)
@@ -53,15 +48,11 @@ class Configuration extends AbstractConfiguration
         return $this;
     }
 
-    protected function getDispatcher() {
-        return $this->dispatcher;
-    }
-
     public function addSubscriber(EventSubscriberInterface $subscriber) {
-        $this->dispatcher->addSubscriber($subscriber);
+        $this->subscribers[] = $subscriber;
     }
 
     public function addListener($eventName, callable $listener, $priority = 0) {
-        $this->dispatcher->addListener($eventName, $listener, $priority);
+        $this->listeners[$eventName][] = [$listener, $priority];
     }
 }

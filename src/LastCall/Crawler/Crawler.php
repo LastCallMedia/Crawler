@@ -5,8 +5,8 @@ namespace LastCall\Crawler;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Queue\Job;
+use LastCall\Crawler\Session\SessionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -48,21 +48,11 @@ class Crawler
     /**
      * @param array|\LastCall\Crawler\Configuration\ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config)
+    public function __construct(SessionInterface $session)
     {
-        $this->configuration = $config;
-        $this->queue = $config->getQueue();
-    }
-
-    /**
-     * @param $uri
-     *
-     * @return \LastCall\Crawler\Url\URLHandler
-     * @deprecated
-     */
-    public function getUrlHandler($uri)
-    {
-        return $this->configuration->getUrlHandler()->forUrl($uri);
+        $this->session = $session;
+        $this->queue = $session->getQueue();
+        $this->client = $session->getClient();
     }
 
     public function addRequest(RequestInterface $request)
@@ -72,8 +62,8 @@ class Crawler
 
     public function start($chunk = 5, $baseUrl = null)
     {
-        $baseUrl = $baseUrl ?: $this->configuration->getBaseUrl();
-        $this->addRequest(new Request('GET', $baseUrl));
+        $start = $this->session->getStartUrl($baseUrl);
+        $this->addRequest(new Request('GET', $start));
 
         // We need to use a double loop of generators here, because
         // if $chunk is greater than the number of items in the queue,
@@ -82,9 +72,9 @@ class Crawler
 
         // The outer generator ($gen) restarts the processing in that case.
         $gen = function() use ($chunk) {
-            while($this->queue->count()) {
+            while(!$this->session->isFinished()) {
                 $inner = new EachPromise($this->getRequestWorkerFn(), [
-                  'concurrency' => $chunk
+                    'concurrency' => $chunk
                 ]);
                 yield $inner->promise();
             }
@@ -99,13 +89,13 @@ class Crawler
         while($job = $this->queue->pop()) {
             $request = $job->getData();
             try {
-                $this->configuration->onRequestSending($request);
-                $promise = $this->configuration->getClient()->sendAsync($job->getData())
+                $this->session->onRequestSending($request);
+                $promise = $this->client->sendAsync($job->getData())
                   ->then($this->getRequestFulfilledFn($request, $job), $this->getRequestRejectedFn($request, $job));
                 yield $promise;
             }
             catch(\Exception $e) {
-                $this->configuration->onRequestException($request, $e, NULL);
+                $this->session->onRequestException($request, $e, NULL);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
         }
@@ -117,9 +107,9 @@ class Crawler
             $this->queue->complete($job);
 
             try {
-                $this->configuration->onRequestSuccess($request, $response);
+                $this->session->onRequestSuccess($request, $response);
             } catch (\Exception $e) {
-                $this->configuration->onRequestException($request, $e,
+                $this->session->onRequestException($request, $e,
                     $response);
                 throw $e;
             }
@@ -136,9 +126,9 @@ class Crawler
                 $response = $reason->getResponse();
 
                 try {
-                    $this->configuration->onRequestFailure($request, $response);
+                    $this->session->onRequestFailure($request, $response);
                 } catch (\Exception $e) {
-                    $this->configuration->onRequestException($request, $e,
+                    $this->session->onRequestException($request, $e,
                         $response);
                     throw $e;
                 }
@@ -151,10 +141,10 @@ class Crawler
     }
 
     public function setUp() {
-        $this->configuration->onSetup();
+        $this->session->onSetup();
     }
 
     public function teardown() {
-        $this->configuration->onTeardown();
+        $this->session->onTeardown();
     }
 }

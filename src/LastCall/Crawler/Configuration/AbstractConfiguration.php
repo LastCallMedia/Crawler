@@ -32,7 +32,10 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     protected $queue;
 
-    abstract protected function getDispatcher();
+    protected $subscribers = array();
+
+    protected $listeners = array();
+
 
     public function getClient()
     {
@@ -54,39 +57,11 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         return $this->baseUrl;
     }
 
-    public function onSetup() {
-        $this->getDispatcher()->dispatch(CrawlerEvents::SETUP);
+    public function getSubscribers() {
+        return $this->subscribers;
     }
 
-    public function onTeardown() {
-        $this->getDispatcher()->dispatch(CrawlerEvents::TEARDOWN);
-    }
-
-    public function onRequestSending(RequestInterface $request) {
-        $urlHandler = $this->urlHandler->forUrl($request->getUri());
-        $event = new CrawlerEvent($request, $this->queue, $urlHandler);
-        $this->getDispatcher()->dispatch(CrawlerEvents::SENDING, $event);
-    }
-
-    public function onRequestFailure(RequestInterface $request, ResponseInterface $response) {
-        $urlHandler = $this->urlHandler->forUrl($request->getUri());
-        $event = new CrawlerResponseEvent($request, $response, $this->queue, $urlHandler);
-        $this->getDispatcher()->dispatch(CrawlerEvents::FAILURE, $event);
-    }
-
-    public function onRequestSuccess(RequestInterface $request, ResponseInterface $response) {
-        $urlHandler = $this->urlHandler->forUrl($request->getUri());
-        $event = new CrawlerResponseEvent($request, $response, $this->queue, $urlHandler);
-        $this->getDispatcher()->dispatch(CrawlerEvents::SUCCESS, $event);
-    }
-
-    public function onRequestException(
-        RequestInterface $request,
-        \Exception $exception,
-        ResponseInterface $response = NULL
-    ) {
-        $urlHandler = $this->urlHandler->forUrl($request->getUri());
-        $event = new CrawlerExceptionEvent($request, $response, $exception, $this->queue, $urlHandler);
-        $this->getDispatcher()->dispatch(CrawlerEvents::EXCEPTION, $event);
+    public function getListeners() {
+        return $this->listeners;
     }
 }
