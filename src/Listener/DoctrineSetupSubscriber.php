@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Listener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

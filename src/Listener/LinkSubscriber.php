@@ -3,7 +3,6 @@
 namespace LastCall\Crawler\Listener;
 
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Queue\RequestQueueInterface;

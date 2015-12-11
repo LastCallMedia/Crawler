@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Listener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Table;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

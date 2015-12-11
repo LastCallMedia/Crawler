@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Listener;
 
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Module\ModuleParser;

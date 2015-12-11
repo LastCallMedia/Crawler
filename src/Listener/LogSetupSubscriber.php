@@ -3,7 +3,6 @@
 namespace LastCall\Crawler\Listener;
 
 
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;

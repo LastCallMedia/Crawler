@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Listener;
 
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Entity\Redirect;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
