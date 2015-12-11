@@ -25,7 +25,7 @@ class RequestLogSubscriber implements EventSubscriberInterface
     {
         return array(
             CrawlerEvents::SENDING => 'onRequestSending',
-            CrawlerEvents::FAIL => 'onRequestComplete',
+            CrawlerEvents::FAILURE => 'onRequestComplete',
             CrawlerEvents::SUCCESS => 'onRequestComplete',
         );
     }

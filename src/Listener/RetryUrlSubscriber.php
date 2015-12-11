@@ -31,7 +31,7 @@ class RetryUrlSubscriber implements EventSubscriberInterface
     {
         return array(
             CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
-            CrawlerEvents::FAIL => 'onCrawlerFail',
+            CrawlerEvents::FAILURE => 'onCrawlerFail',
         );
     }
 

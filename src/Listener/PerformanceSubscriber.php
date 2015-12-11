@@ -40,7 +40,7 @@ class PerformanceSubscriber implements EventSubscriberInterface
         return [
             CrawlerEvents::SENDING => 'onSending',
             CrawlerEvents::SUCCESS => 'onComplete',
-            CrawlerEvents::FAIL => 'onComplete',
+            CrawlerEvents::FAILURE => 'onComplete',
             CrawlerEvents::EXCEPTION => 'onComplete',
         ];
     }
