@@ -23,7 +23,7 @@ class CachedUrlHandler extends URLHandler
     private function getCacheKey($url)
     {
         if (is_object($url)) {
-            return (string) $url;
+            return (string)$url;
         }
 
         return $url;

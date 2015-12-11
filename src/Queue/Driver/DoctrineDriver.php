@@ -69,7 +69,7 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
             $this->_cache[$channel] = array();
         }
         if (!isset($this->_cache[$channel][$key])) {
-            $this->_cache[$channel][$key] = (bool) $this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ? AND queue = ?",
+            $this->_cache[$channel][$key] = (bool)$this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ? AND queue = ?",
                 array(
                     $key,
                     $job->getQueue()
@@ -187,21 +187,21 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         $table = $this->table;
         switch ($status) {
             case Job::FREE:
-                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire <= ?",
+                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire <= ?",
                     array(
                         $channel,
                         Job::FREE,
                         time()
                     ))->fetchColumn();
             case Job::CLAIMED:
-                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire > ?",
+                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire > ?",
                     array(
                         $channel,
                         Job::FREE,
                         time()
                     ))->fetchColumn();
             default:
-                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ?",
+                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ?",
                     array(
                         $channel,
                         Job::COMPLETE

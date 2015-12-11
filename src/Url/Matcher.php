@@ -71,7 +71,7 @@ class Matcher
     private function matchesPattern($type, $value, $default)
     {
         if ($pattern = $this->compilePattern($type)) {
-            return (bool) preg_match($pattern, $value);
+            return (bool)preg_match($pattern, $value);
         }
 
         return $default;
@@ -110,7 +110,7 @@ class Matcher
         if ($path = parse_url($url, PHP_URL_PATH)) {
             if ($ext = pathinfo($path, PATHINFO_EXTENSION)) {
                 if ($pattern = $this->compilePattern($type)) {
-                    return (bool) preg_match($pattern, $ext);
+                    return (bool)preg_match($pattern, $ext);
                 }
             }
         }

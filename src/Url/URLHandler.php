@@ -95,7 +95,7 @@ class URLHandler
      */
     public function includesUrl($url)
     {
-        $_url = (string) $url; // Cast to a string here to avoid doing it 2x.
+        $_url = (string)$url; // Cast to a string here to avoid doing it 2x.
         return $this->matcher->matchesInclude($_url) && !$this->matcher->matchesExclude($_url);
     }
 

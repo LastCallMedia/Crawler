@@ -50,7 +50,7 @@ class Normalizer
      *
      * @param array $map
      *
-     * @return callable
+     * @return \Closure
      */
     public static function preferredDomainMap(array $map)
     {
@@ -62,7 +62,7 @@ class Normalizer
     /**
      * Strip off the URL fragment (#fragment)
      *
-     * @return callable
+     * @return \Closure
      */
     public static function stripFragment()
     {
@@ -74,7 +74,7 @@ class Normalizer
     /**
      * Use http instead of https.
      *
-     * @return callable
+     * @return \Closure
      */
     public static function stripSSL()
     {
@@ -86,7 +86,7 @@ class Normalizer
     /**
      * Strip a trailing slash off of the url path.
      *
-     * @return callable
+     * @return \Closure
      */
     public static function stripTrailingSlash()
     {
@@ -102,7 +102,7 @@ class Normalizer
      *
      * @param string $indexRegex
      *
-     * @return callable
+     * @return \Closure
      */
     public static function stripIndex(
         $indexRegex = '@/index.(html|htm|php|asp|aspx|cfm)$@'
@@ -114,6 +114,13 @@ class Normalizer
         };
     }
 
+    /**
+     * Convert the casing of the URL to all upper or lower case.
+     *
+     * @param string $case
+     *
+     * @return \Closure
+     */
     public static function normalizeCase($case = 'lower')
     {
         if (!in_array($case, array('upper', 'lower'))) {

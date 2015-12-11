@@ -62,7 +62,7 @@ class RetryUrlSubscriber implements EventSubscriberInterface
      * Add the next alternate form of the URL to the queue to be tried.
      *
      * @param \LastCall\Crawler\Event\CrawlerEvent $event
-     * @param null                                 $limitTo
+     * @param string                               $limitTo
      */
     private function addAlternateForms(
         CrawlerResponseEvent $event,
@@ -77,7 +77,7 @@ class RetryUrlSubscriber implements EventSubscriberInterface
                 // Verify that where we're being asked to redirect to is one of the
                 // previous forms of this URI.  Otherwise, we don't need to act here.
                 while ($uri = $uri->getPrevious()) {
-                    if ($limitTo === (string) $uri) {
+                    if ($limitTo === (string)$uri) {
                         $newRequest = new Request('GET', $uri);
                         $queue->push($newRequest);
 
