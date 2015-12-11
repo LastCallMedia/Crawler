@@ -21,12 +21,12 @@ All commands must be run on a given configuration.  A configuration is an instan
 
 When a configuration is run through the crawler, an HTTP request is made to the Base URL.  When the response is received, it is passed to an Event Dispatcher for processing.  The Event Dispatcher hands the event off to the configuration's listeners and subscribers. The following events are fired by the Crawler:
 
-* Crawler::SENDING - A request is about to be sent.
-* Crawler::SUCCESS - A request has been sent and a response has been received.  The response has been deemed "successful" by the client.
-* Crawler::FAIL - A request has been sent and a response has been received.  The response has been deemed "failed" by the client.
-* Crawler::EXCEPTION - An exception has occurred during crawling.  This could be before or after the response was received.  
-* Crawler::SETUP - The user has requested that setup tasks are run. 
-* Crawler::TEARDOWN - The user has requested that teardown tasks are run.
+* CrawlerEvents::SENDING - A request is about to be sent.
+* CrawlerEvents::SUCCESS - A request has been sent and a response has been received.  The response has been deemed "successful" by the client.
+* CrawlerEvents::FAILURE - A request has been sent and a response has been received.  The response has been deemed "failed" by the client.
+* CrawlerEvents::EXCEPTION - An exception has occurred during crawling.  This could be before or after the response was received.
+* CrawlerEvents::SETUP - The user has requested that setup tasks are run.
+* CrawlerEvents::TEARDOWN - The user has requested that teardown tasks are run.
 
 During crawling, Listeners/Subscribers are responsible for all aspects of the Crawler's behavior.  The crawler does not perform any HTML parsing or link checking on it's own.  In order to keep the crawler running beyond the intial request to the base URL, you'll want to add some subscribers to refill the queue.
 
