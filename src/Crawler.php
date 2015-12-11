@@ -30,23 +30,19 @@ use Psr\Http\Message\ResponseInterface;
 class Crawler
 {
 
-    const SENDING = 'crawler.sending';
-    const SUCCESS = 'crawler.success';
-    const FAIL = 'crawler.failure';
-    const EXCEPTION = 'crawler.exception';
-    const SETUP = 'crawler.reset';
-    const TEARDOWN = 'crawler.teardown';
-
-
     /**
-     * @var \LastCall\Crawler\Configuration\ConfigurationInterface
+     * @var \LastCall\Crawler\Session\SessionInterface
      */
-    protected $configuration;
+    protected $session;
 
     protected $queue;
 
+    protected $client;
+
     /**
-     * @param array|\LastCall\Crawler\Configuration\ConfigurationInterface $config
+     * Crawler constructor.
+     *
+     * @param \LastCall\Crawler\Session\SessionInterface $session
      */
     public function __construct(SessionInterface $session)
     {
