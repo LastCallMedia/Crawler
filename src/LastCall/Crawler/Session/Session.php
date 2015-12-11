@@ -62,7 +62,7 @@ class Session implements SessionInterface {
      * @inheritDoc
      */
     public function isFinished() {
-        return $this->getQueue()->count() > 0;
+        return $this->getQueue()->count() === 0;
     }
 
     private function getHandler(UriInterface $uri) {
