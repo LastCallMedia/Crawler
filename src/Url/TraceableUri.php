@@ -107,7 +107,7 @@ class TraceableUri implements UriInterface
     public function withUserInfo($user, $password = null)
     {
         return (new static($this->inner->withUserInfo($user,
-          $password)))->setPrevious($this);
+            $password)))->setPrevious($this);
     }
 
     public function withHost($host)

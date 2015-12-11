@@ -21,7 +21,7 @@ class ErrorLogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::EXCEPTION => 'onRequestException',
+            CrawlerEvents::EXCEPTION => 'onRequestException',
         );
     }
 
@@ -33,7 +33,7 @@ class ErrorLogSubscriber implements EventSubscriberInterface
     public function onRequestException(CrawlerExceptionEvent $event)
     {
         $this->logger->error($event->getException(), array(
-          'url' => (string) $event->getRequest()->getUri()
+            'url' => (string) $event->getRequest()->getUri()
         ));
     }
 }

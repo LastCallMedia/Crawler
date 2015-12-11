@@ -29,11 +29,12 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         return new Client(['handler' => HandlerStack::create($handler)]);
     }
 
-    protected function getMockSession($queue = NULL, $client = NULL) {
-        if(!$queue) {
+    protected function getMockSession($queue = null, $client = null)
+    {
+        if (!$queue) {
             $queue = $this->getMock(RequestQueueInterface::class);
         }
-        if(!$client) {
+        if (!$client) {
             $client = $this->prophesize(ClientInterface::class);
         }
 
@@ -41,13 +42,15 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->getStartUrl(Argument::type('string'))->willReturnArgument(0);
         $session->getQueue()->willReturn($queue);
         $session->getClient()->willReturn($client);
-        $session->isFinished()->will(function() use ($queue) {
+        $session->isFinished()->will(function () use ($queue) {
             return $queue->count() === 0;
         });
+
         return $session;
     }
 
-    public function testTeardownEventIsDispatched() {
+    public function testTeardownEventIsDispatched()
+    {
         $session = $this->getMockSession();
         $session->onTeardown()->shouldBeCalledTimes(1);
 
@@ -55,7 +58,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->teardown();
     }
 
-    public function testSetupEventIsDispatched() {
+    public function testSetupEventIsDispatched()
+    {
         $session = $this->getMockSession();
         $session->onSetup()->shouldBeCalledTimes(1);
 
@@ -72,8 +76,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $session->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
-        $session->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
-            ->shouldBeCalled();
+        $session->onRequestSuccess(Argument::type(RequestInterface::class),
+            Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
@@ -90,8 +94,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $session->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
-        $session->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
-            ->shouldBeCalled();
+        $session->onRequestFailure(Argument::type(RequestInterface::class),
+            Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
@@ -108,8 +112,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             ->shouldBeCalled();
         $session->onRequestSuccess(Argument::any(), Argument::any())
             ->willThrow(new \Exception('foo'));
-        $session->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
-            ->shouldBeCalled();
+        $session->onRequestException(Argument::type(RequestInterface::class),
+            Argument::type(\Exception::class),
+            Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
@@ -125,10 +130,12 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $session->onRequestSending(Argument::any(), Argument::any())
             ->shouldBeCalled();
-        $session->onRequestFailure(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
+        $session->onRequestFailure(Argument::type(RequestInterface::class),
+            Argument::type(ResponseInterface::class))
             ->willThrow(new \Exception('foo'));
-        $session->onRequestException(Argument::type(RequestInterface::class), Argument::type(\Exception::class), Argument::type(ResponseInterface::class))
-            ->shouldBeCalled();
+        $session->onRequestException(Argument::type(RequestInterface::class),
+            Argument::type(\Exception::class),
+            Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
@@ -145,8 +152,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $session->onRequestSending(Argument::any(), Argument::any())
             ->willThrow(new \Exception('foo'));
-        $session->onRequestException(Argument::any(), Argument::type('Exception'), NULL)
-            ->shouldBeCalled();
+        $session->onRequestException(Argument::any(),
+            Argument::type('Exception'), null)->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
@@ -155,7 +162,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 //        $this->assertEquals(1, $queue->count(Job::COMPLETE));
     }
 
-    public function testQueueIsWorkedUntilEmpty() {
+    public function testQueueIsWorkedUntilEmpty()
+    {
         $responses = array_fill(0, 2, new Response(200));
         $count = 0;
 
@@ -163,15 +171,20 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $client = $this->mockClient($responses);
         $session = $this->getMockSession($queue, $client);
 
-        $session->onRequestSending(Argument::type(RequestInterface::class))->shouldBeCalled();
-        $session->onRequestSuccess(Argument::type(RequestInterface::class), Argument::type(ResponseInterface::class))
-            ->will(function($args) use (&$queue, &$count) {
-                $request = $args[0];
-                if($request->getUri() == 'http://google.com/1') {
-                    $queue->push(new Request('GET', 'http://google.com/2'));
-                }
-                $count++;
-            });
+        $session->onRequestSending(Argument::type(RequestInterface::class))
+            ->shouldBeCalled();
+        $session->onRequestSuccess(Argument::type(RequestInterface::class),
+            Argument::type(ResponseInterface::class))->will(function ($args) use
+        (
+            &$queue,
+            &$count
+        ) {
+            $request = $args[0];
+            if ($request->getUri() == 'http://google.com/1') {
+                $queue->push(new Request('GET', 'http://google.com/2'));
+            }
+            $count++;
+        });
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(5, 'http://google.com/1')->wait();

@@ -16,7 +16,8 @@ class SetupCommand extends Command
         if (!$this->getName()) {
             $this->setName('setup');
         }
-        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
+        $this->addArgument('config', InputArgument::REQUIRED,
+            'The path to the crawler configuration.');
         $this->setDescription('Set up any dependencies before the crawler is run');
         parent::configure();
     }
@@ -25,8 +26,9 @@ class SetupCommand extends Command
     {
         /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
         $helper = $this->getHelper('crawler');
-        $config = $helper->getConfiguration($input->getArgument('config'), $output);
-        $crawler = $helper->getCrawler($config, FALSE);
+        $config = $helper->getConfiguration($input->getArgument('config'),
+            $output);
+        $crawler = $helper->getCrawler($config, false);
         $crawler->setup();
         $io = new SymfonyStyle($input, $output);
         $io->success('Setup complete');

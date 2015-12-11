@@ -30,8 +30,8 @@ class RetryUrlSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
-          CrawlerEvents::FAIL => 'onCrawlerFail',
+            CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
+            CrawlerEvents::FAIL => 'onCrawlerFail',
         );
     }
 
@@ -43,10 +43,10 @@ class RetryUrlSubscriber implements EventSubscriberInterface
         $response = $event->getResponse();
 
         if (in_array($response->getStatusCode(),
-            RedirectSubscriber::$redirectCodes) && $response->hasHeader('Location')
+                RedirectSubscriber::$redirectCodes) && $response->hasHeader('Location')
         ) {
             $this->addAlternateForms($event,
-              $response->getHeaderLine('Location'));
+                $response->getHeaderLine('Location'));
         }
     }
 
@@ -65,8 +65,8 @@ class RetryUrlSubscriber implements EventSubscriberInterface
      * @param null                                 $limitTo
      */
     private function addAlternateForms(
-      CrawlerResponseEvent $event,
-      $limitTo = null
+        CrawlerResponseEvent $event,
+        $limitTo = null
     ) {
         $request = $event->getRequest();
         $uri = $request->getUri();

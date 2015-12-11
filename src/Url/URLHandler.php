@@ -35,10 +35,10 @@ class URLHandler
     }
 
     public function __construct(
-      $baseUrl,
-      $currentUrl = null,
-      Matcher $matcher = null,
-      Normalizer $normalizer = null
+        $baseUrl,
+        $currentUrl = null,
+        Matcher $matcher = null,
+        Normalizer $normalizer = null
     ) {
         $this->baseUrl = static::uriFor($baseUrl);
         $this->currentUrl = static::uriFor($currentUrl ? $currentUrl : $baseUrl);
@@ -63,7 +63,7 @@ class URLHandler
             } elseif (strpos($url, '#') === 0) {
                 return $this->currentUrl->withFragment($url);
             } elseif (strpos($url, 'mailto:') === 0 || strpos($url,
-                'javascript:') === 0
+                    'javascript:') === 0
             ) {
                 return false;
             }
@@ -155,6 +155,6 @@ class URLHandler
     public function forUrl($url)
     {
         return new static($this->baseUrl, $url, $this->matcher,
-          $this->normalizer);
+            $this->normalizer);
     }
 }

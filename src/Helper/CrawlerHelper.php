@@ -13,17 +13,22 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class CrawlerHelper extends Helper
 {
 
-    public function getName() {
+    public function getName()
+    {
         return 'crawler';
     }
 
-    public function getCrawler(ConfigurationInterface $config, $profile = FALSE) {
+    public function getCrawler(
+        ConfigurationInterface $config,
+        $profile = false
+    ) {
         $dispatcher = new EventDispatcher();
         if ($profile && $this->getHelperSet()->has('profiler')) {
             $profiler = $this->getHelperSet()->get('profiler');
             $dispatcher = $profiler->getTraceableDispatcher($dispatcher);
         }
         $session = new Session($config, $dispatcher);
+
         return new Crawler($session);
     }
 
@@ -32,17 +37,21 @@ class CrawlerHelper extends Helper
      *
      * @return \LastCall\Crawler\Configuration\ConfigurationInterface
      */
-    public function getConfiguration($filename, OutputInterface $output) {
+    public function getConfiguration($filename, OutputInterface $output)
+    {
         if (!is_file($filename)) {
-            throw new \InvalidArgumentException(sprintf('File does not exist: %s', $filename));
+            throw new \InvalidArgumentException(sprintf('File does not exist: %s',
+                $filename));
         }
         $configuration = require $filename;
         if ($configuration === 1) {
             throw new \RuntimeException('Configuration was not returned.');
         }
         if (!$configuration instanceof ConfigurationInterface) {
-            throw new \RuntimeException(sprintf('Configuration must implement %s', ConfigurationInterface::class));
+            throw new \RuntimeException(sprintf('Configuration must implement %s',
+                ConfigurationInterface::class));
         }
+
         return $configuration;
     }
 }

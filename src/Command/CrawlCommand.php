@@ -20,16 +20,17 @@ class CrawlCommand extends Command
         }
 
         $this->setDescription('Work through items in the request queue.');
-        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
+        $this->addArgument('config', InputArgument::REQUIRED,
+            'The path to the crawler configuration.');
         $this->addOption('chunk', null, InputOption::VALUE_OPTIONAL,
-          'The amount of items to process.', 5);
+            'The amount of items to process.', 5);
         $this->addOption('profile', 'p', InputOption::VALUE_NONE,
-          'Whether to profile the run');
+            'Whether to profile the run');
         $this->addOption('reset', 'r', InputOption::VALUE_NONE,
-          'Reset the migration prior to running');
+            'Reset the migration prior to running');
         parent::configure();
         $this->addArgument('seed', InputArgument::OPTIONAL,
-          'The URL to pre-seed the crawler with');
+            'The URL to pre-seed the crawler with');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -37,8 +38,10 @@ class CrawlCommand extends Command
 
         /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
         $helper = $this->getHelper('crawler');
-        $configuration = $helper->getConfiguration($input->getArgument('config'), $output);
-        $crawler = $helper->getCrawler($configuration, $input->getOption('profile'));
+        $configuration = $helper->getConfiguration($input->getArgument('config'),
+            $output);
+        $crawler = $helper->getCrawler($configuration,
+            $input->getOption('profile'));
 
         if ($input->getOption('reset')) {
             $crawler->teardown();

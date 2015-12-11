@@ -101,15 +101,15 @@ class Job
         return $this->data;
     }
 
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
     public function setIdentifier($identifier)
     {
         $this->identifier = $identifier;
 
         return $this;
-    }
-
-    public function getIdentifier()
-    {
-        return $this->identifier;
     }
 }

@@ -10,13 +10,15 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SetupCommandTest extends CommandTest
 {
-    public function testSetupCommand() {
+    public function testSetupCommand()
+    {
         $configuration = $this->prophesize(ConfigurationInterface::class);
         $crawler = $this->prophesize(Crawler::class);
         $crawler->setUp()->shouldBeCalled();
 
         $command = new SetupCommand();
-        $command->setHelperSet($this->getMockHelperSet($configuration, $crawler));
+        $command->setHelperSet($this->getMockHelperSet($configuration,
+            $crawler));
         $tester = new CommandTester($command);
         $tester->execute(array('config' => 'test.php'));
         $this->assertContains('Setup complete', $tester->getDisplay());

@@ -27,14 +27,18 @@ class CrawlerEvent extends Event
      */
     private $queue;
 
-    public function __construct(RequestInterface $request, RequestQueueInterface $queue, URLHandler $handler)
-    {
+    public function __construct(
+        RequestInterface $request,
+        RequestQueueInterface $queue,
+        URLHandler $handler
+    ) {
         $this->request = $request;
         $this->urlHandler = $handler;
         $this->queue = $queue;
     }
 
-    public function getQueue() {
+    public function getQueue()
+    {
         return $this->queue;
     }
 

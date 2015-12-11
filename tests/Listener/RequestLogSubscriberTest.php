@@ -33,8 +33,8 @@ class RequestLogSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->getMock(LoggerInterface::class);
         $logger->expects($this->once())
-          ->method('info')
-          ->with('Received 200 for http://google.com', []);
+            ->method('info')
+            ->with('Received 200 for http://google.com', []);
         $subscriber = new RequestLogSubscriber($logger);
 
         $request = new Request('GET', 'http://google.com');
@@ -50,11 +50,11 @@ class RequestLogSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->getMock(LoggerInterface::class);
         $logger->expects($this->once())
-          ->method('info')
-          ->with('Received 200 for http://google.com', [
-              'previous' => 'http://google.com/index.html',
-              'next' => '',
-          ]);
+            ->method('info')
+            ->with('Received 200 for http://google.com', [
+                'previous' => 'http://google.com/index.html',
+                'next' => '',
+            ]);
         $subscriber = new RequestLogSubscriber($logger);
 
         $uri = new TraceableUri(new Uri('http://google.com/index.html'));

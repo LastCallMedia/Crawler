@@ -18,7 +18,7 @@ class RedirectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::SUCCESS => 'onResponse',
+            CrawlerEvents::SUCCESS => 'onResponse',
         );
     }
 
@@ -27,7 +27,7 @@ class RedirectSubscriber implements EventSubscriberInterface
         $response = $event->getResponse();
 
         if (in_array($response->getStatusCode(),
-            self::$redirectCodes) && $response->hasHeader('Location')
+                self::$redirectCodes) && $response->hasHeader('Location')
         ) {
             $urlHandler = $event->getUrlHandler();
             $queue = $event->getQueue();

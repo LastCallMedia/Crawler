@@ -12,7 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testBaseUrl() {
+    public function testBaseUrl()
+    {
         $config = new Configuration();
         $this->assertNull($config->getBaseUrl());
         $config->setBaseUrl('http://google.com');
@@ -21,7 +22,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://google.com', $config->getBaseUrl());
     }
 
-    public function testClient() {
+    public function testClient()
+    {
         $config = new Configuration();
         $this->assertInstanceOf('GuzzleHttp\Client', $config->getClient());
         $client = new Client();
@@ -29,7 +31,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($client, $config->getClient());
     }
 
-    public function testUrlHandler() {
+    public function testUrlHandler()
+    {
         $config = new Configuration();
         $this->assertInstanceOf(URLHandler::class, $config->getUrlHandler());
         $handler = $this->prophesize(URLHandler::class)->reveal();
@@ -37,30 +40,37 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($handler, $config->getUrlHandler());
     }
 
-    public function testQueue() {
+    public function testQueue()
+    {
         $config = new Configuration();
-        $this->assertInstanceOf(RequestQueueInterface::class, $config->getQueue());
+        $this->assertInstanceOf(RequestQueueInterface::class,
+            $config->getQueue());
         $queue = $this->prophesize(RequestQueueInterface::class)->reveal();
         $config->setQueue($queue);
         $this->assertSame($queue, $config->getQueue());
     }
 
-    public function testSubscribers() {
+    public function testSubscribers()
+    {
         $config = new Configuration('http://google.com');
         $this->assertEquals([], $config->getSubscribers());
 
-        $subscriber = $this->prophesize(EventSubscriberInterface::class)->reveal();
+        $subscriber = $this->prophesize(EventSubscriberInterface::class)
+            ->reveal();
         $config->addSubscriber($subscriber);
         $this->assertSame([$subscriber], $config->getSubscribers());
     }
 
-    public function testListeners() {
+    public function testListeners()
+    {
         $config = new Configuration('http://google.com');
         $this->assertEquals([], $config->getListeners());
 
-        $listener = function() {};
+        $listener = function () {
+        };
         $config->addListener('foo', $listener, 10);
-        $this->assertEquals(['foo' => [[$listener, 10]]], $config->getListeners());
+        $this->assertEquals(['foo' => [[$listener, 10]]],
+            $config->getListeners());
     }
 
 //

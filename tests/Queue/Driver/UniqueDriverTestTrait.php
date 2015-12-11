@@ -24,7 +24,8 @@ trait UniqueDriverTestTrait
         Assert::assertEquals('b', $job->getData());
     }
 
-    public function testUniqueItemSetsIdentifier() {
+    public function testUniqueItemSetsIdentifier()
+    {
         $driver = $this->getDriver();
         $driver->pushUnique(new Job('a', 'b'), 'foo');
         $job = $driver->pop('a');

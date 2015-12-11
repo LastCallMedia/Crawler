@@ -17,14 +17,16 @@ class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
     public function getLinkInputs()
     {
         return array(
-          array(
-            new Response(200, [], '<html><body><a href="/foo">Test</a></body>'),
-            ['http://google.com/foo']
-          ),
-          array(
-            new Response(301, [], '<html><body><a href="/foo">Test</a></body>'),
-            []
-          ),
+            array(
+                new Response(200, [],
+                    '<html><body><a href="/foo">Test</a></body>'),
+                ['http://google.com/foo']
+            ),
+            array(
+                new Response(301, [],
+                    '<html><body><a href="/foo">Test</a></body>'),
+                []
+            ),
         );
     }
 
@@ -36,8 +38,8 @@ class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
         $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = new URLHandler('http://google.com');
 
-        foreach($links as $link) {
-            $queue->push(Argument::that(function($request) use ($link) {
+        foreach ($links as $link) {
+            $queue->push(Argument::that(function ($request) use ($link) {
                 return $link === (string) $request->getUri();
             }))->shouldBeCalled();
         }
@@ -48,7 +50,8 @@ class LinkSubscriberTest extends \PHPUnit_Framework_TestCase
         $event->getUrlHandler()->willReturn($urlHandler);
         $event->getRequest()->willReturn($request);
         $event->getResponse()->willReturn($response);
-        $event->getDom()->willReturn(new DomCrawler((string)$response->getBody()));
+        $event->getDom()
+            ->willReturn(new DomCrawler((string) $response->getBody()));
 
         $subscriber = new LinkSubscriber();
         $subscriber->onCrawlerSuccess($event->reveal());

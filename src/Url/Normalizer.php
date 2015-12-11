@@ -92,8 +92,8 @@ class Normalizer
     {
         return function (UriInterface $uri) {
             return substr($uri->getPath(),
-              -1) === '/' ? $uri->withPath(substr($uri->getPath(), 0,
-              strlen($uri->getPath()) - 1)) : $uri;
+                -1) === '/' ? $uri->withPath(substr($uri->getPath(), 0,
+                strlen($uri->getPath()) - 1)) : $uri;
         };
     }
 
@@ -105,12 +105,12 @@ class Normalizer
      * @return callable
      */
     public static function stripIndex(
-      $indexRegex = '@/index.(html|htm|php|asp|aspx|cfm)$@'
+        $indexRegex = '@/index.(html|htm|php|asp|aspx|cfm)$@'
     ) {
         return function (UriInterface $uri) use ($indexRegex) {
             return preg_match($indexRegex,
-              $uri->getPath()) ? $uri->withPath(preg_replace($indexRegex, '/',
-              $uri->getPath())) : $uri;
+                $uri->getPath()) ? $uri->withPath(preg_replace($indexRegex, '/',
+                $uri->getPath())) : $uri;
         };
     }
 
@@ -124,10 +124,10 @@ class Normalizer
             switch ($case) {
                 case 'lower':
                     return preg_match('/[A-Z]/',
-                      $uri->getPath()) ? $uri->withPath(mb_strtolower($uri->getPath())) : $uri;
+                        $uri->getPath()) ? $uri->withPath(mb_strtolower($uri->getPath())) : $uri;
                 case 'upper':
                     return preg_match('/[a-z]/',
-                      $uri->getPath()) ? $uri->withPath(mb_strtoupper($uri->getPath())) : $uri;
+                        $uri->getPath()) ? $uri->withPath(mb_strtoupper($uri->getPath())) : $uri;
             }
         };
     }

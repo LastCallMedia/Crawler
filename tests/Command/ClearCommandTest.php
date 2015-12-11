@@ -10,14 +10,16 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class ClearCommandTest extends CommandTest
 {
-    public function testClearCommand() {
+    public function testClearCommand()
+    {
         $configuration = $this->prophesize(ConfigurationInterface::class);
         $crawler = $this->prophesize(Crawler::class);
         $crawler->teardown()->shouldBeCalled();
         $crawler->setUp()->shouldBeCalled();
 
         $command = new ClearCommand();
-        $command->setHelperSet($this->getMockHelperSet($configuration, $crawler));
+        $command->setHelperSet($this->getMockHelperSet($configuration,
+            $crawler));
         $tester = new CommandTester($command);
         $tester->execute(array('config' => 'test.php'));
         $this->assertContains('Cleared', $tester->getDisplay());

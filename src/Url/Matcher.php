@@ -6,32 +6,32 @@ class Matcher
 {
 
     private $patterns = [
-      'include' => [],
-      'exclude' => [],
-      'html' => ['html', 'htm', 'php', 'asp', 'aspx', 'cfm'],
-      'file' => [
-        'gif',
-        'png',
-        'jpg',
-        'jpeg',
-        'svg',
-        'psd',
-        'pdf',
-        'xml',
-        'doc',
-        'docx',
-        'zip',
-        'txt'
-      ]
+        'include' => [],
+        'exclude' => [],
+        'html' => ['html', 'htm', 'php', 'asp', 'aspx', 'cfm'],
+        'file' => [
+            'gif',
+            'png',
+            'jpg',
+            'jpeg',
+            'svg',
+            'psd',
+            'pdf',
+            'xml',
+            'doc',
+            'docx',
+            'zip',
+            'txt'
+        ]
     ];
 
     private $compiled = [];
 
     public function __construct(
-      array $includePatterns = null,
-      array $excludePatterns = null,
-      array $htmlPatterns = null,
-      array $filePatterns = null
+        array $includePatterns = null,
+        array $excludePatterns = null,
+        array $htmlPatterns = null,
+        array $filePatterns = null
     ) {
         if (isset($includePatterns)) {
             $this->patterns['include'] = $includePatterns;
@@ -84,11 +84,11 @@ class Matcher
                 case 'file':
                 case 'html':
                     $this->compiled[$type] = $this->patterns[$type] ? '@(^' . implode('$|^',
-                        $this->patterns[$type]) . '$)@S' : false;
+                            $this->patterns[$type]) . '$)@S' : false;
                     break;
                 default:
                     $this->compiled[$type] = $this->patterns[$type] ? '@(' . implode('|',
-                        $this->patterns[$type]) . ')@S' : false;
+                            $this->patterns[$type]) . ')@S' : false;
             }
         }
 

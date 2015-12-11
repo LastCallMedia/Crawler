@@ -12,10 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class Configuration extends AbstractConfiguration
 {
 
-    public function __construct($baseUrl = NULL)
+    public function __construct($baseUrl = null)
     {
         $this->baseUrl = $baseUrl;
-        $this->client = new Client(['allow_redirects' => FALSE]);
+        $this->client = new Client(['allow_redirects' => false]);
         $this->queue = new RequestQueue(new ArrayDriver(), 'request');
         $this->urlHandler = new URLHandler($baseUrl);
     }
@@ -23,32 +23,38 @@ class Configuration extends AbstractConfiguration
     public function setClient(Client $client)
     {
         $this->client = $client;
+
         return $this;
     }
 
     public function setUrlHandler(URLHandler $handler)
     {
         $this->urlHandler = $handler;
+
         return $this;
     }
 
     public function setQueue(RequestQueueInterface $queue)
     {
         $this->queue = $queue;
+
         return $this;
     }
 
     public function setBaseUrl($baseUrl)
     {
         $this->baseUrl = $baseUrl;
+
         return $this;
     }
 
-    public function addSubscriber(EventSubscriberInterface $subscriber) {
+    public function addSubscriber(EventSubscriberInterface $subscriber)
+    {
         $this->subscribers[] = $subscriber;
     }
 
-    public function addListener($eventName, callable $listener, $priority = 0) {
+    public function addListener($eventName, callable $listener, $priority = 0)
+    {
         $this->listeners[$eventName][] = [$listener, $priority];
     }
 }

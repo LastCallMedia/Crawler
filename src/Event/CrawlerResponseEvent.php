@@ -19,10 +19,10 @@ class CrawlerResponseEvent extends CrawlerEvent
     private $dom;
 
     public function __construct(
-      RequestInterface $request,
-      ResponseInterface $response,
-      RequestQueueInterface $queue,
-      URLHandler $handler
+        RequestInterface $request,
+        ResponseInterface $response,
+        RequestQueueInterface $queue,
+        URLHandler $handler
     ) {
         parent::__construct($request, $queue, $handler);
         $this->response = $response;
@@ -37,7 +37,7 @@ class CrawlerResponseEvent extends CrawlerEvent
     {
         if (!isset($this->dom)) {
             $this->dom = new DomCrawler((string) $this->response->getBody(),
-              $this->getRequest()->getUri());
+                $this->getRequest()->getUri());
         }
 
         return $this->dom;

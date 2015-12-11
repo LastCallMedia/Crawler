@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class StubCrawler extends Crawler
 {
 
-    public function __construct(array $responses = [], $dispatcher = NULL)
+    public function __construct(array $responses = [], $dispatcher = null)
     {
         $mock = new MockHandler($responses);
         $handler = HandlerStack::create($mock);

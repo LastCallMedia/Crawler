@@ -16,8 +16,8 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     public function getTrailingSlashTests()
     {
         return array(
-          array('http://google.com', 'http://google.com'),
-          array('http://google.com/', 'http://google.com')
+            array('http://google.com', 'http://google.com'),
+            array('http://google.com/', 'http://google.com')
         );
     }
 
@@ -51,11 +51,14 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     public function getStripFragmentTests()
     {
         return array(
-          array('http://google.com/index.html', 'http://google.com/index.html'),
-          array(
-            'http://google.com/index.html#foo',
-            'http://google.com/index.html'
-          ),
+            array(
+                'http://google.com/index.html',
+                'http://google.com/index.html'
+            ),
+            array(
+                'http://google.com/index.html#foo',
+                'http://google.com/index.html'
+            ),
         );
     }
 
@@ -71,8 +74,8 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     public function getStripSSLTests()
     {
         return array(
-          array('http://google.com', 'http://google.com'),
-          array('https://google.com', 'http://google.com'),
+            array('http://google.com', 'http://google.com'),
+            array('https://google.com', 'http://google.com'),
         );
     }
 
@@ -88,9 +91,9 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     public function getStripIndexTests()
     {
         return array(
-          array('http://google.com/index.html', 'http://google.com/'),
-          array('http://google.com/', 'http://google.com/'),
-          array('http://google.com/foo', 'http://google.com/foo'),
+            array('http://google.com/index.html', 'http://google.com/'),
+            array('http://google.com/', 'http://google.com/'),
+            array('http://google.com/foo', 'http://google.com/foo'),
         );
     }
 
@@ -106,21 +109,21 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     public function getPreferredDomainTests()
     {
         return array(
-          array(
-            'http://google.com',
-            'http://www.google.com',
-            array('google.com' => 'www.google.com')
-          ),
-          array(
-            'http://www.google.com',
-            'http://www.google.com',
-            array('google.com' => 'www.google.com')
-          ),
-          array(
-            'http://alta-vista.com',
-            'http://alta-vista.com',
-            array('google.com' => 'www.google.com')
-          ),
+            array(
+                'http://google.com',
+                'http://www.google.com',
+                array('google.com' => 'www.google.com')
+            ),
+            array(
+                'http://www.google.com',
+                'http://www.google.com',
+                array('google.com' => 'www.google.com')
+            ),
+            array(
+                'http://alta-vista.com',
+                'http://alta-vista.com',
+                array('google.com' => 'www.google.com')
+            ),
         );
     }
 
@@ -137,23 +140,27 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $pass = new Normalizer();
         $this->assertUrlEquals('http://google.com',
-          $pass->normalize(new Uri('http://google.com')));
+            $pass->normalize(new Uri('http://google.com')));
     }
 
     public function getNormalizeCaseTests()
     {
         return array(
-          array('http://google.com', 'http://google.com', 'http://google.com'),
-          array(
-            'http://google.com/FOO',
-            'http://google.com/foo',
-            'http://google.com/FOO'
-          ),
-          array(
-            'http://google.com/indEx.html',
-            'http://google.com/index.html',
-            'http://google.com/INDEX.HTML'
-          ),
+            array(
+                'http://google.com',
+                'http://google.com',
+                'http://google.com'
+            ),
+            array(
+                'http://google.com/FOO',
+                'http://google.com/foo',
+                'http://google.com/FOO'
+            ),
+            array(
+                'http://google.com/indEx.html',
+                'http://google.com/index.html',
+                'http://google.com/INDEX.HTML'
+            ),
         );
     }
 

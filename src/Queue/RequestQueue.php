@@ -28,6 +28,7 @@ class RequestQueue implements RequestQueueInterface
     {
         $key = $request->getMethod() . $request->getUri();
         $job = new Job($this->channel, $request, $key);
+
         return $this->driver->push($job);
     }
 
@@ -46,7 +47,8 @@ class RequestQueue implements RequestQueueInterface
         return $this->driver->release($job);
     }
 
-    public function count($status = Job::FREE) {
+    public function count($status = Job::FREE)
+    {
         return $this->driver->count($this->channel, $status);
     }
 }

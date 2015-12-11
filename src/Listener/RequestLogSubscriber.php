@@ -24,9 +24,9 @@ class RequestLogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::SENDING => 'onRequestSending',
-          CrawlerEvents::FAIL => 'onRequestComplete',
-          CrawlerEvents::SUCCESS => 'onRequestComplete',
+            CrawlerEvents::SENDING => 'onRequestSending',
+            CrawlerEvents::FAIL => 'onRequestComplete',
+            CrawlerEvents::SUCCESS => 'onRequestComplete',
         );
     }
 
@@ -48,12 +48,14 @@ class RequestLogSubscriber implements EventSubscriberInterface
         $context = [];
         if ($uri instanceof TraceableUri) {
             $context = array(
-              'previous' => (string) $uri->getPrevious(),
-              'next' => (string) $uri->getNext(),
+                'previous' => (string) $uri->getPrevious(),
+                'next' => (string) $uri->getNext(),
             );
         }
 
-        $message = sprintf('Received %d for %s', $event->getResponse()->getStatusCode(), $event->getRequest()->getUri());
+        $message = sprintf('Received %d for %s',
+            $event->getResponse()->getStatusCode(),
+            $event->getRequest()->getUri());
         $this->logger->info($message, $context);
     }
 

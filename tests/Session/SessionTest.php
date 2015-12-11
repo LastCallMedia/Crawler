@@ -18,14 +18,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 
-class SessionTest extends \PHPUnit_Framework_TestCase {
+class SessionTest extends \PHPUnit_Framework_TestCase
+{
 
-    private function mockConfig(array $listeners = [], array $subscribers = [], $queue = NULL) {
-        if(!$queue) {
+    private function mockConfig(
+        array $listeners = [],
+        array $subscribers = [],
+        $queue = null
+    ) {
+        if (!$queue) {
             $queue = $this->prophesize(RequestQueueInterface::class);
         }
         $urlHandler = $this->prophesize(URLHandler::class);
-        $urlHandler->forUrl(Argument::type(UriInterface::class))->willReturn($urlHandler);
+        $urlHandler->forUrl(Argument::type(UriInterface::class))
+            ->willReturn($urlHandler);
 
         $configuration = $this->prophesize(ConfigurationInterface::class);
         $configuration->getListeners()->willReturn($listeners);
@@ -36,16 +42,19 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         return $configuration;
     }
 
-    public function testSetsUrl() {
+    public function testSetsUrl()
+    {
         $configuration = $this->mockConfig();
         $configuration->getBaseUrl()->willReturn('http://google.com');
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $session = new Session($configuration->reveal(), $dispatcher->reveal());
         $this->assertEquals('http://google.com', $session->getStartUrl());
-        $this->assertEquals('http://google.com/1', $session->getStartUrl('http://google.com/1'));
+        $this->assertEquals('http://google.com/1',
+            $session->getStartUrl('http://google.com/1'));
     }
 
-    public function testAddRequest() {
+    public function testAddRequest()
+    {
         $request = new Request('GET', 'http://google.com');
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->push($request)->shouldBeCalled();
@@ -55,17 +64,19 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         $session->addRequest($request);
     }
 
-    public function getIsFinishedTests() {
+    public function getIsFinishedTests()
+    {
         return [
-            [TRUE, 0],
-            [FALSE, 1]
+            [true, 0],
+            [false, 1]
         ];
     }
 
     /**
      * @dataProvider getIsFinishedTests
      */
-    public function testIsFinished($expected, $count) {
+    public function testIsFinished($expected, $count)
+    {
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->count()->willReturn($count);
         $config = $this->mockConfig([], [], $queue);
@@ -74,8 +85,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $session->isFinished());
     }
 
-    public function testAddsListeners() {
-        $cb = function() {};
+    public function testAddsListeners()
+    {
+        $cb = function () {
+        };
         $configuration = $this->prophesize(ConfigurationInterface::class);
         $configuration->getListeners()->willReturn([
             'foo' => [[$cb, 10]]
@@ -86,7 +99,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         new Session($configuration->reveal(), $dispatcher->reveal());
     }
 
-    public function testAddsSubscribers() {
+    public function testAddsSubscribers()
+    {
         $subscriberMock = $this->prophesize(EventSubscriberInterface::class);
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
 
@@ -100,7 +114,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
     }
 
 
-    public function testSetup() {
+    public function testSetup()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::SETUP)->shouldBeCalledTimes(1);
         $config = $this->prophesize(ConfigurationInterface::class);
@@ -109,7 +124,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         $session->onSetup();
     }
 
-    public function testTeardown() {
+    public function testTeardown()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::TEARDOWN)->shouldBeCalledTimes(1);
         $config = $this->prophesize(ConfigurationInterface::class);
@@ -118,10 +134,11 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         $session->onTeardown();
     }
 
-    public function testOnRequestSending() {
+    public function testOnRequestSending()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::SENDING, Argument::type(CrawlerEvent::class))
-            ->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(CrawlerEvents::SENDING,
+            Argument::type(CrawlerEvent::class))->shouldBeCalledTimes(1);
 
         $config = $this->mockConfig();
 
@@ -129,37 +146,42 @@ class SessionTest extends \PHPUnit_Framework_TestCase {
         $session->onRequestSending(new Request('GET', 'http://google.com'));
     }
 
-    public function testOnRequestSuccess() {
+    public function testOnRequestSuccess()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::SUCCESS, Argument::type(CrawlerResponseEvent::class))
+        $dispatcher->dispatch(CrawlerEvents::SUCCESS,
+            Argument::type(CrawlerResponseEvent::class))
             ->shouldBeCalledTimes(1);
 
         $config = $this->mockConfig();
         $session = new Session($config->reveal(), $dispatcher->reveal());
-        $session->onRequestSuccess(new Request('GET', 'http://google.com'), new Response());
+        $session->onRequestSuccess(new Request('GET', 'http://google.com'),
+            new Response());
     }
 
-    public function testOnRequestFailure() {
+    public function testOnRequestFailure()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::FAILURE, Argument::type(CrawlerResponseEvent::class))
+        $dispatcher->dispatch(CrawlerEvents::FAILURE,
+            Argument::type(CrawlerResponseEvent::class))
             ->shouldBeCalledTimes(1);
 
         $config = $this->mockConfig();
         $session = new Session($config->reveal(), $dispatcher->reveal());
-        $session->onRequestFailure(new Request('GET', 'http://google.com'), new Response());
+        $session->onRequestFailure(new Request('GET', 'http://google.com'),
+            new Response());
     }
 
-    public function testOnRequestException() {
+    public function testOnRequestException()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::EXCEPTION, Argument::type(CrawlerExceptionEvent::class))
+        $dispatcher->dispatch(CrawlerEvents::EXCEPTION,
+            Argument::type(CrawlerExceptionEvent::class))
             ->shouldBeCalledTimes(1);
 
         $config = $this->mockConfig();
         $session = new Session($config->reveal(), $dispatcher->reveal());
-        $session->onRequestException(
-            new Request('GET', 'http://google.com'),
-            new \Exception('foo'),
-            new Response()
-        );
+        $session->onRequestException(new Request('GET', 'http://google.com'),
+            new \Exception('foo'), new Response());
     }
 }

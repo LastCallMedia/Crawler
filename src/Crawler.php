@@ -67,8 +67,8 @@ class Crawler
         // requests can be added by processing and cannot be restarted.
 
         // The outer generator ($gen) restarts the processing in that case.
-        $gen = function() use ($chunk) {
-            while(!$this->session->isFinished()) {
+        $gen = function () use ($chunk) {
+            while (!$this->session->isFinished()) {
                 $inner = new EachPromise($this->getRequestWorkerFn(), [
                     'concurrency' => $chunk
                 ]);
@@ -77,21 +77,22 @@ class Crawler
         };
 
         $outer = new EachPromise($gen(), ['concurrency' => 1]);
+
         return $outer->promise();
     }
 
     private function getRequestWorkerFn()
     {
-        while($job = $this->queue->pop()) {
+        while ($job = $this->queue->pop()) {
             $request = $job->getData();
             try {
                 $this->session->onRequestSending($request);
                 $promise = $this->client->sendAsync($job->getData())
-                  ->then($this->getRequestFulfilledFn($request, $job), $this->getRequestRejectedFn($request, $job));
+                    ->then($this->getRequestFulfilledFn($request, $job),
+                        $this->getRequestRejectedFn($request, $job));
                 yield $promise;
-            }
-            catch(\Exception $e) {
-                $this->session->onRequestException($request, $e, NULL);
+            } catch (\Exception $e) {
+                $this->session->onRequestException($request, $e, null);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
         }
@@ -105,10 +106,10 @@ class Crawler
             try {
                 $this->session->onRequestSuccess($request, $response);
             } catch (\Exception $e) {
-                $this->session->onRequestException($request, $e,
-                    $response);
+                $this->session->onRequestException($request, $e, $response);
                 throw $e;
             }
+
             return $response;
         };
     }
@@ -124,8 +125,7 @@ class Crawler
                 try {
                     $this->session->onRequestFailure($request, $response);
                 } catch (\Exception $e) {
-                    $this->session->onRequestException($request, $e,
-                        $response);
+                    $this->session->onRequestException($request, $e, $response);
                     throw $e;
                 }
 
@@ -136,11 +136,13 @@ class Crawler
         };
     }
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->session->onSetup();
     }
 
-    public function teardown() {
+    public function teardown()
+    {
         $this->session->onTeardown();
     }
 }

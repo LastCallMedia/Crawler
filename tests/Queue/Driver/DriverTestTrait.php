@@ -67,7 +67,8 @@ trait DriverTestTrait
         $driver = $this->getDriver();
         $driver->push(new Job('foo', 'bar'));
         $driver->pop('foo', 0);
-        Assert::assertInstanceOf('LastCall\Crawler\Queue\Job', $driver->pop('foo'));
+        Assert::assertInstanceOf('LastCall\Crawler\Queue\Job',
+            $driver->pop('foo'));
     }
 
     public function testReleaseItemForcesStatus()

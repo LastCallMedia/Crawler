@@ -19,8 +19,8 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $parser = $this->prophesize('LastCall\Crawler\Module\ModuleParser');
         $parser->parse(Argument::type('Symfony\Component\DomCrawler\Crawler'))
-          ->shouldBeCalled()
-          ->willReturn([]);
+            ->shouldBeCalled()
+            ->willReturn([]);
 
         $this->dispatchEvent($parser->reveal());
     }
@@ -30,10 +30,10 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $parser = $this->prophesize('LastCall\Crawler\Module\ModuleParser');
         $parser->parse(Argument::type('Symfony\Component\DomCrawler\Crawler'))
-          ->shouldBeCalled()
-          ->willReturn([
-            ['type' => 'foo']
-          ]);
+            ->shouldBeCalled()
+            ->willReturn([
+                ['type' => 'foo']
+            ]);
         $processor = $this->prophesize('LastCall\Crawler\Module\ModuleProcessor');
         $processor->getModuleTypes()->shouldBeCalled()->willReturn(['foo']);
         $processor->process(['type' => 'foo'])->shouldBeCalled();
@@ -47,23 +47,26 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
         $logger = $this->prophesize('PSR\Log\LoggerInterface');
 
         $parser->parse(Argument::type('Symfony\Component\DomCrawler\Crawler'))
-          ->shouldBeCalled()
-          ->willReturn([
-            ['type' => 'foo']
-          ]);
+            ->shouldBeCalled()
+            ->willReturn([
+                ['type' => 'foo']
+            ]);
 
-        $logger->warning('Unknown module type: foo')
-          ->shouldBeCalled();
+        $logger->warning('Unknown module type: foo')->shouldBeCalled();
 
         $this->dispatchEvent($parser->reveal(), [], $logger->reveal());
     }
 
-    private function dispatchEvent(ModuleParser $parser, array $processors = [], LoggerInterface $logger = NULL)
-    {
+    private function dispatchEvent(
+        ModuleParser $parser,
+        array $processors = [],
+        LoggerInterface $logger = null
+    ) {
         $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = $this->prophesize(URLHandler::class);
         $request = new Request('GET', 'http://google.com');
-        $event = new CrawlerResponseEvent($request, new Response(), $queue->reveal(), $urlHandler->reveal());
+        $event = new CrawlerResponseEvent($request, new Response(),
+            $queue->reveal(), $urlHandler->reveal());
         $subscriber = new ModuleSubscriber($parser, $processors, $logger);
         $subscriber->onCrawlerSuccess($event);
     }

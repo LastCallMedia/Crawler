@@ -19,7 +19,7 @@ class LinkSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::SUCCESS => array('onCrawlerSuccess'),
+            CrawlerEvents::SUCCESS => array('onCrawlerSuccess'),
         );
     }
 
@@ -39,14 +39,14 @@ class LinkSubscriber implements EventSubscriberInterface
     }
 
     private function scanLinks(
-      DomCrawler $dom,
-      URLHandler $urlHandler,
-      RequestQueueInterface $queue
+        DomCrawler $dom,
+        URLHandler $urlHandler,
+        RequestQueueInterface $queue
     ) {
         // This is the same as the CSS selector a[href].
         // Converted to xpath for performance.
         $urls = array_unique($dom->filterXPath('descendant-or-self::a[@href]')
-          ->extract('href'));
+            ->extract('href'));
 
         foreach ($urls as $url) {
             if ($url = $urlHandler->absolutizeUrl($url)) {

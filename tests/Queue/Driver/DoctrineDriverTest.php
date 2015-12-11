@@ -15,10 +15,11 @@ class DoctrineDriverTest extends \PHPUnit_Framework_TestCase
     {
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
-            'memory' => TRUE,
+            'memory' => true,
         ]);
         $driver = new DoctrineDriver($connection);
         $driver->createTable();
+
         return $driver;
     }
 }

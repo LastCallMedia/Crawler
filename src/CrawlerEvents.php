@@ -9,7 +9,8 @@
 namespace LastCall\Crawler;
 
 
-class CrawlerEvents {
+class CrawlerEvents
+{
 
     const SENDING = 'request.sending';
     const SUCCESS = 'request.success';

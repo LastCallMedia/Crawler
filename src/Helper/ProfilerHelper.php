@@ -20,17 +20,22 @@ class ProfilerHelper extends Helper
      */
     private $dispatcher;
 
-    public function getName() {
+    public function getName()
+    {
         return 'profiler';
     }
 
-    public function getTraceableDispatcher($dispatcher) {
+    public function getTraceableDispatcher($dispatcher)
+    {
         $this->stopwatch = new Stopwatch();
-        $this->dispatcher = new TraceableEventDispatcher($dispatcher, $this->stopwatch);
+        $this->dispatcher = new TraceableEventDispatcher($dispatcher,
+            $this->stopwatch);
+
         return $this->dispatcher;
     }
 
-    public function renderProfile(OutputStyle $io) {
+    public function renderProfile(OutputStyle $io)
+    {
         $headers = array('Listener', 'Time');
         $rows = array();
         foreach ($this->stopwatch->getSections() as $section) {

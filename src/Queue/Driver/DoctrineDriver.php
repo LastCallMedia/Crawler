@@ -23,10 +23,11 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         $this->table = $table;
     }
 
-    public function createTable() {
+    public function createTable()
+    {
         $table = new Table($this->table);
-        $table->addColumn('id', 'integer')->setAutoincrement(TRUE);
-        $table->addColumn('identifier', 'binary', ['nullable' => TRUE]);
+        $table->addColumn('id', 'integer')->setAutoincrement(true);
+        $table->addColumn('identifier', 'binary', ['nullable' => true]);
         $table->addColumn('queue', 'string');
         $table->addColumn('status', 'integer');
         $table->addColumn('expire', 'integer');
@@ -63,10 +64,10 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         }
         if (!isset($this->_cache[$channel][$key])) {
             $this->_cache[$channel][$key] = (bool) $this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ? AND queue = ?",
-              array(
-                $key,
-                $job->getQueue()
-              ))->fetchColumn();
+                array(
+                    $key,
+                    $job->getQueue()
+                ))->fetchColumn();
         }
 
         return $this->_cache[$channel][$key];
@@ -75,11 +76,11 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
     private function doPush(Job $job, $key)
     {
         return 1 === $this->connection->insert($this->table, [
-          'expire' => $job->getExpire(),
-          'identifier' => $key,
-          'status' => $job->getStatus(),
-          'queue' => $job->getQueue(),
-          'data' => serialize($job->getData()),
+            'expire' => $job->getExpire(),
+            'identifier' => $key,
+            'status' => $job->getStatus(),
+            'queue' => $job->getQueue(),
+            'data' => serialize($job->getData()),
         ]) && $job->setIdentifier($key) && ($this->_cache[$job->getQueue()][$key] = true);
     }
 
@@ -87,26 +88,26 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
     {
         $conn = $this->connection;
         $sql = "SELECT * FROM " . $conn->getDatabasePlatform()
-            ->appendLockHint($this->table,
-              LockMode::PESSIMISTIC_READ) . " WHERE queue = ? AND status = ? AND expire <= ? LIMIT 1";
+                ->appendLockHint($this->table,
+                    LockMode::PESSIMISTIC_READ) . " WHERE queue = ? AND status = ? AND expire <= ? LIMIT 1";
 
         $return = null;
 
         $this->connection->transactional(function () use (
-          $channel,
-          $sql,
-          $conn,
-          &$return,
-          $leaseTime
+            $channel,
+            $sql,
+            $conn,
+            &$return,
+            $leaseTime
         ) {
             if ($res = $conn->executeQuery($sql, [$channel, Job::FREE, time()])
-              ->fetch()
+                ->fetch()
             ) {
                 $expire = time() + $leaseTime;
                 $conn->update($this->table, [
-                  'expire' => $expire
+                    'expire' => $expire
                 ], [
-                  'id' => $res['id']
+                    'id' => $res['id']
                 ]);
                 $res['expire'] = $expire;
                 $return = $this->hydrateRecord($res);
@@ -122,12 +123,12 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         $job = $refl->newInstanceWithoutConstructor();
         $record['data'] = unserialize($record['data']);
         foreach (array(
-                   'data',
-                   'id',
-                   'queue',
-                   'status',
-                   'expire',
-                   'identifier'
+                     'data',
+                     'id',
+                     'queue',
+                     'status',
+                     'expire',
+                     'identifier'
                  ) as $property) {
             $prop = $refl->getProperty($property);
             $prop->setAccessible(true);
@@ -140,10 +141,10 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
     public function complete(Job $job)
     {
         $ret = $this->connection->update($this->table, [
-          'expire' => 0,
-          'status' => Job::COMPLETE,
+            'expire' => 0,
+            'status' => Job::COMPLETE,
         ], [
-          'id' => $job->getId(),
+            'id' => $job->getId(),
         ]);
 
         return $ret === 1 && $job->setStatus(Job::COMPLETE)->setExpire(0);
@@ -152,9 +153,9 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
     public function release(Job $job)
     {
         $ret = $this->connection->update($this->table, [
-          'expire' => 0,
+            'expire' => 0,
         ], [
-          'id' => $job->getId(),
+            'id' => $job->getId(),
         ]);
 
         return $ret === 1 && $job->setStatus(Job::FREE)->setExpire(0);
@@ -166,24 +167,24 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface
         switch ($status) {
             case Job::FREE:
                 return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire <= ?",
-                  array(
-                    $channel,
-                    Job::FREE,
-                    time()
-                  ))->fetchColumn();
+                    array(
+                        $channel,
+                        Job::FREE,
+                        time()
+                    ))->fetchColumn();
             case Job::CLAIMED:
                 return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire > ?",
-                  array(
-                    $channel,
-                    Job::FREE,
-                    time()
-                  ))->fetchColumn();
+                    array(
+                        $channel,
+                        Job::FREE,
+                        time()
+                    ))->fetchColumn();
             default:
                 return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ?",
-                  array(
-                    $channel,
-                    Job::COMPLETE
-                  ))->fetchColumn();
+                    array(
+                        $channel,
+                        Job::COMPLETE
+                    ))->fetchColumn();
         }
     }
 

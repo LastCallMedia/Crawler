@@ -15,11 +15,11 @@ class CrawlerExceptionEvent extends CrawlerEvent
     private $response;
 
     public function __construct(
-      RequestInterface $request,
-      ResponseInterface $response = NULL,
-      \Exception $exception,
-      RequestQueueInterface $queue,
-      URLHandler $handler
+        RequestInterface $request,
+        ResponseInterface $response = null,
+        \Exception $exception,
+        RequestQueueInterface $queue,
+        URLHandler $handler
     ) {
         parent::__construct($request, $queue, $handler);
         $this->response = $response;

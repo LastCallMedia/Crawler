@@ -87,16 +87,16 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
         }
 
         return array_reduce($this->jobs[$channel],
-          function ($count, Job $job) use ($status) {
-              switch ($status) {
-                  case Job::FREE:
-                      return $job->getStatus() === Job::FREE && $job->getExpire() <= time() ? $count + 1 : $count;
-                  case Job::CLAIMED:
-                      return $job->getStatus() === Job::FREE && $job->getExpire() > time() ? $count + 1 : $count;
-                  case Job::COMPLETE:
-                      return $job->getStatus() === Job::COMPLETE ? $count + 1 : $count;
-              }
-          }, 0);
+            function ($count, Job $job) use ($status) {
+                switch ($status) {
+                    case Job::FREE:
+                        return $job->getStatus() === Job::FREE && $job->getExpire() <= time() ? $count + 1 : $count;
+                    case Job::CLAIMED:
+                        return $job->getStatus() === Job::FREE && $job->getExpire() > time() ? $count + 1 : $count;
+                    case Job::COMPLETE:
+                        return $job->getStatus() === Job::COMPLETE ? $count + 1 : $count;
+                }
+            }, 0);
     }
 
     public function inspect($channel)

@@ -31,7 +31,11 @@ class ModuleSubscriber implements EventSubscriberInterface
      */
     private $logger;
 
-    public function __construct(ModuleParser $parser, array $processors = array(), LoggerInterface $logger = NULL) {
+    public function __construct(
+        ModuleParser $parser,
+        array $processors = array(),
+        LoggerInterface $logger = null
+    ) {
         $this->parser = $parser;
         $this->processors = $processors;
         $this->logger = $logger ?: new NullLogger();
@@ -48,9 +52,9 @@ class ModuleSubscriber implements EventSubscriberInterface
     private function getProcessors($type)
     {
         return array_filter($this->processors,
-          function (ModuleProcessor $processor) use ($type) {
-              return in_array($type, $processor->getModuleTypes());
-          });
+            function (ModuleProcessor $processor) use ($type) {
+                return in_array($type, $processor->getModuleTypes());
+            });
     }
 
     private function processModule($module)
@@ -60,8 +64,7 @@ class ModuleSubscriber implements EventSubscriberInterface
         $processors = $this->getProcessors($type);
         if (empty($processors)) {
             $this->logger->warning(sprintf('Unknown module type: %s', $type));
-        }
-        else {
+        } else {
             $this->logger->info(sprintf('Processing: %s', $type));
         }
         foreach ($processors as $processor) {
@@ -75,7 +78,7 @@ class ModuleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
+            CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
         );
     }
 

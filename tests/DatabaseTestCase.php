@@ -33,7 +33,7 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
         $config->setProxyNamespace('DoctrineProxy');
 
         $driver = $config->newDefaultAnnotationDriver(array(
-          __DIR__ . '/../../../../src/LastCall/Crawler/RequestQueue',
+            __DIR__ . '/../../../../src/LastCall/Crawler/RequestQueue',
         ), false);
         $config->setMetadataDriverImpl($driver);
 
@@ -43,15 +43,17 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
     protected function getConnection()
     {
         $connectionParams = array(
-          'driver' => 'pdo_sqlite',
-          'memory' => true,
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
         );
 
         return DriverManager::getConnection($connectionParams);
     }
 
-    protected function getManager(Connection $connection, Configuration $config)
-    {
+    protected function getManager(
+        Connection $connection,
+        Configuration $config
+    ) {
         return EntityManager::create($connection, $config);
     }
 
@@ -76,14 +78,14 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
         };
         $pimple['manager'] = function () use ($pimple) {
             $manager = $this->getManager($pimple['connection'],
-              $pimple['configuration']);
+                $pimple['configuration']);
             $this->createSchemas($manager);
 
             return $manager;
         };
 
         return new PimpleManagerRegistry($pimple,
-          array('connection' => 'connection'), array('manager' => 'manager'),
-          'connection', 'manager');
+            array('connection' => 'connection'), array('manager' => 'manager'),
+            'connection', 'manager');
     }
 }

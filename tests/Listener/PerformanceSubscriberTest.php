@@ -14,13 +14,15 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\PerformanceSubscriber;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class PerformanceSubscriberTest extends \PHPUnit_Framework_TestCase {
+class PerformanceSubscriberTest extends \PHPUnit_Framework_TestCase
+{
 
-    public function testLogsPerformance() {
+    public function testLogsPerformance()
+    {
         $output = new StreamOutput(fopen('php://memory', 'w', false));
         $subscriber = new PerformanceSubscriber($output);
 
-        for($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $sendingEvent = $this->prophesize(CrawlerEvent::class);
             $subscriber->onSending($sendingEvent->reveal());
 
@@ -28,6 +30,7 @@ class PerformanceSubscriberTest extends \PHPUnit_Framework_TestCase {
             $subscriber->onComplete($completeEvent->reveal());
         }
         rewind($output->getStream());
-        $this->assertRegExp('/Processed 5 in \ds \(\d+ms/', stream_get_contents($output->getStream()));
+        $this->assertRegExp('/Processed 5 in \ds \(\d+ms/',
+            stream_get_contents($output->getStream()));
     }
 }

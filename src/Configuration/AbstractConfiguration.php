@@ -50,11 +50,13 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         return $this->baseUrl;
     }
 
-    public function getSubscribers() {
+    public function getSubscribers()
+    {
         return $this->subscribers;
     }
 
-    public function getListeners() {
+    public function getListeners()
+    {
         return $this->listeners;
     }
 }

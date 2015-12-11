@@ -52,12 +52,14 @@ class PerformanceSubscriber implements EventSubscriberInterface
         $this->timer = new Stopwatch();
     }
 
-    public function onSending(CrawlerEvent $event) {
+    public function onSending(CrawlerEvent $event)
+    {
         $this->sent++;
         $this->timer->start('crawler.request');
     }
 
-    public function onComplete(CrawlerEvent $event) {
+    public function onComplete(CrawlerEvent $event)
+    {
         $this->completed++;
         $this->timer->lap('crawler.request');
 
@@ -69,8 +71,8 @@ class PerformanceSubscriber implements EventSubscriberInterface
 
             $memory = $event->getMemory() / 1024 / 1024;
 
-            $this->output->writeln(sprintf('Processed %s in %ss (%sms, %smb)', $segments,
-              round($duration / 1000), $rate, $memory));
+            $this->output->writeln(sprintf('Processed %s in %ss (%sms, %smb)',
+                $segments, round($duration / 1000), $rate, $memory));
         }
 
     }

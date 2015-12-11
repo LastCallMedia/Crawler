@@ -10,7 +10,8 @@ use Symfony\Component\Filesystem\Filesystem;
 class LogSetupSubscriber implements EventSubscriberInterface
 {
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return array(
             CrawlerEvents::SETUP => 'onSetup',
             CrawlerEvents::TEARDOWN => 'onTeardown',
@@ -24,11 +25,13 @@ class LogSetupSubscriber implements EventSubscriberInterface
         $this->dir = $dir;
     }
 
-    public function onSetup() {
+    public function onSetup()
+    {
         (new Filesystem())->mkdir($this->dir);
     }
 
-    public function onTeardown() {
+    public function onTeardown()
+    {
         (new Filesystem())->remove(glob($this->dir . '/*.log'));
     }
 

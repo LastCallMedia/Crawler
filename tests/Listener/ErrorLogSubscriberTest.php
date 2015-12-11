@@ -15,7 +15,7 @@ class ErrorLogSubscriberTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'http://google.com');
         $logger = $this->prophesize('Psr\Log\LoggerInterface');
         $logger->error(Argument::type('Exception'),
-          ['url' => 'http://google.com'])->shouldBeCalled();
+            ['url' => 'http://google.com'])->shouldBeCalled();
 
         $event = $this->prophesize(CrawlerExceptionEvent::class);
         $event->getRequest()->willReturn($request);

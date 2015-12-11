@@ -16,7 +16,8 @@ class TeardownCommand extends Command
         if (!$this->getName()) {
             $this->setName('teardown');
         }
-        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
+        $this->addArgument('config', InputArgument::REQUIRED,
+            'The path to the crawler configuration.');
         $this->setDescription('Tear down any dependencies after the crawler is run');
         parent::configure();
     }
@@ -25,8 +26,9 @@ class TeardownCommand extends Command
     {
         /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
         $helper = $this->getHelper('crawler');
-        $config = $helper->getConfiguration($input->getArgument('config'), $output);
-        $crawler = $helper->getCrawler($config, FALSE);
+        $config = $helper->getConfiguration($input->getArgument('config'),
+            $output);
+        $crawler = $helper->getCrawler($config, false);
         $crawler->teardown();
         $io = new SymfonyStyle($input, $output);
         $io->success('Teardown complete');

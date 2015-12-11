@@ -21,7 +21,7 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $queue = $this->prophesize(RequestQueueInterface::class);
         $urlHandler = new URLHandler('http://google.com');
 
-        $queue->push(Argument::that(function($request) {
+        $queue->push(Argument::that(function ($request) {
             return 'http://google.com/index.html' === (string) $request->getUri();
         }));
 
@@ -30,12 +30,8 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', $uri);
         $response = new Response(404);
 
-        $event = new CrawlerResponseEvent(
-            $request,
-            $response,
-            $queue->reveal(),
-            $urlHandler
-        );
+        $event = new CrawlerResponseEvent($request, $response, $queue->reveal(),
+            $urlHandler);
 
         $subscriber = new RetryUrlSubscriber();
         $subscriber->onCrawlerFail($event);
@@ -45,7 +41,7 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $urlHandler = new URLHandler('http://google.com');
         $queue = $this->prophesize(RequestQueueInterface::class);
-        $queue->push(Argument::that(function($request) {
+        $queue->push(Argument::that(function ($request) {
             return 'http://google.com/index.html' === (string) $request->getUri();
         }))->shouldBeCalled();
 
@@ -53,14 +49,10 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $uri = $originalUri->withPath('');
         $request = new Request('GET', $uri);
         $response = new Response(301,
-          ['Location' => 'http://google.com/index.html']);
+            ['Location' => 'http://google.com/index.html']);
 
-        $event = new CrawlerResponseEvent(
-            $request,
-            $response,
-            $queue->reveal(),
-            $urlHandler
-        );
+        $event = new CrawlerResponseEvent($request, $response, $queue->reveal(),
+            $urlHandler);
 
         $subscriber = new RetryUrlSubscriber();
         $subscriber->onCrawlerSuccess($event);
@@ -81,12 +73,8 @@ class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', $uri);
         $response = new Response(301, ['Location' => 'http://google.com/foo']);
 
-        $event = new CrawlerResponseEvent(
-            $request,
-            $response,
-            $queue->reveal(),
-            $urlHandler
-        );
+        $event = new CrawlerResponseEvent($request, $response, $queue->reveal(),
+            $urlHandler);
 
         $subscriber = new RetryUrlSubscriber();
         $subscriber->onCrawlerSuccess($event);

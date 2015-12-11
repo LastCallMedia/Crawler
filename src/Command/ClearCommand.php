@@ -16,7 +16,8 @@ class ClearCommand extends Command
         if (!$this->getName()) {
             $this->setName('clear');
         }
-        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
+        $this->addArgument('config', InputArgument::REQUIRED,
+            'The path to the crawler configuration.');
         $this->setDescription('Clear existing data.');
         parent::configure();
     }
@@ -26,8 +27,9 @@ class ClearCommand extends Command
         $io = new SymfonyStyle($input, $output);
         /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
         $helper = $this->getHelper('crawler');
-        $config = $helper->getConfiguration($input->getArgument('config'), $output);
-        $crawler = $helper->getCrawler($config, FALSE);
+        $config = $helper->getConfiguration($input->getArgument('config'),
+            $output);
+        $crawler = $helper->getCrawler($config, false);
         $crawler->teardown();
         $crawler->setUp();
         $io->success('Cleared');

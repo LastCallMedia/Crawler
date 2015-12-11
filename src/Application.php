@@ -18,6 +18,7 @@ class Application extends BaseApplication
         $helpers = parent::getDefaultHelperSet();
         $helpers->set(new CrawlerHelper());
         $helpers->set(new ProfilerHelper());
+
         return $helpers;
     }
 

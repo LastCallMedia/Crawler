@@ -10,7 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DoctrineQueueListener implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return array(
             CrawlerEvents::SETUP => 'onSetup',
             CrawlerEvents::TEARDOWN => 'onTeardown',
@@ -27,10 +28,11 @@ class DoctrineQueueListener implements EventSubscriberInterface
         $this->tableName = $tableName;
     }
 
-    public function onSetup() {
+    public function onSetup()
+    {
         $table = new Table($this->tableName);
-        $table->addColumn('id', 'integer')->setAutoincrement(TRUE);
-        $table->addColumn('identifier', 'binary', ['nullable' => TRUE]);
+        $table->addColumn('id', 'integer')->setAutoincrement(true);
+        $table->addColumn('identifier', 'binary', ['nullable' => true]);
         $table->addColumn('queue', 'string');
         $table->addColumn('status', 'integer');
         $table->addColumn('expire', 'integer');
@@ -41,8 +43,11 @@ class DoctrineQueueListener implements EventSubscriberInterface
         $this->connection->getSchemaManager()->dropAndCreateTable($table);
     }
 
-    public function onTeardown() {
-        if ($this->connection->getSchemaManager()->tablesExist([$this->tableName])) {
+    public function onTeardown()
+    {
+        if ($this->connection->getSchemaManager()
+            ->tablesExist([$this->tableName])
+        ) {
             $this->connection->getSchemaManager()->dropTable($this->tableName);
         }
     }

@@ -10,9 +10,9 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function getMatchesIncludeTests()
     {
         return array(
-          array('http://google.com', true),
-          array('http://yahoo.com', true),
-          array('http://alta-vista.com', false),
+            array('http://google.com', true),
+            array('http://yahoo.com', true),
+            array('http://alta-vista.com', false),
         );
     }
 
@@ -28,9 +28,9 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function getMatchesExcludeTests()
     {
         return array(
-          array('http://google.com', true),
-          array('http://yahoo.com', true),
-          array('http://alta-vista.com', false),
+            array('http://google.com', true),
+            array('http://yahoo.com', true),
+            array('http://alta-vista.com', false),
         );
     }
 
@@ -46,13 +46,13 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function getMatchesHTMLTests()
     {
         return array(
-          array('http://google.com', true),
-          array('http://google.com/index.html', true),
-          array('http://google.com/index.php', true),
-          array('http://google.com/index.asp', true),
-          array('http://google.com/index.asp#test', true),
-          array('http://google.com/index.asp?foo=bar', true),
-          array('http://google.com/index.cfm', true),
+            array('http://google.com', true),
+            array('http://google.com/index.html', true),
+            array('http://google.com/index.php', true),
+            array('http://google.com/index.asp', true),
+            array('http://google.com/index.asp#test', true),
+            array('http://google.com/index.asp?foo=bar', true),
+            array('http://google.com/index.cfm', true),
         );
     }
 
@@ -68,22 +68,22 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function getMatchesFileTests()
     {
         $exts = array(
-          'pdf',
-          'xml',
-          'png',
-          'svg',
-          'psd',
-          'gif',
-          'jpg',
-          'jpeg',
-          'doc',
-          'docx',
-          'txt'
+            'pdf',
+            'xml',
+            'png',
+            'svg',
+            'psd',
+            'gif',
+            'jpg',
+            'jpeg',
+            'doc',
+            'docx',
+            'txt'
         );
         $return = array(
-          array('http://google.com', false),
-          array('http://google.com/index.html', false),
-          array('http://google.com/index.txt#test', true),
+            array('http://google.com', false),
+            array('http://google.com/index.html', false),
+            array('http://google.com/index.txt#test', true),
         );
         foreach ($exts as $ext) {
             $return[] = array(sprintf('http://google.com/test.%s', $ext), true);
@@ -105,9 +105,9 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = new Matcher();
         $this->assertEquals(true,
-          $matcher->matchesInclude('http://google.com'));
+            $matcher->matchesInclude('http://google.com'));
         $this->assertEquals(false,
-          $matcher->matchesExclude('http://alta-vista.com'));
+            $matcher->matchesExclude('http://alta-vista.com'));
     }
 
     public function testAddInclusionPattern()

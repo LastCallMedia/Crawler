@@ -21,7 +21,7 @@ class RedirectLogSubscriber extends RedirectSubscriber
     public static function getSubscribedEvents()
     {
         return array(
-          CrawlerEvents::SUCCESS => 'onRequestSuccess',
+            CrawlerEvents::SUCCESS => 'onRequestSuccess',
         );
     }
 
@@ -36,12 +36,13 @@ class RedirectLogSubscriber extends RedirectSubscriber
         $request = $event->getRequest();
 
         if (in_array($response->getStatusCode(),
-            self::$redirectCodes) && $response->hasHeader('Location')
+                self::$redirectCodes) && $response->hasHeader('Location')
         ) {
             $urlHandler = $event->getUrlHandler();
             $location = $urlHandler->absolutizeUrl($response->getHeaderLine('Location'));
 
-            $this->logger->info(sprintf('Redirect %s detected from %s to %s', $response->getStatusCode(), $request->getUri(), $location), [
+            $this->logger->info(sprintf('Redirect %s detected from %s to %s',
+                $response->getStatusCode(), $request->getUri(), $location), [
                 'from' => $request->getUri(),
                 'to' => $location
             ]);

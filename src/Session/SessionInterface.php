@@ -7,14 +7,15 @@ use LastCall\Crawler\Queue\RequestQueueInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-interface SessionInterface {
+interface SessionInterface
+{
 
     /**
      * @param string $startUrl
      *
      * @return string
      */
-    public function getStartUrl($startUrl = NULL);
+    public function getStartUrl($startUrl = null);
 
     /**
      * @param \Psr\Http\Message\RequestInterface $request
@@ -39,9 +40,24 @@ interface SessionInterface {
     public function isFinished();
 
     public function onSetup();
+
     public function onTeardown();
+
     public function onRequestSending(RequestInterface $request);
-    public function onRequestSuccess(RequestInterface $request, ResponseInterface $response);
-    public function onRequestFailure(RequestInterface $request, ResponseInterface $response);
-    public function onRequestException(RequestInterface $request, \Exception $exception, ResponseInterface $response = NULL);
+
+    public function onRequestSuccess(
+        RequestInterface $request,
+        ResponseInterface $response
+    );
+
+    public function onRequestFailure(
+        RequestInterface $request,
+        ResponseInterface $response
+    );
+
+    public function onRequestException(
+        RequestInterface $request,
+        \Exception $exception,
+        ResponseInterface $response = null
+    );
 }

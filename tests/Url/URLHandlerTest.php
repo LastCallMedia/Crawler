@@ -22,54 +22,54 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     public function getRelativeUrls()
     {
         return array(
-          array(
-            'http://google.com',
-            'http://google.com/search',
-            'https://newegg.com',
-            'https://newegg.com'
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search',
-            '/relative1',
-            'http://google.com/relative1'
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search',
-            '/relative1',
-            'http://google.com/relative1'
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search/',
-            'relative2',
-            'http://google.com/search/relative2'
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search/',
-            '//google.com/schemerelative',
-            'http://google.com/schemerelative'
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search/',
-            '#foo',
-            'http://google.com/search/#foo'
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search/',
-            'mailto:joe@blow.com',
-            false
-          ),
-          array(
-            'http://google.com',
-            'http://google.com/search/',
-            'javascript:alert()',
-            false
-          ),
+            array(
+                'http://google.com',
+                'http://google.com/search',
+                'https://newegg.com',
+                'https://newegg.com'
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search',
+                '/relative1',
+                'http://google.com/relative1'
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search',
+                '/relative1',
+                'http://google.com/relative1'
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search/',
+                'relative2',
+                'http://google.com/search/relative2'
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search/',
+                '//google.com/schemerelative',
+                'http://google.com/schemerelative'
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search/',
+                '#foo',
+                'http://google.com/search/#foo'
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search/',
+                'mailto:joe@blow.com',
+                false
+            ),
+            array(
+                'http://google.com',
+                'http://google.com/search/',
+                'javascript:alert()',
+                false
+            ),
         );
     }
 
@@ -80,21 +80,21 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new URLHandler($base, $current);
         $this->assertEquals($expected,
-          (string) $handler->absolutizeUrl($toProcess));
+            (string) $handler->absolutizeUrl($toProcess));
     }
 
     /**
      * @dataProvider getRelativeUrls
      */
     public function testAbsolutizeCachedUrl(
-      $base,
-      $current,
-      $toProcess,
-      $expected
+        $base,
+        $current,
+        $toProcess,
+        $expected
     ) {
         $handler = new CachedUrlHandler($base, $current);
         $this->assertEquals($expected,
-          (string) $handler->absolutizeUrl($toProcess));
+            (string) $handler->absolutizeUrl($toProcess));
     }
 
     /**
@@ -104,39 +104,43 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $normalizer = $this->prophesize('LastCall\Crawler\Url\Normalizer');
         $normalizer->normalize(Argument::any())
-          ->should(new CallPrediction())
-          ->will(new ReturnArgumentPromise());
+            ->should(new CallPrediction())
+            ->will(new ReturnArgumentPromise());
         $handler = new URLHandler($base, $current, null, $normalizer->reveal());
         $this->assertEquals($expected,
-          (string) $handler->normalizeUrl($toProcess));
+            (string) $handler->normalizeUrl($toProcess));
     }
 
     /**
      * @dataProvider getRelativeUrls
      */
-    public function testNormalizeCached($base, $current, $toProcess, $expected)
-    {
+    public function testNormalizeCached(
+        $base,
+        $current,
+        $toProcess,
+        $expected
+    ) {
         $normalizer = $this->prophesize('LastCall\Crawler\Url\Normalizer');
         $normalizer->normalize(Argument::any())
-          ->should(new CallPrediction())
-          ->will(new ReturnArgumentPromise());
+            ->should(new CallPrediction())
+            ->will(new ReturnArgumentPromise());
         $handler = new CachedUrlHandler($base, $current, null,
-          $normalizer->reveal());
+            $normalizer->reveal());
         $this->assertEquals($expected,
-          (string) $handler->normalizeUrl($toProcess));
+            (string) $handler->normalizeUrl($toProcess));
     }
 
     public function testIncludesUrl()
     {
         $matcher = $this->prophesize('LastCall\Crawler\Url\Matcher');
         $matcher->matchesInclude('http://google.com')
-          ->should(new CallPrediction())
-          ->willReturn(true);
+            ->should(new CallPrediction())
+            ->willReturn(true);
         $matcher->matchesExclude('http://google.com')
-          ->should(new CallPrediction())
-          ->willReturn(false);
+            ->should(new CallPrediction())
+            ->willReturn(false);
         $handler = new URLHandler('http://google.com', null,
-          $matcher->reveal());
+            $matcher->reveal());
         $this->assertEquals(true, $handler->includesUrl('http://google.com'));
     }
 
@@ -144,10 +148,10 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = $this->prophesize('LastCall\Crawler\Url\Matcher');
         $matcher->matchesHTML('http://google.com')
-          ->should(new CallPrediction())
-          ->willReturn(true);
+            ->should(new CallPrediction())
+            ->willReturn(true);
         $handler = new URLHandler('http://example.com', null,
-          $matcher->reveal());
+            $matcher->reveal());
         $this->assertEquals($handler->isCrawlable('http://google.com'), true);
     }
 
@@ -155,11 +159,11 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = $this->prophesize('LastCall\Crawler\Url\Matcher');
         $matcher->matchesFile('http://google.com/test.txt')
-          ->should(new CallPrediction())
-          ->willReturn(true);
+            ->should(new CallPrediction())
+            ->willReturn(true);
         $handler = new URLHandler('http://example.com', null,
-          $matcher->reveal());
+            $matcher->reveal());
         $this->assertEquals(true,
-          $handler->isFile('http://google.com/test.txt'));
+            $handler->isFile('http://google.com/test.txt'));
     }
 }
