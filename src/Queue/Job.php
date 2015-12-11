@@ -2,15 +2,7 @@
 
 namespace LastCall\Crawler\Queue;
 
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(
- *  uniqueConstraints={@ORM\UniqueConstraint(name="queue_identifier",
- *  columns={"identifier", "queue"})}
- * )
- */
 class Job
 {
 
@@ -19,34 +11,32 @@ class Job
     const COMPLETE = 2;
 
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(name="identifier", type="binary", nullable=true)
+     * @var string
      */
     private $identifier;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     private $queue;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $status = self::FREE;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $expire = 0;
 
     /**
-     * @ORM\Column(type="object")
+     * @var object
      */
     private $data;
 

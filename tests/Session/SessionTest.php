@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Test\Session;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
@@ -16,7 +17,6 @@ use Prophecy\Argument;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use LastCall\Crawler\Common\SetupTeardownInterface;
 
 
 class SessionTest extends \PHPUnit_Framework_TestCase
@@ -186,7 +186,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             new \Exception('foo'), new Response());
     }
 
-    public function testSetsUpQueue() {
+    public function testSetsUpQueue()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->willImplement(SetupTeardownInterface::class);
@@ -197,7 +198,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $session->onSetup();
     }
 
-    public function testTearsDownQueue() {
+    public function testTearsDownQueue()
+    {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->willImplement(SetupTeardownInterface::class);
