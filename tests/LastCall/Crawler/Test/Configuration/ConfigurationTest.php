@@ -3,17 +3,10 @@
 namespace LastCall\Crawler\Test\Configuration;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Configuration\Configuration;
-use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase

@@ -4,13 +4,11 @@ namespace LastCall\Crawler\Test\Listener;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use LastCall\Crawler\Configuration\Configuration;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RedirectLogSubscriber;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 
 class RedirectLogSubscriberTest extends \PHPUnit_Framework_TestCase
 {

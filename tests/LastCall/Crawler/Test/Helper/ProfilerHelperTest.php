@@ -5,9 +5,9 @@ namespace LastCall\Crawler\Test\Helper;
 
 use LastCall\Crawler\Helper\ProfilerHelper;
 use Prophecy\Argument;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\Console\Style\OutputStyle;
+use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ProfilerHelperTest extends \PHPUnit_Framework_TestCase {
 

@@ -2,10 +2,10 @@
 
 namespace LastCall\Crawler\Session;
 
+use GuzzleHttp\ClientInterface;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use LastCall\Crawler\Queue\RequestQueueInterface;
-use GuzzleHttp\ClientInterface;
 
 interface SessionInterface {
 

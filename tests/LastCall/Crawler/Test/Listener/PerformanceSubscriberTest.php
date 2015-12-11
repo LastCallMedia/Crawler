@@ -9,10 +9,10 @@
 namespace LastCall\Crawler\Test\Listener;
 
 
-use LastCall\Crawler\Listener\PerformanceSubscriber;
-use Symfony\Component\Console\Output\StreamOutput;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Listener\PerformanceSubscriber;
+use Symfony\Component\Console\Output\StreamOutput;
 
 class PerformanceSubscriberTest extends \PHPUnit_Framework_TestCase {
 

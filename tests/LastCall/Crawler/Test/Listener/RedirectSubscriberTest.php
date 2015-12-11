@@ -6,10 +6,9 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RedirectSubscriber;
-use LastCall\Crawler\Url\URLHandler;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use LastCall\Crawler\Crawler;
 
 class RedirectSubscriberTest extends \PHPUnit_Framework_TestCase
 {

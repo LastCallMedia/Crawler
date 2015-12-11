@@ -8,10 +8,10 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Listener\RetryUrlSubscriber;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\TraceableUri;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 
 class RetryUrlSubscriberTest extends \PHPUnit_Framework_TestCase
 {

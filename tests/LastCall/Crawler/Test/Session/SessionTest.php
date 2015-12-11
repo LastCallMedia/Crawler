@@ -2,21 +2,20 @@
 
 namespace LastCall\Crawler\Test\Session;
 
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
-use LastCall\Crawler\Queue\Job;
+use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerExceptionEvent;
+use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
-use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Queue\RequestQueueInterface;
-use Psr\Http\Message\UriInterface;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Event\CrawlerExceptionEvent;
 
 
 class SessionTest extends \PHPUnit_Framework_TestCase {

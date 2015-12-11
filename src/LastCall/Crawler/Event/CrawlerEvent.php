@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Event;
 
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerSession;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;

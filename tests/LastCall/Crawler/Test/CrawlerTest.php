@@ -12,11 +12,11 @@ use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
 use LastCall\Crawler\Queue\Job;
 use LastCall\Crawler\Queue\RequestQueue;
-use Prophecy\Argument;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\Session\SessionInterface;
+use Prophecy\Argument;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use LastCall\Crawler\Session\SessionInterface;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
 {

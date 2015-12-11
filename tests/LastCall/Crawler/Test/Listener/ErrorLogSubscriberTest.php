@@ -3,11 +3,9 @@
 namespace LastCall\Crawler\Test\Listener;
 
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Listener\ErrorLogSubscriber;
 use Prophecy\Argument;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ErrorLogSubscriberTest extends \PHPUnit_Framework_TestCase
 {

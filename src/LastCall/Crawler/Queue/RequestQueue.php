@@ -3,7 +3,6 @@
 namespace LastCall\Crawler\Queue;
 
 use LastCall\Crawler\Queue\Driver\DriverInterface;
-use LastCall\Crawler\Queue\Driver\UniqueJobInterface;
 use Psr\Http\Message\RequestInterface;
 
 class RequestQueue implements RequestQueueInterface

@@ -4,13 +4,9 @@ namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
-use LastCall\Crawler\Queue\Driver\DriverInterface;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Configuration extends AbstractConfiguration

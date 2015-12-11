@@ -9,7 +9,6 @@ use LastCall\Crawler\Session\Session;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CrawlerHelper extends Helper
 {

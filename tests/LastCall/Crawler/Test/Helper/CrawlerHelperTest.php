@@ -3,8 +3,8 @@
 namespace LastCall\Crawler\Test\Helper;
 
 use LastCall\Crawler\Configuration\Configuration;
-use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;

@@ -2,13 +2,6 @@
 
 namespace LastCall\Crawler\Configuration;
 
-use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
-use LastCall\Crawler\Event\CrawlerExceptionEvent;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-
 abstract class AbstractConfiguration implements ConfigurationInterface
 {
 

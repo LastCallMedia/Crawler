@@ -3,9 +3,9 @@
 namespace LastCall\Crawler;
 
 use LastCall\Crawler\Command\ClearCommand;
+use LastCall\Crawler\Command\CrawlCommand;
 use LastCall\Crawler\Command\SetupCommand;
 use LastCall\Crawler\Command\TeardownCommand;
-use LastCall\Crawler\Command\CrawlCommand;
 use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use Symfony\Component\Console\Application as BaseApplication;
