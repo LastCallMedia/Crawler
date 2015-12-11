@@ -23,7 +23,7 @@ When a configuration is run through the crawler, an HTTP request is made to the 
 
 * Crawler::SENDING - A request is about to be sent.
 * Crawler::SUCCESS - A request has been sent and a response has been received.  The response has been deemed "successful" by the client.
-* Crawler::FAIL - A request has been sent and a response has been received.  The response has been deemed "failed" by the client.
+* Crawler::FAILURE - A request has been sent and a response has been received.  The response has been deemed "failed" by the client.
 * Crawler::EXCEPTION - An exception has occurred during crawling.  This could be before or after the response was received.  
 * Crawler::SETUP - The user has requested that setup tasks are run. 
 * Crawler::TEARDOWN - The user has requested that teardown tasks are run.
