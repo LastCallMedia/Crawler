@@ -1,18 +1,23 @@
 <?php
 
-namespace LastCall\Crawler\Test\Listener;
+
+namespace LastCall\Crawler\Test\Handler\Module;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Handler\Module\DomModule;
 use LastCall\Crawler\Listener\ModuleSubscriber;
 use LastCall\Crawler\Module\ModuleParser;
+use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
-class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
+class DomModuleTest extends \PHPUnit_Framework_TestCase
 {
+    use HandlerTestTrait;
 
     public function testCallsParse()
     {
@@ -65,7 +70,8 @@ class ModuleSubscriberTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'http://google.com');
         $event = new CrawlerResponseEvent($request, new Response(),
             $urlHandler->reveal());
-        $subscriber = new ModuleSubscriber($parser, $processors, $logger);
-        $subscriber->onCrawlerSuccess($event);
+        $handler = new DomModule($parser, $processors, $logger);
+        $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
     }
+
 }

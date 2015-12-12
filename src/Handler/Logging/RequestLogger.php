@@ -8,11 +8,13 @@ use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
+use LastCall\Crawler\Handler\RedirectDetectionTrait;
 use LastCall\Crawler\Url\TraceableUri;
 use Psr\Log\LoggerInterface;
 
 class RequestLogger implements CrawlerHandlerInterface
 {
+    use RedirectDetectionTrait;
     private $logger;
 
     public static function getSubscribedEvents()
@@ -37,12 +39,6 @@ class RequestLogger implements CrawlerHandlerInterface
         return (int)$event->getResponse()->getStatusCode();
     }
 
-    private function isRedirectResponse(CrawlerResponseEvent $event) {
-        $codes = [201, 301, 302, 303, 307, 308];
-        return in_array($event->getResponse()->getStatusCode(), $codes)
-            && $event->getResponse()->hasHeader('Location');
-    }
-
     private function getRedirectUri(CrawlerResponseEvent $event) {
         return $event->getResponse()->getHeaderLine('Location');
     }
@@ -63,10 +59,11 @@ class RequestLogger implements CrawlerHandlerInterface
         }
     }
 
-    public function onSuccess(CrawlerEvent $event) {
+    public function onSuccess(CrawlerResponseEvent $event) {
         $uri = $this->getUri($event);
         $status = $this->getStatus($event);
-        if($this->isRedirectResponse($event)) {
+        $response = $event->getResponse();
+        if($this->isRedirectResponse($response)) {
             $redirectUri = $this->getRedirectUri($event);
             $this->logger->info(sprintf('Received %s redirecting to %s', $uri, $redirectUri), [
                 'url' => (string)$uri,

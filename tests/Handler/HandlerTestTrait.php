@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\Event;
 trait HandlerTestTrait
 {
 
-    public function invokeEvent(CrawlerHandlerInterface $handler, $eventName, Event $event) {
+    public function invokeEvent(CrawlerHandlerInterface $handler, $eventName, Event $event = NULL) {
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($handler);
         return $dispatcher->dispatch($eventName, $event);

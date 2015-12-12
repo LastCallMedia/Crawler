@@ -1,19 +1,18 @@
 <?php
 
-namespace LastCall\Crawler\Listener;
+
+namespace LastCall\Crawler\Handler\Module;
+
 
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Module\ModuleParser;
 use LastCall\Crawler\Module\ModuleProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Process modules in the HTML by running them through a parser.
- */
-class ModuleSubscriber implements EventSubscriberInterface
+class DomModule implements CrawlerHandlerInterface
 {
 
     /**
@@ -41,7 +40,7 @@ class ModuleSubscriber implements EventSubscriberInterface
         $this->logger = $logger ?: new NullLogger();
     }
 
-    public function onCrawlerSuccess(CrawlerResponseEvent $event)
+    public function onSuccess(CrawlerResponseEvent $event)
     {
         $modules = $this->parser->parse($event->getDom());
         foreach ($modules as $module) {
@@ -78,7 +77,9 @@ class ModuleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            CrawlerEvents::SUCCESS => 'onCrawlerSuccess',
+//            CrawlerEvents::SETUP => 'onSetup',
+            CrawlerEvents::SUCCESS => 'onSuccess',
+//            CrawlerEvents::TEARDOWN => 'onTeardown',
         );
     }
 

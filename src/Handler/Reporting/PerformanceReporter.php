@@ -1,15 +1,16 @@
 <?php
 
-namespace LastCall\Crawler\Listener;
+
+namespace LastCall\Crawler\Handler\Reporting;
 
 
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class PerformanceSubscriber implements EventSubscriberInterface
+class PerformanceReporter implements CrawlerHandlerInterface
 {
     /**
      * @var int

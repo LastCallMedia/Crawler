@@ -1,15 +1,15 @@
 <?php
 
-namespace LastCall\Crawler\Listener;
+
+namespace LastCall\Crawler\Handler\Setup;
 
 
+use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\CrawlerEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class LogSetupSubscriber implements EventSubscriberInterface
+class LogSetup implements CrawlerHandlerInterface
 {
-
     public static function getSubscribedEvents()
     {
         return array(

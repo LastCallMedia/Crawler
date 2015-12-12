@@ -1,16 +1,18 @@
 <?php
 
-namespace LastCall\Crawler\Listener;
 
-use GuzzleHttp\Psr7\Request;
+namespace LastCall\Crawler\Handler\Discovery;
+
+
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use LastCall\Crawler\Handler\CrawlerHandlerInterface;
+use LastCall\Crawler\Handler\RedirectDetectionTrait;
+use GuzzleHttp\Psr7\Request;
 
-class RedirectSubscriber implements EventSubscriberInterface
+class RedirectDiscoverer implements CrawlerHandlerInterface
 {
-
-    public static $redirectCodes = array(201, 301, 302, 303, 307, 308);
+    use RedirectDetectionTrait;
 
     /**
      * {@inheritDoc}
@@ -25,10 +27,7 @@ class RedirectSubscriber implements EventSubscriberInterface
     public function onResponse(CrawlerResponseEvent $event)
     {
         $response = $event->getResponse();
-
-        if (in_array($response->getStatusCode(),
-                self::$redirectCodes) && $response->hasHeader('Location')
-        ) {
+        if($this->isRedirectResponse($response)) {
             $urlHandler = $event->getUrlHandler();
 
             $location = $urlHandler->absolutizeUrl($response->getHeaderLine('Location'));
@@ -39,4 +38,5 @@ class RedirectSubscriber implements EventSubscriberInterface
             }
         }
     }
+
 }

@@ -1,19 +1,24 @@
 <?php
 
-namespace LastCall\Crawler\Test\Listener;
+
+namespace LastCall\Crawler\Test\Handler\Setup;
 
 
-use LastCall\Crawler\Listener\LogSetupSubscriber;
+use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Handler\Setup\LogSetup;
+use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use Symfony\Component\Filesystem\Filesystem;
 
-class LogClearingSubscriberTest extends \PHPUnit_Framework_TestCase
+class LogSetupTest extends \PHPUnit_Framework_TestCase
 {
+    use HandlerTestTrait;
+
     public function testCreatesDir()
     {
         $dir = sys_get_temp_dir() . '/phpunit/crawler-log-dir' . mt_rand(1,
                 9999999);
-        $sub = new LogSetupSubscriber($dir);
-        $sub->onSetup();
+        $handler = new LogSetup($dir);
+        $this->invokeEvent($handler, CrawlerEvents::SETUP);
         $this->assertTrue(is_dir($dir));
         rmdir($dir);
     }
@@ -26,8 +31,8 @@ class LogClearingSubscriberTest extends \PHPUnit_Framework_TestCase
         $fs->mkdir($dir);
         $fs->touch($dir . '/test.txt');
         $fs->touch($dir . '/test.log');
-        $sub = new LogSetupSubscriber($dir);
-        $sub->onTeardown();
+        $handler = new LogSetup($dir);
+        $this->invokeEvent($handler, CrawlerEvents::TEARDOWN);
         $this->assertTrue(file_exists($dir . '/test.txt'));
         $this->assertFalse(file_exists($dir . '/test.log'));
     }
