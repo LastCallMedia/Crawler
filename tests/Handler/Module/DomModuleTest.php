@@ -14,6 +14,7 @@ use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class DomModuleTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,6 +60,26 @@ class DomModuleTest extends \PHPUnit_Framework_TestCase
         $logger->warning('Unknown module type: foo')->shouldBeCalled();
 
         $this->dispatchEvent($parser->reveal(), [], $logger->reveal());
+    }
+
+    public function testSetupCallsProcessors() {
+        $parser = $this->prophesize('LastCall\Crawler\Module\ModuleParser');
+
+        $processor = $this->prophesize('LastCall\Crawler\Module\ModuleProcessor');
+        $processor->willImplement('LastCall\Crawler\Common\SetupTeardownInterface');
+        $handler = new DomModule($parser->reveal(), [$processor->reveal()], new NullLogger());
+        $this->invokeEvent($handler, CrawlerEvents::SETUP);
+        $processor->onSetup()->shouldHaveBeenCalled();
+    }
+
+    public function testTeardownCallsProcessors() {
+        $parser = $this->prophesize('LastCall\Crawler\Module\ModuleParser');
+
+        $processor = $this->prophesize('LastCall\Crawler\Module\ModuleProcessor');
+        $processor->willImplement('LastCall\Crawler\Common\SetupTeardownInterface');
+        $handler = new DomModule($parser->reveal(), [$processor->reveal()], new NullLogger());
+        $this->invokeEvent($handler, CrawlerEvents::TEARDOWN);
+        $processor->onTeardown()->shouldHaveBeenCalled();
     }
 
     private function dispatchEvent(

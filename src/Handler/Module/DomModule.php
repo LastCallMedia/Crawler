@@ -4,6 +4,7 @@
 namespace LastCall\Crawler\Handler\Module;
 
 
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
@@ -71,15 +72,33 @@ class DomModule implements CrawlerHandlerInterface
         }
     }
 
+    public function onSetup() {
+        foreach($this->getSetupTeardownProcessors() as $processor) {
+            $processor->onSetup();
+        }
+    }
+
+    public function onTeardown() {
+        foreach($this->getSetupTeardownProcessors() as $processor) {
+            $processor->onTeardown();
+        }
+    }
+
+    protected function getSetupTeardownProcessors() {
+        return array_filter($this->processors, function(ModuleProcessor $processor) {
+            return $processor instanceof SetupTeardownInterface;
+        });
+    }
+
     /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-//            CrawlerEvents::SETUP => 'onSetup',
+            CrawlerEvents::SETUP => 'onSetup',
             CrawlerEvents::SUCCESS => 'onSuccess',
-//            CrawlerEvents::TEARDOWN => 'onTeardown',
+            CrawlerEvents::TEARDOWN => 'onTeardown',
         );
     }
 
