@@ -22,7 +22,7 @@ class CrawlerEvent extends Event
     private $urlHandler;
 
     /**
-     * @var \Psr\Http\Message\RequestInterface
+     * @var \Psr\Http\Message\RequestInterface[]
      */
     private $discoveredRequests = [];
 
@@ -44,11 +44,17 @@ class CrawlerEvent extends Event
         return $this->urlHandler;
     }
 
+    /**
+     * @param \Psr\Http\Message\RequestInterface $request
+     */
     public function addAdditionalRequest(RequestInterface $request)
     {
         $this->discoveredRequests[] = $request;
     }
 
+    /**
+     * @return \Psr\Http\Message\RequestInterface[]
+     */
     public function getAdditionalRequests()
     {
         return $this->discoveredRequests;
