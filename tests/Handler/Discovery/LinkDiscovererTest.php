@@ -16,24 +16,29 @@ class LinkDiscovererTest extends \PHPUnit_Framework_TestCase
 {
     use HandlerTestTrait;
 
-    public function getInputs() {
+    public function getInputs()
+    {
         $inputs = array(
             array(
-                new Response(200, [], '<html><body><a href="/foo">Test</a></body>'),
+                new Response(200, [],
+                    '<html><body><a href="/foo">Test</a></body>'),
                 ['https://lastcallmedia.com/foo']
             ),
             array(
-                new Response(200, [], '<html><body><a href="https://lastcallmedia.com/bar">Test</a></body>'),
+                new Response(200, [],
+                    '<html><body><a href="https://lastcallmedia.com/bar">Test</a></body>'),
                 ['https://lastcallmedia.com/bar']
             )
         );
+
         return $inputs;
     }
 
     /**
      * @dataProvider getInputs
      */
-    public function testLinkDiscovery($response, $expected) {
+    public function testLinkDiscovery($response, $expected)
+    {
         $request = new Request('GET', 'https://lastcallmedia.com');
         $urlHandler = new URLHandler('https://lastcallmedia.com');
         $event = new CrawlerResponseEvent($request, $response, $urlHandler);
@@ -41,7 +46,7 @@ class LinkDiscovererTest extends \PHPUnit_Framework_TestCase
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
 
         $added = [];
-        foreach($event->getAdditionalRequests() as $addedRequest) {
+        foreach ($event->getAdditionalRequests() as $addedRequest) {
             $added[] = (string)$addedRequest->getUri();
         }
         $this->assertEquals($expected, $added);

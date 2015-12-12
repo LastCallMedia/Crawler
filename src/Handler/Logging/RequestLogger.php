@@ -31,47 +31,52 @@ class RequestLogger implements CrawlerHandlerInterface
         $this->logger = $logger;
     }
 
-    private function getUri(CrawlerEvent $event) {
+    private function getUri(CrawlerEvent $event)
+    {
         return $event->getRequest()->getUri();
     }
 
-    private function getStatus(CrawlerResponseEvent $event) {
+    private function getStatus(CrawlerResponseEvent $event)
+    {
         return (int)$event->getResponse()->getStatusCode();
     }
 
-    private function getRedirectUri(CrawlerResponseEvent $event) {
+    private function getRedirectUri(CrawlerResponseEvent $event)
+    {
         return $event->getResponse()->getHeaderLine('Location');
     }
 
-    public function onSending(CrawlerEvent $event) {
+    public function onSending(CrawlerEvent $event)
+    {
         $uri = $this->getUri($event);
 
-        if($uri instanceof TraceableUri && $uri->getNext()) {
-            $this->logger->debug(sprintf('Sending %s as a retry for %s', $uri, $uri->getNext()), [
+        if ($uri instanceof TraceableUri && $uri->getNext()) {
+            $this->logger->debug(sprintf('Sending %s as a retry for %s', $uri,
+                $uri->getNext()), [
                 'url' => (string)$uri,
                 'retry' => (string)$uri->getNext()
             ]);
-        }
-        else {
+        } else {
             $this->logger->debug(sprintf('Sending %s', $uri), [
                 'url' => (string)$uri
             ]);
         }
     }
 
-    public function onSuccess(CrawlerResponseEvent $event) {
+    public function onSuccess(CrawlerResponseEvent $event)
+    {
         $uri = $this->getUri($event);
         $status = $this->getStatus($event);
         $response = $event->getResponse();
-        if($this->isRedirectResponse($response)) {
+        if ($this->isRedirectResponse($response)) {
             $redirectUri = $this->getRedirectUri($event);
-            $this->logger->info(sprintf('Received %s redirecting to %s', $uri, $redirectUri), [
+            $this->logger->info(sprintf('Received %s redirecting to %s', $uri,
+                $redirectUri), [
                 'url' => (string)$uri,
                 'status' => $status,
                 'redirect' => (string)$redirectUri,
             ]);
-        }
-        else {
+        } else {
             $this->logger->debug(sprintf('Received %s', $uri), [
                 'url' => (string)$uri,
                 'status' => $status,
@@ -79,7 +84,8 @@ class RequestLogger implements CrawlerHandlerInterface
         }
     }
 
-    public function onFailure(CrawlerEvent $event) {
+    public function onFailure(CrawlerEvent $event)
+    {
         $uri = $this->getUri($event);
         $status = $this->getStatus($event);
         $this->logger->warning(sprintf('Failure %s', $uri), [

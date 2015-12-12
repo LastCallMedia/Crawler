@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 class PerformanceReporterTest extends \PHPUnit_Framework_TestCase
 {
     use HandlerTestTrait;
+
     public function testOutputsPerformance()
     {
         $output = new StreamOutput(fopen('php://memory', 'w', false));
@@ -25,11 +26,13 @@ class PerformanceReporterTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'foo');
         $response = new Response(200);
         $sendingEvent = new CrawlerEvent($request, $urlHandler);
-        $completeEvent = new CrawlerResponseEvent($request, $response, $urlHandler);
+        $completeEvent = new CrawlerResponseEvent($request, $response,
+            $urlHandler);
 
         for ($i = 0; $i < 5; $i++) {
             $this->invokeEvent($handler, CrawlerEvents::SENDING, $sendingEvent);
-            $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $completeEvent);
+            $this->invokeEvent($handler, CrawlerEvents::SUCCESS,
+                $completeEvent);
         }
         rewind($output->getStream());
         $this->assertRegExp('/Processed 5 in \ds \(\d+ms/',

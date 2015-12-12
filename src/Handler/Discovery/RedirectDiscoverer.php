@@ -4,11 +4,11 @@
 namespace LastCall\Crawler\Handler\Discovery;
 
 
+use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Handler\RedirectDetectionTrait;
-use GuzzleHttp\Psr7\Request;
 
 class RedirectDiscoverer implements CrawlerHandlerInterface
 {
@@ -27,7 +27,7 @@ class RedirectDiscoverer implements CrawlerHandlerInterface
     public function onResponse(CrawlerResponseEvent $event)
     {
         $response = $event->getResponse();
-        if($this->isRedirectResponse($response)) {
+        if ($this->isRedirectResponse($response)) {
             $urlHandler = $event->getUrlHandler();
 
             $location = $urlHandler->absolutizeUrl($response->getHeaderLine('Location'));

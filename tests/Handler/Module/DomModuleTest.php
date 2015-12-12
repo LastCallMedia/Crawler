@@ -62,22 +62,26 @@ class DomModuleTest extends \PHPUnit_Framework_TestCase
         $this->dispatchEvent($parser->reveal(), [], $logger->reveal());
     }
 
-    public function testSetupCallsProcessors() {
+    public function testSetupCallsProcessors()
+    {
         $parser = $this->prophesize('LastCall\Crawler\Module\ModuleParser');
 
         $processor = $this->prophesize('LastCall\Crawler\Module\ModuleProcessor');
         $processor->willImplement('LastCall\Crawler\Common\SetupTeardownInterface');
-        $handler = new DomModule($parser->reveal(), [$processor->reveal()], new NullLogger());
+        $handler = new DomModule($parser->reveal(), [$processor->reveal()],
+            new NullLogger());
         $this->invokeEvent($handler, CrawlerEvents::SETUP);
         $processor->onSetup()->shouldHaveBeenCalled();
     }
 
-    public function testTeardownCallsProcessors() {
+    public function testTeardownCallsProcessors()
+    {
         $parser = $this->prophesize('LastCall\Crawler\Module\ModuleParser');
 
         $processor = $this->prophesize('LastCall\Crawler\Module\ModuleProcessor');
         $processor->willImplement('LastCall\Crawler\Common\SetupTeardownInterface');
-        $handler = new DomModule($parser->reveal(), [$processor->reveal()], new NullLogger());
+        $handler = new DomModule($parser->reveal(), [$processor->reveal()],
+            new NullLogger());
         $this->invokeEvent($handler, CrawlerEvents::TEARDOWN);
         $processor->onTeardown()->shouldHaveBeenCalled();
     }

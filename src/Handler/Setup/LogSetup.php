@@ -4,8 +4,8 @@
 namespace LastCall\Crawler\Handler\Setup;
 
 
-use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LogSetup implements CrawlerHandlerInterface

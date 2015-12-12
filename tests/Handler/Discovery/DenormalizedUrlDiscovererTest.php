@@ -3,15 +3,15 @@
 
 namespace LastCall\Crawler\Test\Handler\Discovery;
 
-use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Handler\Discovery\DenormalizedUrlDiscoverer;
-use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Url\URLHandler;
-use LastCall\Crawler\Url\TraceableUri;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Handler\Discovery\DenormalizedUrlDiscoverer;
+use LastCall\Crawler\Test\Handler\HandlerTestTrait;
+use LastCall\Crawler\Url\TraceableUri;
+use LastCall\Crawler\Url\URLHandler;
 
 class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,8 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
             $added[0]->getUri());
     }
 
-    public function getRetryTests() {
+    public function getRetryTests()
+    {
         $tests = array();
 
         $tests[] = array(
@@ -48,13 +49,14 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
         $tests[] = array(
             (new TraceableUri(new Uri('https://lastcallmedia.com/index.html')))->withPath(''),
             'https://lastcallmedia.com/some/other.html',
-            FALSE
+            false
         );
         $tests[] = array(
             (new TraceableUri(new Uri('https://lastcallmedia.com/index.html')))->withPath(''),
             '/index.html',
             'https://lastcallmedia.com/index.html',
         );
+
         return $tests;
     }
 
@@ -73,11 +75,10 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
         $handler = new DenormalizedUrlDiscoverer();
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
         $added = $event->getAdditionalRequests();
-        if($expected) {
+        if ($expected) {
             $this->assertCount(1, $added);
-            $this->assertEquals($expected, (string) $added[0]->getUri());
-        }
-        else {
+            $this->assertEquals($expected, (string)$added[0]->getUri());
+        } else {
             $this->assertCount(0, $added);
         }
 

@@ -16,14 +16,16 @@ class ExceptionLoggingHandlerTest extends \PHPUnit_Framework_TestCase
 {
     use HandlerTestTrait;
 
-    public function testLogsException() {
+    public function testLogsException()
+    {
         $request = new Request('GET', 'bar');
         $exception = new \Exception('foo');
 
         $logger = $this->prophesize(LoggerInterface::class);
 
         $handler = new ExceptionLoggingHandler($logger->reveal());
-        $event = new CrawlerExceptionEvent($request, NULL, $exception, new URLHandler('foo'));
+        $event = new CrawlerExceptionEvent($request, null, $exception,
+            new URLHandler('foo'));
         $this->invokeEvent($handler, CrawlerEvents::EXCEPTION, $event);
 
         $logger->critical($exception, [

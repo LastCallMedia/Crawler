@@ -17,7 +17,8 @@ class ExceptionLoggingHandler implements CrawlerHandlerInterface
      */
     private $logger;
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             CrawlerEvents::EXCEPTION => 'onCrawlerException',
         ];
@@ -28,7 +29,8 @@ class ExceptionLoggingHandler implements CrawlerHandlerInterface
         $this->logger = $logger;
     }
 
-    public function onCrawlerException(CrawlerExceptionEvent $event) {
+    public function onCrawlerException(CrawlerExceptionEvent $event)
+    {
         $this->logger->critical($event->getException(), [
             'exception' => $event->getException(),
             'url' => $event->getRequest()->getUri(),

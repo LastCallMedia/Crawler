@@ -6,8 +6,8 @@ namespace LastCall\Crawler\Handler\Module;
 
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Module\ModuleParser;
 use LastCall\Crawler\Module\ModuleProcessor;
 use Psr\Log\LoggerInterface;
@@ -72,22 +72,26 @@ class DomModule implements CrawlerHandlerInterface
         }
     }
 
-    public function onSetup() {
-        foreach($this->getSetupTeardownProcessors() as $processor) {
+    public function onSetup()
+    {
+        foreach ($this->getSetupTeardownProcessors() as $processor) {
             $processor->onSetup();
         }
     }
 
-    public function onTeardown() {
-        foreach($this->getSetupTeardownProcessors() as $processor) {
+    public function onTeardown()
+    {
+        foreach ($this->getSetupTeardownProcessors() as $processor) {
             $processor->onTeardown();
         }
     }
 
-    protected function getSetupTeardownProcessors() {
-        return array_filter($this->processors, function(ModuleProcessor $processor) {
-            return $processor instanceof SetupTeardownInterface;
-        });
+    protected function getSetupTeardownProcessors()
+    {
+        return array_filter($this->processors,
+            function (ModuleProcessor $processor) {
+                return $processor instanceof SetupTeardownInterface;
+            });
     }
 
     /**
