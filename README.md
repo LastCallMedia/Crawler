@@ -1,6 +1,8 @@
 Static Site Crawler
 ===================
 
+[![Build Status](https://travis-ci.org/LastCallMedia/Crawler.svg?branch=master)](https://travis-ci.org/LastCallMedia/Crawler)
+
 This is a CLI tool to crawl a website and do processing on the data that's found.  The most common use case would be for scraping content off of an HTML site, but it could also be used to invoke an API and process the data.
 
 This tool exposes 3 subcommands:
