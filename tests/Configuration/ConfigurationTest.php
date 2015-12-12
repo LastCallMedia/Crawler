@@ -72,48 +72,4 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => [[$listener, 10]]],
             $config->getListeners());
     }
-
-//
-//    public function testSetup() {
-//        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-//        $dispatcher->dispatch(CrawlerEvents::SETUP)->shouldBeCalledTimes(1);
-//        $config = new Configuration(NULL, $dispatcher->reveal());
-//        $config->onSetup();
-//    }
-//
-//    public function testTeardown() {
-//        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-//        $dispatcher->dispatch(CrawlerEvents::TEARDOWN)->shouldBeCalledTimes(1);
-//        $config = new Configuration(NULL, $dispatcher->reveal());
-//        $config->onTeardown();
-//    }
-//
-//    public function testOnRequestSending() {
-//        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-//        $dispatcher->dispatch(CrawlerEvents::SENDING, Argument::type(CrawlerEvent::class))->shouldBeCalledTimes(1);
-//        $config = new Configuration(NULL, $dispatcher->reveal());
-//        $config->onRequestSending(new Request('GET', 'http://google.com'));
-//    }
-//
-//    public function testOnRequestSuccess() {
-//        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-//        $dispatcher->dispatch(CrawlerEvents::SUCCESS, Argument::type(CrawlerResponseEvent::class))->shouldBeCalledTimes(1);
-//        $config = new Configuration(NULL, $dispatcher->reveal());
-//        $config->onRequestSuccess(new Request('GET', 'http://google.com'), new Response());
-//    }
-//
-//    public function testOnRequestFailure() {
-//        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-//        $dispatcher->dispatch(CrawlerEvents::FAILURE, Argument::type(CrawlerResponseEvent::class))->shouldBeCalledTimes(1);
-//        $config = new Configuration(NULL, $dispatcher->reveal());
-//        $config->onRequestFailure(new Request('GET', 'http://google.com'), new Response());
-//    }
-//
-//    public function testOnRequestException() {
-//        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-//        $dispatcher->dispatch(CrawlerEvents::EXCEPTION, Argument::type(CrawlerExceptionEvent::class))->shouldBeCalledTimes(1);
-//        $config = new Configuration(NULL, $dispatcher->reveal());
-//        $config->onRequestException(new Request('GET', 'http://google.com'),
-//            new \Exception('foo'), new Response());
-//    }
 }
