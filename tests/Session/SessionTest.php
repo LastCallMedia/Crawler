@@ -15,6 +15,7 @@ use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Http\Message\UriInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -184,6 +185,21 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $session = new Session($config->reveal(), $dispatcher->reveal());
         $session->onRequestException(new Request('GET', 'http://google.com'),
             new \Exception('foo'), new Response());
+    }
+
+    public function testAddsAdditionalRequests() {
+        $newRequest = new Request('GET', 'https://lastcallmedia.com');
+        $fn = function(CrawlerEvent $event) use ($newRequest) {
+            $event->addAdditionalRequest($newRequest);
+        };
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $queue->push($newRequest)->shouldBeCalled();
+        $config = $this->mockConfig([], [], $queue);
+        $config->getListeners()->willReturn([
+            CrawlerEvents::SENDING => [[$fn, 0]]
+        ]);
+        $session = new Session($config->reveal(), new EventDispatcher());
+        $session->onRequestSending(new Request('GET', 'http://google.com'));
     }
 
     public function testSetsUpQueue()
