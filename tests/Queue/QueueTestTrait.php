@@ -20,10 +20,13 @@ trait QueueTestTrait
      */
     abstract protected function getAssert();
 
-    private function getRequest($suffix = '') {
+    private function getRequest($suffix = '')
+    {
         return new Request('GET', 'https://lastcallmedia.com' . $suffix);
     }
-    public function testPush() {
+
+    public function testPush()
+    {
         $assert = $this->getAssert();
         $request = $this->getRequest();
         $queue = $this->getQueue();
@@ -31,39 +34,43 @@ trait QueueTestTrait
         $assert->assertFalse($queue->push($request));
     }
 
-    public function testPop() {
+    public function testPop()
+    {
         $queue = $this->getQueue();
         $assert = $this->getAssert();
         $queue->push($this->getRequest());
         $job = $queue->pop();
         $assert->assertInstanceOf(Job::class, $job);
-        $assert->assertEquals('GEThttps://lastcallmedia.com', $job->getIdentifier());
+        $assert->assertEquals('GEThttps://lastcallmedia.com',
+            $job->getIdentifier());
         $assert->greaterThan(time(), $job->getExpire());
         $assert->assertNull($queue->pop());
     }
 
-    public function testComplete() {
+    public function testComplete()
+    {
         $assert = $this->getAssert();
         $queue = $this->getQueue();
         $queue->push($this->getRequest());
         $job = $queue->pop();
-        $assert->assertTrue($queue->complete($job));
+        $queue->complete($job);
         $assert->equalTo(Job::COMPLETE, $job->getStatus());
         $assert->equalTo(0, $job->getExpire());
     }
 
-    public function testRelease() {
+    public function testRelease()
+    {
         $assert = $this->getAssert();
         $queue = $this->getQueue();
         $queue->push($this->getRequest());
         $job = $queue->pop();
-        $assert->assertTrue($queue->release($job));
+        $queue->release($job);
         $assert->equalTo(Job::FREE, $job->getStatus());
         $assert->equalTo(0, $job->getExpire());
-        $assert->assertFalse($queue->release($job));
     }
 
-    public function testCount() {
+    public function testCount()
+    {
         $assert = $this->getAssert();
         $queue = $this->getQueue();
         $queue->push($this->getRequest());
@@ -75,6 +82,26 @@ trait QueueTestTrait
         $assert->assertEquals(1, $queue->count(Job::FREE));
         $assert->assertEquals(1, $queue->count(Job::CLAIMED));
         $assert->assertEquals(1, $queue->count(Job::COMPLETE));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage This job is not managed by this queue
+     */
+    public function testCompleteJobNotOnQueue()
+    {
+        $queue = $this->getQueue();
+        $queue->complete(new Job('foo', 'bar'));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage This job is not managed by this queue
+     */
+    public function testReleaseJobNotOnQueue()
+    {
+        $queue = $this->getQueue();
+        $queue->release(new Job('foo', 'barbaz'));
     }
 
 }

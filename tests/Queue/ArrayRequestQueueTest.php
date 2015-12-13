@@ -10,11 +10,13 @@ class ArrayRequestQueueTest extends \PHPUnit_Framework_TestCase
 {
     use QueueTestTrait;
 
-    protected function getQueue() {
+    protected function getQueue()
+    {
         return new ArrayRequestQueue();
     }
 
-    protected function getAssert() {
+    protected function getAssert()
+    {
         return $this;
     }
 

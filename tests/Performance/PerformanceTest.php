@@ -87,7 +87,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $event = $this->runConfiguration($configuration, 'Logging');
 
         $this->logDataPoint($event);
-        $this->assertLessThan(12, $event->getDuration());
+        $this->assertLessThan(24, $event->getDuration());
     }
 
     public function testLinkDiscovery()
@@ -100,29 +100,33 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $event = $this->runConfiguration($configuration, 'Link Discovery');
 
         $this->logDataPoint($event);
-        $this->assertLessThan(12, $event->getDuration());
+        $this->assertLessThan(24, $event->getDuration());
     }
 
-    public function getQueues() {
+    public function getQueues()
+    {
         $conn = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
-            'memory' => TRUE,
+            'memory' => true,
         ]);
+
         return [
-            [new ArrayRequestQueue(), 120],
-            [new DoctrineRequestQueue($conn, 'new'), 300]
+            [new ArrayRequestQueue(), 240],
+            [new DoctrineRequestQueue($conn, 'new'), 600]
         ];
     }
+
     /**
      * @dataProvider getQueues
      */
-    public function testQueues(RequestQueueInterface $queue, $expectedTime) {
-        if($queue instanceof SetupTeardownInterface) {
+    public function testQueuePush(RequestQueueInterface $queue, $expectedTime)
+    {
+        if ($queue instanceof SetupTeardownInterface) {
             $queue->onSetup();
         }
         $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue));
-        for($i = 0; $i < 500; $i++) {
+        $stopwatch->start('queue', get_class($queue) . '::push()');
+        for ($i = 0; $i < 500; $i++) {
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
@@ -131,12 +135,35 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
         }
         $stopwatch->stop('queue');
-        if($queue instanceof SetupTeardownInterface) {
+        if ($queue instanceof SetupTeardownInterface) {
             $queue->onTeardown();
         }
         $event = $stopwatch->getEvent('queue');
         $this->logDataPoint($event);
         $this->assertLessThan($expectedTime, $event->getDuration());
+    }
+
+    /**
+     * @dataProvider getQueues
+     */
+    public function testQueueComplete(RequestQueueInterface $queue)
+    {
+        if ($queue instanceof SetupTeardownInterface) {
+            $queue->onSetup();
+        }
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('queue', get_class($queue) . '::complete()');
+        for ($i = 0; $i < 500; $i++) {
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $job = $queue->pop();
+            $queue->complete($job);
+        }
+        $stopwatch->stop('queue');
+        if ($queue instanceof SetupTeardownInterface) {
+            $queue->onTeardown();
+        }
+        $event = $stopwatch->getEvent('queue');
+        $this->logDataPoint($event);
     }
 
     private function runConfiguration(
@@ -154,7 +181,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         return $stopwatch->getEvent(__FUNCTION__, $category);
     }
 
-    private function logDataPoint(StopwatchEvent $event) {
+    private function logDataPoint(StopwatchEvent $event)
+    {
         print $event . PHP_EOL;
     }
 }

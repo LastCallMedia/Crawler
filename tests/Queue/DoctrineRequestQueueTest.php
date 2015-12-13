@@ -11,20 +11,22 @@ class DoctrineRequestQueueTest extends \PHPUnit_Framework_TestCase
 {
     use QueueTestTrait;
 
-    public function getQueue() {
+    public function getQueue()
+    {
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
-            'memory' => TRUE,
+            'memory' => true,
         ]);
         $queue = new DoctrineRequestQueue($connection);
         $queue->onSetup();
+
         return $queue;
     }
 
-    protected function getAssert() {
+    protected function getAssert()
+    {
         return $this;
     }
-
 
 
 }

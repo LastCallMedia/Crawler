@@ -11,19 +11,9 @@ class Job
     const COMPLETE = 2;
 
     /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var string
      */
     private $identifier;
-
-    /**
-     * @var string
-     */
-    private $queue;
 
     /**
      * @var int
@@ -40,21 +30,10 @@ class Job
      */
     private $data;
 
-    public function __construct($queue, $data, $identifier = null)
+    public function __construct($data, $identifier)
     {
-        $this->queue = $queue;
         $this->data = $data;
         $this->identifier = $identifier;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function getQueue()
-    {
-        return $this->queue;
     }
 
     public function getStatus()
@@ -89,12 +68,5 @@ class Job
     public function getIdentifier()
     {
         return $this->identifier;
-    }
-
-    public function setIdentifier($identifier)
-    {
-        $this->identifier = $identifier;
-
-        return $this;
     }
 }

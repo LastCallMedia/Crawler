@@ -8,24 +8,27 @@ use Psr\Http\Message\RequestInterface;
 
 class ArrayRequestQueue implements RequestQueueInterface
 {
-    private $jobs;
+
+    private $jobs = [];
 
     public function push(RequestInterface $request)
     {
         $key = $request->getMethod() . $request->getUri();
-        if(!isset($this->jobs[$key])) {
-            $job = new Job(NULL, $request, $key);
+        if (!isset($this->jobs[$key])) {
+            $job = new Job($request, $key);
             $this->jobs[$key] = $job;
-            return TRUE;
+
+            return true;
         }
-        return FALSE;
+
+        return false;
     }
 
     public function pop()
     {
         $now = time();
-        foreach($this->jobs as $job) {
-            if($job->getStatus() === Job::FREE && $job->getExpire() < $now) {
+        foreach ($this->jobs as $job) {
+            if ($job->getStatus() === Job::FREE && $job->getExpire() < $now) {
                 $job->setExpire(time() + 30);
 
                 return $job;
@@ -36,23 +39,24 @@ class ArrayRequestQueue implements RequestQueueInterface
     public function complete(Job $job)
     {
         $managedJob = $this->getJob($job->getIdentifier());
-        if($managedJob->getStatus() !== Job::COMPLETE) {
-            $managedJob->setStatus(Job::COMPLETE);
-            $managedJob->setExpire(0);
-            return TRUE;
+        $managedJob->setStatus(Job::COMPLETE);
+        $managedJob->setExpire(0);
+    }
+
+    private function getJob($identifier)
+    {
+        if (!isset($this->jobs[$identifier])) {
+            throw new \RuntimeException('This job is not managed by this queue');
         }
-        return FALSE;
+
+        return $this->jobs[$identifier];
     }
 
     public function release(Job $job)
     {
         $managedJob = $this->getJob($job->getIdentifier());
-        if($managedJob->getStatus() !== Job::FREE || $managedJob->getExpire() !== 0) {
-            $managedJob->setStatus(Job::FREE);
-            $managedJob->setExpire(0);
-            return TRUE;
-        }
-        return FALSE;
+        $managedJob->setStatus(Job::FREE);
+        $managedJob->setExpire(0);
     }
 
     public function count($status = Job::FREE)
@@ -68,13 +72,6 @@ class ArrayRequestQueue implements RequestQueueInterface
                         return $job->getStatus() === Job::COMPLETE ? $count + 1 : $count;
                 }
             }, 0);
-    }
-
-    private function getJob($identifier) {
-        if(!isset($this->jobs[$identifier])) {
-            throw new \Exception('This job is not managed by this queue');
-        }
-        return $this->jobs[$identifier];
     }
 
 }

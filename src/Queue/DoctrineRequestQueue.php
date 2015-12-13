@@ -6,15 +6,16 @@ namespace LastCall\Crawler\Queue;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Schema\Table;
 use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use Psr\Http\Message\RequestInterface;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\LockMode;
 
 class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterface
 {
     use DoctrineSetupTeardownTrait;
+
     /**
      * @var \Doctrine\DBAL\Connection
      */
@@ -35,19 +36,20 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     {
         $key = $request->getMethod() . $request->getUri();
         try {
-            if(!$this->exists($key)) {
+            if (!$this->exists($key)) {
                 $ret = $this->connection->insert($this->table, [
                     'expire' => 0,
                     'identifier' => $key,
                     'status' => Job::FREE,
                     'data' => serialize($request),
                 ]);
+
                 return $ret === 1;
             }
-            return FALSE;
-        }
-        catch(UniqueConstraintViolationException $e) {
-            return FALSE;
+
+            return false;
+        } catch (UniqueConstraintViolationException $e) {
+            return false;
         }
     }
 
@@ -75,10 +77,10 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
                 $conn->update($this->table, [
                     'expire' => $expire
                 ], [
-                    'id' => $res['id']
+                    'identifier' => $res['identifier']
                 ]);
                 $res['expire'] = $expire;
-                $return = $this->hydrateRecord($res);
+                $return = $this->hydrateFromArray($res);
             }
         });
 
@@ -86,48 +88,27 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     }
 
     /**
-     * {@inheritDoc}
-     */
-    private function hydrateRecord(array $record)
-    {
-        $refl = new \ReflectionClass('LastCall\Crawler\Queue\Job');
-        $job = $refl->newInstanceWithoutConstructor();
-        $record['data'] = unserialize($record['data']);
-        foreach (array(
-                     'data',
-                     'id',
-                     'status',
-                     'expire',
-                     'identifier'
-                 ) as $property) {
-            $prop = $refl->getProperty($property);
-            $prop->setAccessible(true);
-            $prop->setValue($job, $record[$property]);
-        }
-
-        return $job;
-    }
-
-    /**
      * @inheritDoc
      */
     public function complete(Job $job)
     {
-        $ret = $this->connection->update($this->table, [
-            'expire' => 0,
-            'status' => Job::COMPLETE,
-        ], [
-            'id' => $job->getId(),
-            'expire' => $job->getExpire(),
-            'status' => $job->getStatus()
-        ]);
+        if ($this->exists($job->getIdentifier())) {
+            $ret = $this->connection->update($this->table, [
+                'expire' => 0,
+                'status' => Job::COMPLETE,
+            ], [
+                'identifier' => $job->getIdentifier(),
+                'expire' => $job->getExpire(),
+                'status' => $job->getStatus()
+            ]);
 
-        if($ret === 1) {
-            $job->setStatus(Job::COMPLETE)
-                ->setExpire(0);
-            return TRUE;
+            if ($ret === 1) {
+                $job->setStatus(Job::COMPLETE)->setExpire(0);
+            }
+
+            return;
         }
-        return FALSE;
+        $this->throwNotManaged();
     }
 
     /**
@@ -135,21 +116,22 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
      */
     public function release(Job $job)
     {
-        $ret = $this->connection->update($this->table, [
-            'expire' => 0,
-            'status' => Job::FREE,
-        ], [
-            'id' => $job->getId(),
-            'expire' => $job->getExpire(),
-            'status' => $job->getStatus(),
-        ]);
+        if ($this->exists($job->getIdentifier())) {
+            $ret = $this->connection->update($this->table, [
+                'expire' => 0,
+                'status' => Job::FREE,
+            ], [
+                'identifier' => $job->getIdentifier(),
+                'expire' => $job->getExpire(),
+                'status' => $job->getStatus(),
+            ]);
+            if ($ret === 1) {
+                $job->setStatus(Job::COMPLETE)->setExpire(0);
+            }
 
-        if($ret === 1) {
-            $job->setStatus(Job::COMPLETE)
-                ->setExpire(0);
-            return TRUE;
+            return;
         }
-        return FALSE;
+        $this->throwNotManaged();
     }
 
     public function count($status = Job::FREE)
@@ -176,28 +158,51 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         }
     }
 
-    private function exists($identifier) {
+    protected function getConnection()
+    {
+        return $this->connection;
+    }
+
+    protected function getTables()
+    {
+        $table = new Table($this->table);
+        $table->addColumn('identifier', 'binary');
+        $table->addColumn('status', 'integer');
+        $table->addColumn('expire', 'integer');
+        $table->addColumn('data', 'object');
+        $table->setPrimaryKey(['identifier']);
+
+        return [$table];
+    }
+
+    private function exists($identifier)
+    {
         return $this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ?",
             array(
                 $identifier
             ))->fetchColumn();
     }
 
-    protected function getConnection() {
-        return $this->connection;
+    private function throwNotManaged()
+    {
+        throw new \RuntimeException('This job is not managed by this queue');
     }
 
-    protected function getTables() {
-        $table = new Table($this->table);
-        $table->addColumn('id', 'integer')->setAutoincrement(true);
-        $table->addColumn('identifier', 'binary', ['nullable' => true]);
-        $table->addColumn('status', 'integer');
-        $table->addColumn('expire', 'integer');
-        $table->addColumn('data', 'object');
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['identifier']);
+    private function hydrateFromArray(array $record)
+    {
+        $record += array(
+            'data' => null,
+            'status' => Job::FREE,
+            'expire' => 0,
+            'identifier' => null,
+        );
+        $job = new Job(unserialize($record['data']), $record['identifier']);
+        foreach (['status', 'expire'] as $prop) {
+            $refl = new \ReflectionProperty(Job::class, $prop);
+            $refl->setAccessible(true);
+            $refl->setValue($job, $record[$prop]);
+        }
 
-        return [$table];
+        return $job;
     }
-
 }
