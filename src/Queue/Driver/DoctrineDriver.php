@@ -8,11 +8,12 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Schema\Table;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Queue\Job;
+use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 
 class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardownInterface
 {
 
-    use \LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
+    use DoctrineSetupTeardownTrait;
 
     private $connection;
 

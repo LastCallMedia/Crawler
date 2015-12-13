@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Command;
 
-use LastCall\Crawler\CrawlerSession;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
