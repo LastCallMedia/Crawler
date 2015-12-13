@@ -1,12 +1,13 @@
 <?php
 
 
-namespace LastCall\Crawler\Module;
+namespace LastCall\Crawler\Handler\Module;
 
 
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
+use LastCall\Crawler\Module\ModuleSubscription;
 use LastCall\Crawler\Module\Parser\ModuleParserInterface;
 use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 

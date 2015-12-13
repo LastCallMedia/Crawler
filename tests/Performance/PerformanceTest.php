@@ -16,7 +16,7 @@ use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
-use LastCall\Crawler\Module\ModuleHandler;
+use LastCall\Crawler\Handler\Module\ModuleHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\ArrayRequestQueue;

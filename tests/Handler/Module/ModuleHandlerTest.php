@@ -7,7 +7,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Module\ModuleHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
@@ -28,7 +27,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $processor = $this->prophesize(ModuleProcessorInterface::class);
         $processor->getSubscribedMethods()->willReturn(false);
-        new ModuleHandler([], [$processor->reveal()]);
+        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor->reveal()]);
     }
 
     /**
@@ -39,7 +38,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $processor = $this->prophesize(ModuleProcessorInterface::class);
         $processor->getSubscribedMethods()->willReturn([false]);
-        new ModuleHandler([], [$processor->reveal()]);
+        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor->reveal()]);
     }
 
     /**
@@ -49,7 +48,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     public function testChecksForSetSubscriptionParser()
     {
         $processor = new DummyProcessor(null, null);
-        new ModuleHandler([], [$processor]);
+        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor]);
     }
 
     /**
@@ -59,7 +58,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     public function testChecksForValidParser()
     {
         $processor = new DummyProcessor('foo', 'bar');
-        new ModuleHandler([], [$processor]);
+        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor]);
     }
 
     public function testCallsParsersAndSubscribers()
@@ -67,7 +66,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
         $processor = new DummyProcessor('xpath', 'descendant-or-self::a');
         $parser = new XPathParser();
 
-        $handler = new ModuleHandler([$parser], [$processor]);
+        $handler = new \LastCall\Crawler\Handler\Module\ModuleHandler([$parser], [$processor]);
 
         $html = '<html><a>Foo</a></html>';
         $req = new Request('GET', 'https://lastcallmedia.com');
