@@ -12,10 +12,9 @@ use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Handler\Discovery\LinkDiscoverer;
 use LastCall\Crawler\Handler\Logging\ExceptionLoggingHandler;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
-use LastCall\Crawler\Handler\Module\DomModule2;
+use LastCall\Crawler\Handler\Module\ModuleHandler;
 use LastCall\Crawler\Handler\Module\Parser\XPathParser;
 use LastCall\Crawler\Handler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
@@ -79,7 +78,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration('http://example.com/index.html');
         $configuration->setQueue($this->getQueue());
         $configuration->setClient($this->getClient());
-        $configuration->addSubscriber(new LinkDiscoverer());
+        $configuration->addSubscriber(new ModuleHandler([new XPathParser()], [new LinkProcessor()]));
         $event = $this->runConfiguration($configuration, 'links');
         $this->assertLessThan(12, $event->getDuration());
     }
