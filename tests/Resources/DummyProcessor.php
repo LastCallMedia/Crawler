@@ -4,8 +4,8 @@
 namespace LastCall\Crawler\Test\Resources;
 
 
-use LastCall\Crawler\Handler\Module\ModuleSubscription;
-use LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Module\ModuleSubscription;
+use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 
 class DummyProcessor implements ModuleProcessorInterface
 {

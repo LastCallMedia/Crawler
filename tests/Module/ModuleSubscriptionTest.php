@@ -1,10 +1,10 @@
 <?php
 
 
-namespace LastCall\Crawler\Test\Handler\Module\Subscription;
+namespace LastCall\Crawler\Test\Module;
 
 
-use LastCall\Crawler\Handler\Module\ModuleSubscription;
+use LastCall\Crawler\Module\ModuleSubscription;
 use LastCall\Crawler\Test\Resources\DummyProcessor;
 
 class ModuleSubscriptionTest extends \PHPUnit_Framework_TestCase

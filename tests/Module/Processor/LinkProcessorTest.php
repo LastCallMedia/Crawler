@@ -1,13 +1,13 @@
 <?php
 
 
-namespace LastCall\Crawler\Test\Handler\Module\Processor;
+namespace LastCall\Crawler\Test\Module\Processor;
 
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\Module\Processor\LinkProcessor;
+use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
@@ -17,7 +17,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new LinkProcessor();
         $methods = $processor->getSubscribedMethods();
         $this->assertCount(1, $methods);
-        /** @var \LastCall\Crawler\Handler\Module\ModuleSubscription $method */
+        /** @var \LastCall\Crawler\Module\ModuleSubscription $method */
         $method = reset($methods);
         $this->assertEquals('xpath', $method->getParserId());
         $this->assertEquals('descendant-or-self::a[@href]', $method->getSelector());

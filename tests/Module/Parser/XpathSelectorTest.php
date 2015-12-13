@@ -1,11 +1,11 @@
 <?php
 
 
-namespace LastCall\Crawler\Test\Handler\Module\Parser;
+namespace LastCall\Crawler\Test\Module\Parser;
 
 
-use LastCall\Crawler\Handler\Module\Parser\XPathParser;
 use GuzzleHttp\Psr7\Response;
+use LastCall\Crawler\Module\Parser\XPathParser;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class XpathSelectorTest extends \PHPUnit_Framework_TestCase

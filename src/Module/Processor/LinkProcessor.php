@@ -1,14 +1,14 @@
 <?php
 
 
-namespace LastCall\Crawler\Handler\Module\Processor;
+namespace LastCall\Crawler\Module\Processor;
 
 
+use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\Module\ModuleSubscription;
+use LastCall\Crawler\Module\ModuleSubscription;
 use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
-use GuzzleHttp\Psr7\Request;
 
 class LinkProcessor implements ModuleProcessorInterface
 {

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace LastCall\Crawler\Handler\Module\Parser;
+namespace LastCall\Crawler\Module\Parser;
 
 use Psr\Http\Message\ResponseInterface;
 

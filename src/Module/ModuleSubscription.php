@@ -1,10 +1,10 @@
 <?php
 
 
-namespace LastCall\Crawler\Handler\Module;
+namespace LastCall\Crawler\Module;
 
 
-use LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 
 /**
  * ModuleSubscription registers a callback when a named parser

@@ -7,13 +7,13 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\Module\ModuleHandler;
-use LastCall\Crawler\Handler\Module\Parser\XPathParser;
+use LastCall\Crawler\Module\ModuleHandler;
+use LastCall\Crawler\Module\Parser\XPathParser;
+use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Test\Resources\DummyProcessor;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
-use LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class ModuleHandlerTest extends \PHPUnit_Framework_TestCase

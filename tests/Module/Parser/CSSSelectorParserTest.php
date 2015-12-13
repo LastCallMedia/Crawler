@@ -1,11 +1,11 @@
 <?php
 
 
-namespace LastCall\Crawler\Test\Handler\Module\Parser;
+namespace LastCall\Crawler\Test\Module\Parser;
 
 
 use GuzzleHttp\Psr7\Response;
-use LastCall\Crawler\Handler\Module\Parser\CSSSelectorParser;
+use LastCall\Crawler\Module\Parser\CSSSelectorParser;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class CSSSelectorParserTest extends \PHPUnit_Framework_TestCase

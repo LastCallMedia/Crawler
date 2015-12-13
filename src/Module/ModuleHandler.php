@@ -1,14 +1,14 @@
 <?php
 
 
-namespace LastCall\Crawler\Handler\Module;
+namespace LastCall\Crawler\Module;
 
 
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
-use LastCall\Crawler\Handler\Module\Parser\ModuleParserInterface;
-use LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Module\Parser\ModuleParserInterface;
+use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 
 /**
  * ModuleHandler delegates parsing and processing of subsections (modules)
@@ -28,17 +28,17 @@ class ModuleHandler implements CrawlerHandlerInterface
     }
 
     /**
-     * @var \LastCall\Crawler\Handler\Module\Parser\ModuleParserInterface[]
+     * @var \LastCall\Crawler\Module\Parser\ModuleParserInterface[]
      */
     private $parsers = [];
 
     /**
-     * @var \LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface[]
+     * @var \LastCall\Crawler\Module\Processor\ModuleProcessorInterface[]
      */
     private $processors = [];
 
     /**
-     * @var \LastCall\Crawler\Handler\Module\ModuleSubscription[]
+     * @var \LastCall\Crawler\Module\ModuleSubscription[]
      */
     private $subscribed = [];
 
@@ -62,7 +62,7 @@ class ModuleHandler implements CrawlerHandlerInterface
     /**
      * Add a parser to the handler.
      *
-     * @param \LastCall\Crawler\Handler\Module\Parser\ModuleParserInterface $parser
+     * @param \LastCall\Crawler\Module\Parser\ModuleParserInterface $parser
      */
     public function addParser(ModuleParserInterface $parser) {
         $this->parsers[$parser->getId()] = $parser;
@@ -71,7 +71,7 @@ class ModuleHandler implements CrawlerHandlerInterface
     /**
      * Add a processor to the handler.
      *
-     * @param \LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface $processor
+     * @param \LastCall\Crawler\Module\Processor\ModuleProcessorInterface $processor
      */
     public function addProcessor(ModuleProcessorInterface $processor) {
         $this->processors[] = $processor;
@@ -79,9 +79,9 @@ class ModuleHandler implements CrawlerHandlerInterface
     }
 
     /**
-     * @param \LastCall\Crawler\Handler\Module\Processor\ModuleProcessorInterface $processor
+     * @param \LastCall\Crawler\Module\Processor\ModuleProcessorInterface $processor
      *
-     * @return \LastCall\Crawler\Handler\Module\ModuleSubscription[]
+     * @return \LastCall\Crawler\Module\ModuleSubscription[]
      */
     private function getSubscribedMethods(ModuleProcessorInterface $processor) {
         $methods = $processor->getSubscribedMethods();
@@ -115,7 +115,7 @@ class ModuleHandler implements CrawlerHandlerInterface
     /**
      * @param $parserId
      *
-     * @return \LastCall\Crawler\Handler\Module\Parser\ModuleParserInterface
+     * @return \LastCall\Crawler\Module\Parser\ModuleParserInterface
      */
     private function getParser($parserId) {
         if(!isset($this->parsers[$parserId])) {

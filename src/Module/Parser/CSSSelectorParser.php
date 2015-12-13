@@ -1,10 +1,10 @@
 <?php
 
 
-namespace LastCall\Crawler\Handler\Module\Parser;
+namespace LastCall\Crawler\Module\Parser;
 
-use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class CSSSelectorParser implements ModuleParserInterface
 {
