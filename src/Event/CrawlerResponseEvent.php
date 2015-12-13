@@ -12,11 +12,6 @@ class CrawlerResponseEvent extends CrawlerEvent
 
     private $response;
 
-    /**
-     * @var DomCrawler
-     */
-    private $dom;
-
     public function __construct(
         RequestInterface $request,
         ResponseInterface $response,
