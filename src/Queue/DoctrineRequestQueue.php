@@ -1,25 +1,26 @@
 <?php
 
-namespace LastCall\Crawler\Queue\Driver;
+
+namespace LastCall\Crawler\Queue;
+
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Schema\Table;
-use LastCall\Crawler\Common\SetupTeardownInterface;
-use LastCall\Crawler\Queue\Job;
 use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
+use LastCall\Crawler\Common\SetupTeardownInterface;
+use Psr\Http\Message\RequestInterface;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\LockMode;
 
-class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardownInterface
+class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterface
 {
-
     use DoctrineSetupTeardownTrait;
-
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
     private $connection;
 
-    private $table;
-
-    private $_cache = array();
+    private $table = 'Job';
 
     public function __construct(Connection $connection, $table = 'Job')
     {
@@ -28,80 +29,49 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardo
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function pushUnique(Job $job, $key)
+    public function push(RequestInterface $request)
     {
+        $key = $request->getMethod() . $request->getUri();
         try {
-            if (!$this->exists($job, $key)) {
-                return $this->doPush($job, $key);
+            if(!$this->exists($key)) {
+                $ret = $this->connection->insert($this->table, [
+                    'expire' => 0,
+                    'identifier' => $key,
+                    'status' => Job::FREE,
+                    'data' => serialize($request),
+                ]);
+                return $ret === 1;
             }
-        } catch (UniqueConstraintViolationException $e) {
-            // This is OK.  The record wasn't inserted.
+            return FALSE;
         }
-
-        return false;
+        catch(UniqueConstraintViolationException $e) {
+            return FALSE;
+        }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function push(Job $job)
-    {
-        return $this->doPush($job, uniqid());
-    }
-
-    private function exists(Job $job, $key)
-    {
-        $channel = $job->getQueue();
-        if (!isset($this->_cache[$channel])) {
-            $this->_cache[$channel] = array();
-        }
-        if (!isset($this->_cache[$channel][$key])) {
-            $this->_cache[$channel][$key] = (bool)$this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ? AND queue = ?",
-                array(
-                    $key,
-                    $job->getQueue()
-                ))->fetchColumn();
-        }
-
-        return $this->_cache[$channel][$key];
-    }
-
-    private function doPush(Job $job, $key)
-    {
-        return 1 === $this->connection->insert($this->table, [
-            'expire' => $job->getExpire(),
-            'identifier' => $key,
-            'status' => $job->getStatus(),
-            'queue' => $job->getQueue(),
-            'data' => serialize($job->getData()),
-        ]) && $job->setIdentifier($key) && ($this->_cache[$job->getQueue()][$key] = true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function pop($channel, $leaseTime = 30)
+    public function pop()
     {
         $conn = $this->connection;
         $sql = "SELECT * FROM " . $conn->getDatabasePlatform()
                 ->appendLockHint($this->table,
-                    LockMode::PESSIMISTIC_READ) . " WHERE queue = ? AND status = ? AND expire <= ? LIMIT 1";
+                    LockMode::PESSIMISTIC_READ) . " WHERE status = ? AND expire <= ? LIMIT 1";
 
         $return = null;
 
         $this->connection->transactional(function () use (
-            $channel,
             $sql,
             $conn,
-            &$return,
-            $leaseTime
+            &$return
         ) {
-            if ($res = $conn->executeQuery($sql, [$channel, Job::FREE, time()])
+            if ($res = $conn->executeQuery($sql, [Job::FREE, time()])
                 ->fetch()
             ) {
-                $expire = time() + $leaseTime;
+                $expire = time() + 30;
                 $conn->update($this->table, [
                     'expire' => $expire
                 ], [
@@ -126,7 +96,6 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardo
         foreach (array(
                      'data',
                      'id',
-                     'queue',
                      'status',
                      'expire',
                      'identifier'
@@ -140,7 +109,7 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardo
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function complete(Job $job)
     {
@@ -149,71 +118,86 @@ class DoctrineDriver implements DriverInterface, UniqueJobInterface, SetupTeardo
             'status' => Job::COMPLETE,
         ], [
             'id' => $job->getId(),
+            'expire' => $job->getExpire(),
+            'status' => $job->getStatus()
         ]);
 
-        return $ret === 1 && $job->setStatus(Job::COMPLETE)->setExpire(0);
+        if($ret === 1) {
+            $job->setStatus(Job::COMPLETE)
+                ->setExpire(0);
+            return TRUE;
+        }
+        return FALSE;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function release(Job $job)
     {
         $ret = $this->connection->update($this->table, [
             'expire' => 0,
+            'status' => Job::FREE,
         ], [
             'id' => $job->getId(),
+            'expire' => $job->getExpire(),
+            'status' => $job->getStatus(),
         ]);
 
-        return $ret === 1 && $job->setStatus(Job::FREE)->setExpire(0);
+        if($ret === 1) {
+            $job->setStatus(Job::COMPLETE)
+                ->setExpire(0);
+            return TRUE;
+        }
+        return FALSE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function count($channel, $status = Job::FREE)
+    public function count($status = Job::FREE)
     {
         $table = $this->table;
         switch ($status) {
             case Job::FREE:
-                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire <= ?",
+                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire <= ?",
                     array(
-                        $channel,
                         Job::FREE,
                         time()
                     ))->fetchColumn();
             case Job::CLAIMED:
-                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ? AND expire > ?",
+                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire > ?",
                     array(
-                        $channel,
                         Job::FREE,
                         time()
                     ))->fetchColumn();
             default:
-                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE queue = ? AND status = ?",
+                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ?",
                     array(
-                        $channel,
                         Job::COMPLETE
                     ))->fetchColumn();
         }
     }
 
-    protected function getConnection()
-    {
+    private function exists($identifier) {
+        return $this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ?",
+            array(
+                $identifier
+            ))->fetchColumn();
+    }
+
+    protected function getConnection() {
         return $this->connection;
     }
 
-    protected function getTables()
-    {
+    protected function getTables() {
         $table = new Table($this->table);
         $table->addColumn('id', 'integer')->setAutoincrement(true);
         $table->addColumn('identifier', 'binary', ['nullable' => true]);
-        $table->addColumn('queue', 'string');
         $table->addColumn('status', 'integer');
         $table->addColumn('expire', 'integer');
         $table->addColumn('data', 'object');
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['identifier']);
 
         return [$table];
     }
+
 }

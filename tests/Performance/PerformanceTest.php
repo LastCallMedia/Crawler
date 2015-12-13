@@ -4,11 +4,13 @@
 namespace LastCall\Crawler\Test\Performance;
 
 
+use Doctrine\DBAL\DriverManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
@@ -17,12 +19,17 @@ use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Module\ModuleHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
+use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
+use LastCall\Crawler\Queue\Driver\DoctrineDriver;
 use LastCall\Crawler\Queue\RequestQueue;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
  * @group performance
@@ -60,7 +67,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
 
     private function getQueue()
     {
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
         $queue->push(new Request('GET', 'http://example.com/index.html'));
         $queue->push(new Request('GET', 'http://example.com/1.html'));
         $queue->push(new Request('GET', 'http://example.com/2.html'));
@@ -77,7 +84,9 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $configuration->setClient($this->getClient());
         $configuration->addSubscriber(new RequestLogger(new NullLogger()));
         $configuration->addSubscriber(new ExceptionLogger(new NullLogger()));
-        $event = $this->runConfiguration($configuration, 'logging');
+        $event = $this->runConfiguration($configuration, 'Logging');
+
+        $this->logDataPoint($event);
         $this->assertLessThan(12, $event->getDuration());
     }
 
@@ -88,8 +97,46 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $configuration->setClient($this->getClient());
         $configuration->addSubscriber(new ModuleHandler([new XPathParser()],
             [new LinkProcessor()]));
-        $event = $this->runConfiguration($configuration, 'links');
+        $event = $this->runConfiguration($configuration, 'Link Discovery');
+
+        $this->logDataPoint($event);
         $this->assertLessThan(12, $event->getDuration());
+    }
+
+    public function getQueues() {
+        $conn = DriverManager::getConnection([
+            'driver' => 'pdo_sqlite',
+            'memory' => TRUE,
+        ]);
+        return [
+            [new ArrayRequestQueue(), 120],
+            [new DoctrineRequestQueue($conn, 'new'), 300]
+        ];
+    }
+    /**
+     * @dataProvider getQueues
+     */
+    public function testQueues(RequestQueueInterface $queue, $expectedTime) {
+        if($queue instanceof SetupTeardownInterface) {
+            $queue->onSetup();
+        }
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('queue', get_class($queue));
+        for($i = 0; $i < 500; $i++) {
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+        }
+        $stopwatch->stop('queue');
+        if($queue instanceof SetupTeardownInterface) {
+            $queue->onTeardown();
+        }
+        $event = $stopwatch->getEvent('queue');
+        $this->logDataPoint($event);
+        $this->assertLessThan($expectedTime, $event->getDuration());
     }
 
     private function runConfiguration(
@@ -107,4 +154,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         return $stopwatch->getEvent(__FUNCTION__, $category);
     }
 
+    private function logDataPoint(StopwatchEvent $event) {
+        print $event . PHP_EOL;
+    }
 }

@@ -9,9 +9,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Queue\Driver\ArrayDriver;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\Job;
-use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\SessionInterface;
 use Prophecy\Argument;
@@ -69,7 +68,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testItemIsCompletedOnSuccess()
     {
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
         $client = $this->mockClient([new Response(200)]);
 
         $session = $this->getMockSession($queue, $client);
@@ -87,7 +86,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testItemIsCompletedOnFailure()
     {
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
         $client = $this->mockClient([new Response(400)]);
 
         $session = $this->getMockSession($queue, $client);
@@ -104,7 +103,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionEventIsFiredOnSuccesfulResponseException()
     {
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
         $client = $this->mockClient([new Response(200)]);
         $session = $this->getMockSession($queue, $client);
 
@@ -124,7 +123,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testExceptionEventIsFiredOnFailureResponseException()
     {
         $client = $this->mockClient([new Response(400)]);
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
 
         $session = $this->getMockSession($queue, $client);
 
@@ -145,7 +144,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionEventIsFiredOnSendingException()
     {
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
         $client = $this->mockClient([new Response(400)]);
 
         $session = $this->getMockSession($queue, $client);
@@ -167,7 +166,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $responses = array_fill(0, 2, new Response(200));
         $count = 0;
 
-        $queue = new RequestQueue(new ArrayDriver(), 'request');
+        $queue = new ArrayRequestQueue();
         $client = $this->mockClient($responses);
         $session = $this->getMockSession($queue, $client);
 

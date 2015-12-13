@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\Driver\ArrayDriver;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
@@ -16,7 +17,7 @@ class Configuration extends AbstractConfiguration
     {
         $this->baseUrl = $baseUrl;
         $this->client = new Client(['allow_redirects' => false]);
-        $this->queue = new RequestQueue(new ArrayDriver(), 'request');
+        $this->queue = new ArrayRequestQueue();
         $this->urlHandler = new URLHandler($baseUrl);
     }
 
