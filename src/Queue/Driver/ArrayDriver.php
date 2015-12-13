@@ -32,7 +32,7 @@ class ArrayDriver implements DriverInterface, UniqueJobInterface
      */
     public function push(Job $job)
     {
-        return $this->doPush($job, uniqid());
+        return $this->doPush($job, $job->getIdentifier());
     }
 
     /**
