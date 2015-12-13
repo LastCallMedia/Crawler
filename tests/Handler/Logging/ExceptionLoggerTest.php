@@ -6,13 +6,13 @@ namespace LastCall\Crawler\Test\Handler\Logging;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
-use LastCall\Crawler\Handler\Logging\ExceptionLoggingHandler;
+use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Url\URLHandler;
 use Psr\Log\LoggerInterface;
 
 
-class ExceptionLoggingHandlerTest extends \PHPUnit_Framework_TestCase
+class ExceptionLoggerTest extends \PHPUnit_Framework_TestCase
 {
     use HandlerTestTrait;
 
@@ -23,7 +23,7 @@ class ExceptionLoggingHandlerTest extends \PHPUnit_Framework_TestCase
 
         $logger = $this->prophesize(LoggerInterface::class);
 
-        $handler = new ExceptionLoggingHandler($logger->reveal());
+        $handler = new ExceptionLogger($logger->reveal());
         $event = new CrawlerExceptionEvent($request, null, $exception,
             new URLHandler('foo'));
         $this->invokeEvent($handler, CrawlerEvents::EXCEPTION, $event);

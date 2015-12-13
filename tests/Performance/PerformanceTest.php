@@ -12,7 +12,7 @@ use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Handler\Logging\ExceptionLoggingHandler;
+use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Module\ModuleHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
@@ -76,7 +76,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $configuration->setQueue($this->getQueue());
         $configuration->setClient($this->getClient());
         $configuration->addSubscriber(new RequestLogger(new NullLogger()));
-        $configuration->addSubscriber(new ExceptionLoggingHandler(new NullLogger()));
+        $configuration->addSubscriber(new ExceptionLogger(new NullLogger()));
         $event = $this->runConfiguration($configuration, 'logging');
         $this->assertLessThan(12, $event->getDuration());
     }

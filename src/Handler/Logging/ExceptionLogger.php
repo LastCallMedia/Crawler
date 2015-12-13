@@ -9,7 +9,7 @@ use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use Psr\Log\LoggerInterface;
 
-class ExceptionLoggingHandler implements CrawlerHandlerInterface
+class ExceptionLogger implements CrawlerHandlerInterface
 {
 
     /**
