@@ -13,15 +13,18 @@ use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSubscribesToRightMethod() {
+    public function testSubscribesToRightMethod()
+    {
         $processor = new LinkProcessor();
         $methods = $processor->getSubscribedMethods();
         $this->assertCount(1, $methods);
         /** @var \LastCall\Crawler\Module\ModuleSubscription $method */
         $method = reset($methods);
         $this->assertEquals('xpath', $method->getParserId());
-        $this->assertEquals('descendant-or-self::a[@href]', $method->getSelector());
-        $this->assertEquals([$processor, 'processLinks'], $method->getCallable());
+        $this->assertEquals('descendant-or-self::a[@href]',
+            $method->getSelector());
+        $this->assertEquals([$processor, 'processLinks'],
+            $method->getCallable());
     }
 
     public function getInputs()
@@ -44,7 +47,8 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInputs
      */
-    public function testProcessLinks($html, $expected) {
+    public function testProcessLinks($html, $expected)
+    {
         $request = new Request('GET', 'https://lastcallmedia.com');
         $response = new Response();
         $urlHandler = new URLHandler('https://lastcallmedia.com');

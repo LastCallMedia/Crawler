@@ -15,7 +15,8 @@ class DummyProcessor implements ModuleProcessorInterface
 
     public function __construct($parserId, $selector)
     {
-        $this->subscriptions[] = new ModuleSubscription($this, $parserId, $selector, 'dummyMethod');
+        $this->subscriptions[] = new ModuleSubscription($this, $parserId,
+            $selector, 'dummyMethod');
     }
 
     public function getSubscribedMethods()
@@ -23,11 +24,13 @@ class DummyProcessor implements ModuleProcessorInterface
         return $this->subscriptions;
     }
 
-    public function dummyMethod() {
+    public function dummyMethod()
+    {
         $this->calls[] = func_get_args();
     }
 
-    public function getCalls() {
+    public function getCalls()
+    {
         return $this->calls;
     }
 }

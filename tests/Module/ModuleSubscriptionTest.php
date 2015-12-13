@@ -9,7 +9,8 @@ use LastCall\Crawler\Test\Resources\DummyProcessor;
 
 class ModuleSubscriptionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSubscriptionProperties() {
+    public function testSubscriptionProperties()
+    {
         $processor = new DummyProcessor('xxx', 'xxx');
         $subscription = new ModuleSubscription($processor, 'foo', 'bar', 'baz');
         $this->assertEquals('foo', $subscription->getParserId());

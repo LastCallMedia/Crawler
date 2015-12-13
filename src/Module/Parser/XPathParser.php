@@ -15,7 +15,7 @@ class XPathParser implements ModuleParserInterface
 
     public function parseResponse(ResponseInterface $response)
     {
-        return new DomCrawler((string) $response->getBody());
+        return new DomCrawler((string)$response->getBody());
     }
 
     public function parseNodes($node, $selector)

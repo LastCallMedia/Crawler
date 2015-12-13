@@ -24,9 +24,10 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage ::getSubscribedMethods must return an array.
      */
-    public function testChecksForValidSubscriptionArray() {
+    public function testChecksForValidSubscriptionArray()
+    {
         $processor = $this->prophesize(ModuleProcessorInterface::class);
-        $processor->getSubscribedMethods()->willReturn(FALSE);
+        $processor->getSubscribedMethods()->willReturn(false);
         new ModuleHandler([], [$processor->reveal()]);
     }
 
@@ -34,9 +35,10 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid module subscription
      */
-    public function testChecksForValidSubscription() {
+    public function testChecksForValidSubscription()
+    {
         $processor = $this->prophesize(ModuleProcessorInterface::class);
-        $processor->getSubscribedMethods()->willReturn([FALSE]);
+        $processor->getSubscribedMethods()->willReturn([false]);
         new ModuleHandler([], [$processor->reveal()]);
     }
 
@@ -44,8 +46,9 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No parser was specified
      */
-    public function testChecksForSetSubscriptionParser() {
-        $processor = new DummyProcessor(NULL, NULL);
+    public function testChecksForSetSubscriptionParser()
+    {
+        $processor = new DummyProcessor(null, null);
         new ModuleHandler([], [$processor]);
     }
 
@@ -53,12 +56,14 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid parser foo
      */
-    public function testChecksForValidParser() {
+    public function testChecksForValidParser()
+    {
         $processor = new DummyProcessor('foo', 'bar');
         new ModuleHandler([], [$processor]);
     }
 
-    public function testCallsParsersAndSubscribers() {
+    public function testCallsParsersAndSubscribers()
+    {
         $processor = new DummyProcessor('xpath', 'descendant-or-self::a');
         $parser = new XPathParser();
 
@@ -73,6 +78,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $processor->getCalls());
         $this->assertEquals($event, $processor->getCalls()[0][0]);
-        $this->assertInstanceOf(DomCrawler::class, $processor->getCalls()[0][1]);
+        $this->assertInstanceOf(DomCrawler::class,
+            $processor->getCalls()[0][1]);
     }
 }

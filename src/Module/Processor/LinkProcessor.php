@@ -16,11 +16,15 @@ class LinkProcessor implements ModuleProcessorInterface
     public function getSubscribedMethods()
     {
         return [
-            new ModuleSubscription($this, 'xpath', 'descendant-or-self::a[@href]', 'processLinks')
+            new ModuleSubscription($this, 'xpath',
+                'descendant-or-self::a[@href]', 'processLinks')
         ];
     }
 
-    public function processLinks(CrawlerResponseEvent $event, DomCrawler $crawler) {
+    public function processLinks(
+        CrawlerResponseEvent $event,
+        DomCrawler $crawler
+    ) {
         $urls = array_unique($crawler->extract(['href']));
 
         $handler = $event->getUrlHandler();
@@ -31,7 +35,8 @@ class LinkProcessor implements ModuleProcessorInterface
         }
     }
 
-    public function processUrls(array $urls, URLHandler $handler) {
+    public function processUrls(array $urls, URLHandler $handler)
+    {
         foreach ($urls as $url) {
             if ($url = $handler->absolutizeUrl($url)) {
                 if ($handler->includesUrl($url)) {

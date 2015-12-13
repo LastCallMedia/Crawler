@@ -187,9 +187,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             new \Exception('foo'), new Response());
     }
 
-    public function testAddsAdditionalRequests() {
+    public function testAddsAdditionalRequests()
+    {
         $newRequest = new Request('GET', 'https://lastcallmedia.com');
-        $fn = function(CrawlerEvent $event) use ($newRequest) {
+        $fn = function (CrawlerEvent $event) use ($newRequest) {
             $event->addAdditionalRequest($newRequest);
         };
         $queue = $this->prophesize(RequestQueueInterface::class);

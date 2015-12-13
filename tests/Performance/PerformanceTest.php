@@ -30,41 +30,48 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class PerformanceTest extends \PHPUnit_Framework_TestCase
 {
 
-    private function getClient() {
+    private function getClient()
+    {
         $handler = $this->handler();
         $client = new Client(['handler' => HandlerStack::create($handler)]);
+
         return $client;
     }
 
-    private function handler() {
-        return function(Request $request, array $options) {
+    private function handler()
+    {
+        return function (Request $request, array $options) {
             $status = 404;
-            $body = NULL;
+            $body = null;
             $headers = [];
 
             $path = $request->getUri()->getPath();
-            $file = __DIR__. '/../Resources/html' . $path;
-            if(file_exists($file)) {
+            $file = __DIR__ . '/../Resources/html' . $path;
+            if (file_exists($file)) {
                 $status = 200;
                 $handle = fopen($file, 'r');
                 $body = \GuzzleHttp\Psr7\stream_for($handle);
             }
             $response = new Response($status, $headers, $body);
+
             return new FulfilledPromise($response);
         };
     }
 
-    private function getQueue() {
+    private function getQueue()
+    {
         $queue = new RequestQueue(new ArrayDriver(), 'request');
         $queue->push(new Request('GET', 'http://example.com/index.html'));
         $queue->push(new Request('GET', 'http://example.com/1.html'));
         $queue->push(new Request('GET', 'http://example.com/2.html'));
         $queue->push(new Request('GET', 'http://example.com/nonexistent.html'));
+
         return $queue;
     }
 
 
-    public function testLogging() {
+    public function testLogging()
+    {
         $configuration = new Configuration('http://example.com/index.html');
         $configuration->setQueue($this->getQueue());
         $configuration->setClient($this->getClient());
@@ -74,16 +81,21 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(12, $event->getDuration());
     }
 
-    public function testLinkDiscovery() {
+    public function testLinkDiscovery()
+    {
         $configuration = new Configuration('http://example.com/index.html');
         $configuration->setQueue($this->getQueue());
         $configuration->setClient($this->getClient());
-        $configuration->addSubscriber(new ModuleHandler([new XPathParser()], [new LinkProcessor()]));
+        $configuration->addSubscriber(new ModuleHandler([new XPathParser()],
+            [new LinkProcessor()]));
         $event = $this->runConfiguration($configuration, 'links');
         $this->assertLessThan(12, $event->getDuration());
     }
 
-    private function runConfiguration(ConfigurationInterface $configuration, $category) {
+    private function runConfiguration(
+        ConfigurationInterface $configuration,
+        $category
+    ) {
         $session = new Session($configuration, new EventDispatcher());
         $crawler = new Crawler($session);
         $stopwatch = new Stopwatch();
@@ -91,6 +103,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $promise = $crawler->start();
         $promise->wait();
         $stopwatch->stop(__FUNCTION__);
+
         return $stopwatch->getEvent(__FUNCTION__, $category);
     }
 
