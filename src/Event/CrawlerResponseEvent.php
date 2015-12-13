@@ -31,15 +31,4 @@ class CrawlerResponseEvent extends CrawlerEvent
         return $this->response;
     }
 
-    public function getDom()
-    {
-        if (!isset($this->dom)) {
-            $this->dom = new DomCrawler((string)$this->response->getBody(),
-                $this->getRequest()->getUri());
-        }
-
-        return $this->dom;
-    }
-
-
 }
