@@ -10,6 +10,9 @@ use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use Symfony\Component\Console\Application as BaseApplication;
 
+/**
+ * Crawler application
+ */
 class Application extends BaseApplication
 {
 
