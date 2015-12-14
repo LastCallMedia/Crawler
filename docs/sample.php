@@ -66,7 +66,6 @@ $config->addSubscriber($exceptionLogger);
 // adding a request logger that logs to the console output.
 // By default, there won't be much shown, so you may want to
 // crank up the console verbosity using the verbose flag (-vvv).
-$consoleLogger = new ConsoleLogger($output);
 $logHandler = new RequestLogger($consoleLogger);
 $config->addSubscriber($logHandler);
 

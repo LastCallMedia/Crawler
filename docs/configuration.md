@@ -1,10 +1,14 @@
 Configuration
 =============
 
-A configuration is just an instance of a `LastCall\Crawler\Configuration\ConfigurationInterface` that lives in a .php file and is included by the command line runner.  It specifies what to crawl, and what to do with the responses that are received.  When building your configuration, you can either start with the `LastCall\Crawler\Configuration\Configuration` class, which will allow you to set everything up in a single PHP file, or you can subclass `LastCall\Crawler\Configuration\AbstractConfiguration` and build it in a PHP class.  We recommend starting from the AbstractConfiguration, as it will make your configuration easier to test in the future.
+What is a Configuration
+-----------------------
+An instance of `LastCall\Crawler\Configuration\ConfigurationInterface` that lives in a .php file and is included by the command line runner.  It specifies what to crawl, and what to do with the responses that are received.  You can either start with the `LastCall\Crawler\Configuration\Configuration` class and build everything up in a single PHP file, or you can subclass `LastCall\Crawler\Configuration\AbstractConfiguration` and build it in a PHP class.  We recommend starting from the AbstractConfiguration, as it will make your configuration easier to test in the future.
 
 Configurations have a few special properties that you need to know about.  These are going to be the same whether you're subclassing or using the Configuration directly, but for brevity's sake, we'll assume you're building up a `Configuration` object in a single PHP file.
 
+Creating a Configuration
+------------------------
 You'll need to start out by constructing a new configuration:
 ```php
 use LastCall\Crawler\Configuration\Configuration;
@@ -33,4 +37,6 @@ That's all you need for the most simple crawler configuration.  Make sure to ret
 return $config;
 ```
 
-A fuller sample configuration can be seen [here](sample.php).
+[Sample configuration using `LastCall\Crawler\Configuration\Configuration`](sample.php)
+
+[Sample configuration using `LastCall\Crawler\Configuration\AbstractConfiguration`](SampleSubclassConfig.php) 
