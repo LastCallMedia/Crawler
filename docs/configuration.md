@@ -39,4 +39,4 @@ return $config;
 
 [Sample configuration using `LastCall\Crawler\Configuration\Configuration`](sample.php)
 
-[Sample configuration using `LastCall\Crawler\Configuration\AbstractConfiguration`](SampleSubclassConfig.php) 
+[Sample configuration using `LastCall\Crawler\Configuration\AbstractConfiguration`](SampleSubclassConfiguration.php) 
