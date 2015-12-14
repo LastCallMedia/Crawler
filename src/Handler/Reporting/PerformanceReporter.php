@@ -10,6 +10,9 @@ use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+/**
+ * Logs performance statistics to the command line.
+ */
 class PerformanceReporter implements CrawlerHandlerInterface
 {
     /**

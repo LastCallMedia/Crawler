@@ -28,3 +28,4 @@ Documentation can be found here:
 
 * [Configurations](docs/configuration.md)
 * [CLI](docs/cli.md)
+* [Handlers](docs/handler.md)

@@ -9,6 +9,9 @@ use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Logs exceptions to a PSR-3 compatible logger.
+ */
 class ExceptionLogger implements CrawlerHandlerInterface
 {
 

@@ -12,6 +12,10 @@ use LastCall\Crawler\Handler\RedirectDetectionTrait;
 use LastCall\Crawler\Url\TraceableUri;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Retries the original, denormalized form of a URL that results in
+ * either failure or a redirect back to the original form.
+ */
 class DenormalizedUrlDiscoverer implements CrawlerHandlerInterface
 {
     use RedirectDetectionTrait;

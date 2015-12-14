@@ -10,6 +10,10 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Handler\RedirectDetectionTrait;
 
+/**
+ * Add in URLs that are redirected to, as long as they are matched
+ * by the URLHandler.
+ */
 class RedirectDiscoverer implements CrawlerHandlerInterface
 {
     use RedirectDetectionTrait;

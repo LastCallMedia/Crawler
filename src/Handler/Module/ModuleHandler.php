@@ -12,7 +12,7 @@ use LastCall\Crawler\Module\Parser\ModuleParserInterface;
 use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 
 /**
- * ModuleHandler delegates parsing and processing of subsections (modules)
+ * Delegates parsing and processing of subsections (modules)
  * of the response.
  */
 class ModuleHandler implements CrawlerHandlerInterface

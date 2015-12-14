@@ -12,6 +12,9 @@ use LastCall\Crawler\Handler\RedirectDetectionTrait;
 use LastCall\Crawler\Url\TraceableUri;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Logs requests sent and completed to a PSR-3 compatible logger.
+ */
 class RequestLogger implements CrawlerHandlerInterface
 {
     use RedirectDetectionTrait;
