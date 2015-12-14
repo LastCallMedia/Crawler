@@ -10,14 +10,30 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * Console helper for instantiating crawlers and configurations
+ */
 class CrawlerHelper extends Helper
 {
 
+    /**
+     * Get the name of the helper.
+     *
+     * @return string
+     */
     public function getName()
     {
         return 'crawler';
     }
 
+    /**
+     * Get a crawler instance for a given configuration.
+     *
+     * @param ConfigurationInterface $config
+     * @param bool                   $profile
+     *
+     * @return \LastCall\Crawler\Crawler
+     */
     public function getCrawler(
         ConfigurationInterface $config,
         $profile = false
@@ -33,9 +49,12 @@ class CrawlerHelper extends Helper
     }
 
     /**
-     * @param $file
+     * Open and return a configuration file.
      *
-     * @return \LastCall\Crawler\Configuration\ConfigurationInterface
+     * @param string          $filename
+     * @param OutputInterface $output
+     *
+     * @return ConfigurationInterface
      */
     public function getConfiguration($filename, OutputInterface $output)
     {

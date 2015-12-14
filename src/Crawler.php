@@ -37,6 +37,10 @@ class Crawler
         $this->client = $session->getClient();
     }
 
+    /**
+     * @param \Psr\Http\Message\RequestInterface $request
+     * @deprecated
+     */
     private function addRequest(RequestInterface $request)
     {
         $this->queue->push($request);
@@ -45,8 +49,8 @@ class Crawler
     /**
      * Start crawling.
      *
-     * @param int  $chunk
-     * @param null $baseUrl
+     * @param int    $chunk
+     * @param string $baseUrl
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
      */

@@ -9,6 +9,8 @@ use LastCall\Crawler\Command\TeardownCommand;
 use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * Crawler application
@@ -16,6 +18,11 @@ use Symfony\Component\Console\Application as BaseApplication;
 class Application extends BaseApplication
 {
 
+    /**
+     * Get the default helper set.
+     *
+     * @return HelperSet
+     */
     public function getDefaultHelperSet()
     {
         $helpers = parent::getDefaultHelperSet();
@@ -25,6 +32,11 @@ class Application extends BaseApplication
         return $helpers;
     }
 
+    /**
+     * Get the default commands.
+     *
+     * @return Command[]
+     */
     public function getDefaultCommands()
     {
         return array_merge(parent::getDefaultCommands(), array(
