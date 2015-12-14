@@ -27,7 +27,8 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $processor = $this->prophesize(ModuleProcessorInterface::class);
         $processor->getSubscribedMethods()->willReturn(false);
-        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor->reveal()]);
+        new \LastCall\Crawler\Handler\Module\ModuleHandler([],
+            [$processor->reveal()]);
     }
 
     /**
@@ -38,7 +39,8 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $processor = $this->prophesize(ModuleProcessorInterface::class);
         $processor->getSubscribedMethods()->willReturn([false]);
-        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor->reveal()]);
+        new \LastCall\Crawler\Handler\Module\ModuleHandler([],
+            [$processor->reveal()]);
     }
 
     /**
@@ -66,7 +68,8 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
         $processor = new DummyProcessor('xpath', 'descendant-or-self::a');
         $parser = new XPathParser();
 
-        $handler = new \LastCall\Crawler\Handler\Module\ModuleHandler([$parser], [$processor]);
+        $handler = new \LastCall\Crawler\Handler\Module\ModuleHandler([$parser],
+            [$processor]);
 
         $html = '<html><a>Foo</a></html>';
         $req = new Request('GET', 'https://lastcallmedia.com');

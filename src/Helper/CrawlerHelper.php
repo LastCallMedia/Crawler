@@ -6,6 +6,7 @@ namespace LastCall\Crawler\Helper;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Session\Session;
+use LastCall\Crawler\Session\SessionInterface;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -27,25 +28,36 @@ class CrawlerHelper extends Helper
     }
 
     /**
-     * Get a crawler instance for a given configuration.
+     * Get a crawler instance for a session.
      *
      * @param ConfigurationInterface $config
-     * @param bool                   $profile
      *
      * @return \LastCall\Crawler\Crawler
      */
     public function getCrawler(
-        ConfigurationInterface $config,
-        $profile = false
+        SessionInterface $session
     ) {
+
+        return new Crawler($session);
+    }
+
+    /**
+     * Create a crawler session for a configuration.
+     *
+     * @param \LastCall\Crawler\Configuration\ConfigurationInterface $config
+     * @param bool                                                   $profile
+     *
+     * @return \LastCall\Crawler\Session\Session
+     */
+    public function getSession(ConfigurationInterface $config, $profile = false)
+    {
         $dispatcher = new EventDispatcher();
         if ($profile && $this->getHelperSet()->has('profiler')) {
             $profiler = $this->getHelperSet()->get('profiler');
             $dispatcher = $profiler->getTraceableDispatcher($dispatcher);
         }
-        $session = new Session($config, $dispatcher);
 
-        return new Crawler($session);
+        return new Session($config, $dispatcher);
     }
 
     /**

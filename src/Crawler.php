@@ -39,6 +39,7 @@ class Crawler
 
     /**
      * @param \Psr\Http\Message\RequestInterface $request
+     *
      * @deprecated
      */
     private function addRequest(RequestInterface $request)

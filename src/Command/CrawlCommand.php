@@ -39,8 +39,10 @@ class CrawlCommand extends Command
         $helper = $this->getHelper('crawler');
         $configuration = $helper->getConfiguration($input->getArgument('config'),
             $output);
-        $crawler = $helper->getCrawler($configuration,
+        $session = $helper->getSession($configuration,
             $input->getOption('profile'));
+
+        $crawler = $helper->getCrawler($session);
 
         if ($input->getOption('reset')) {
             $crawler->teardown();
