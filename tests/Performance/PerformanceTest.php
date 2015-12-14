@@ -87,7 +87,6 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $event = $this->runConfiguration($configuration, 'Logging');
 
         $this->logDataPoint($event);
-        $this->assertLessThan(24, $event->getDuration());
     }
 
     public function testLinkDiscovery()
@@ -100,7 +99,6 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $event = $this->runConfiguration($configuration, 'Link Discovery');
 
         $this->logDataPoint($event);
-        $this->assertLessThan(24, $event->getDuration());
     }
 
     public function getQueues()
@@ -140,7 +138,6 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         }
         $event = $stopwatch->getEvent('queue');
         $this->logDataPoint($event);
-        $this->assertLessThan($expectedTime, $event->getDuration());
     }
 
     /**
