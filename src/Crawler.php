@@ -11,21 +11,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * This file contains the crawler, which is the engine that powers the rest of
- * the system.  It is responsible for queuing requests, sending them to the
- * server, receiving the responses, and dispatching the success or failure
- * events back to the session for processing.
- *
- * Most of what happens in here is implemented inside of promises, meaning we
- * can run multiple requests concurrently.  Using the PromiseIterator, we're
- * able to keep refilling the queue as we work through it, meaning we can start
- * with a single item and spider out from there.
- *
- * The basic cycle of processing goes:
- *
- * Work on the request queue until it is empty.
- * Work on the process queue until it is empty.
- * Complete.
+ * Dispatches requests to the client, and responses to the session.
  */
 class Crawler
 {
@@ -51,7 +37,7 @@ class Crawler
         $this->client = $session->getClient();
     }
 
-    public function addRequest(RequestInterface $request)
+    private function addRequest(RequestInterface $request)
     {
         $this->queue->push($request);
     }
@@ -98,7 +84,7 @@ class Crawler
         }
     }
 
-    public function getRequestFulfilledFn(RequestInterface $request, Job $job)
+    private function getRequestFulfilledFn(RequestInterface $request, Job $job)
     {
         return function (ResponseInterface $response) use ($request, $job) {
             $this->queue->complete($job);
@@ -114,7 +100,7 @@ class Crawler
         };
     }
 
-    public function getRequestRejectedFn(RequestInterface $request, Job $job)
+    private function getRequestRejectedFn(RequestInterface $request, Job $job)
     {
         return function ($reason) use ($request, $job) {
             $this->queue->complete($job);
@@ -136,11 +122,17 @@ class Crawler
         };
     }
 
+    /**
+     * Execute setup tasks.
+     */
     public function setUp()
     {
         $this->session->onSetup();
     }
 
+    /**
+     * Execute teardown tasks.
+     */
     public function teardown()
     {
         $this->session->onTeardown();
