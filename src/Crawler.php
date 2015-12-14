@@ -19,11 +19,11 @@ class Crawler
     /**
      * @var \LastCall\Crawler\Session\SessionInterface
      */
-    protected $session;
+    private $session;
 
-    protected $queue;
+    private $queue;
 
-    protected $client;
+    private $client;
 
     /**
      * Crawler constructor.
@@ -42,6 +42,14 @@ class Crawler
         $this->queue->push($request);
     }
 
+    /**
+     * Start crawling.
+     *
+     * @param int  $chunk
+     * @param null $baseUrl
+     *
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
     public function start($chunk = 5, $baseUrl = null)
     {
         $start = $this->session->getStartUrl($baseUrl);

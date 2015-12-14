@@ -14,6 +14,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Concrete implementation of the session.
+ * @see SessionInterface
+ */
 class Session implements SessionInterface
 {
 
@@ -27,6 +31,12 @@ class Session implements SessionInterface
      */
     private $dispatcher;
 
+    /**
+     * Session constructor.
+     *
+     * @param \LastCall\Crawler\Configuration\ConfigurationInterface      $configuration
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function __construct(
         ConfigurationInterface $configuration,
         EventDispatcherInterface $dispatcher
@@ -65,25 +75,16 @@ class Session implements SessionInterface
         $this->configuration->getQueue()->push($request);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getQueue()
     {
         return $this->configuration->getQueue();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getClient()
     {
         return $this->configuration->getClient();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isFinished()
     {
         return $this->getQueue()->count() === 0;
