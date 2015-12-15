@@ -97,7 +97,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $subscriberMock = $this->prophesize(EventSubscriberInterface::class);
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $queue = $this->prophesize(RequestQueueInterface::class);
-        
+
         $subscriber = $subscriberMock->reveal();
         $dispatcher->addSubscriber($subscriber)->shouldBeCalled();
 

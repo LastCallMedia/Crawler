@@ -30,8 +30,10 @@ class Crawler
      *
      * @param \LastCall\Crawler\Session\SessionInterface $session
      */
-    public function __construct(SessionInterface $session, ClientInterface $client)
-    {
+    public function __construct(
+        SessionInterface $session,
+        ClientInterface $client
+    ) {
         $this->session = $session;
         $this->client = $client;
     }
@@ -39,7 +41,7 @@ class Crawler
     /**
      * Start crawling.
      *
-     * @param int    $chunk
+     * @param int $chunk
      * @param string $baseUrl
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
