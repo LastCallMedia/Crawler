@@ -29,18 +29,23 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $this->table = $table;
     }
 
+    private function getKey(RequestInterface $request)
+    {
+        return $request->getMethod() . $request->getUri();
+    }
+
     /**
      * @inheritDoc
      */
     public function push(RequestInterface $request)
     {
-        $key = $request->getMethod() . $request->getUri();
+        $key = $this->getKey($request);
         try {
             if (!$this->exists($key)) {
                 $ret = $this->connection->insert($this->table, [
                     'expire' => 0,
                     'identifier' => $key,
-                    'status' => Job::FREE,
+                    'status' => self::FREE,
                     'data' => serialize($request),
                 ]);
 
@@ -53,10 +58,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function pop()
+    public function pop($leaseTime = 30)
     {
         $conn = $this->connection;
         $sql = "SELECT * FROM " . $conn->getDatabasePlatform()
@@ -65,22 +67,22 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
 
         $return = null;
 
-        $this->connection->transactional(function () use (
+        $conn->transactional(function () use (
             $sql,
             $conn,
-            &$return
+            &$return,
+            $leaseTime
         ) {
-            if ($res = $conn->executeQuery($sql, [Job::FREE, time()])
+            if ($res = $conn->executeQuery($sql, [self::FREE, time()])
                 ->fetch()
             ) {
-                $expire = time() + 30;
+                $expire = time() + $leaseTime;
                 $conn->update($this->table, [
                     'expire' => $expire
                 ], [
                     'identifier' => $res['identifier']
                 ]);
-                $res['expire'] = $expire;
-                $return = $this->hydrateFromArray($res);
+                $return = unserialize($res['data']);
             }
         });
 
@@ -90,21 +92,16 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     /**
      * @inheritDoc
      */
-    public function complete(Job $job)
+    public function complete(RequestInterface $request)
     {
-        if ($this->exists($job->getIdentifier())) {
-            $ret = $this->connection->update($this->table, [
+        $key = $this->getKey($request);
+        if ($this->existsAndIsPending($key)) {
+            $this->connection->update($this->table, [
                 'expire' => 0,
-                'status' => Job::COMPLETE,
+                'status' => self::COMPLETE,
             ], [
-                'identifier' => $job->getIdentifier(),
-                'expire' => $job->getExpire(),
-                'status' => $job->getStatus()
+                'identifier' => $key,
             ]);
-
-            if ($ret === 1) {
-                $job->setStatus(Job::COMPLETE)->setExpire(0);
-            }
 
             return;
         }
@@ -114,46 +111,42 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     /**
      * @inheritDoc
      */
-    public function release(Job $job)
+    public function release(RequestInterface $request)
     {
-        if ($this->exists($job->getIdentifier())) {
-            $ret = $this->connection->update($this->table, [
+        $key = $this->getKey($request);
+        if ($this->existsAndIsPending($key)) {
+            $this->connection->update($this->table, [
                 'expire' => 0,
-                'status' => Job::FREE,
+                'status' => self::FREE,
             ], [
-                'identifier' => $job->getIdentifier(),
-                'expire' => $job->getExpire(),
-                'status' => $job->getStatus(),
+                'identifier' => $key,
             ]);
-            if ($ret === 1) {
-                $job->setStatus(Job::COMPLETE)->setExpire(0);
-            }
 
             return;
         }
         $this->throwNotManaged();
     }
 
-    public function count($status = Job::FREE)
+    public function count($status = self::FREE)
     {
         $table = $this->table;
         switch ($status) {
-            case Job::FREE:
+            case self::FREE:
                 return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire <= ?",
                     array(
-                        Job::FREE,
+                        self::FREE,
                         time()
                     ))->fetchColumn();
-            case Job::CLAIMED:
+            case self::PENDING:
                 return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire > ?",
                     array(
-                        Job::FREE,
+                        self::FREE,
                         time()
                     ))->fetchColumn();
             default:
                 return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ?",
                     array(
-                        Job::COMPLETE
+                        self::COMPLETE
                     ))->fetchColumn();
         }
     }
@@ -183,26 +176,20 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
             ))->fetchColumn();
     }
 
+    private function existsAndIsPending($identifier)
+    {
+        $sql = "SELECT 1 FROM {$this->table} WHERE identifier = ? AND status = ? AND expire > ?";
+
+        return $this->connection->executeQuery($sql, [
+            $identifier,
+            self::FREE,
+            time()
+        ])->fetchColumn();
+    }
+
     private function throwNotManaged()
     {
         throw new \RuntimeException('This job is not managed by this queue');
     }
 
-    private function hydrateFromArray(array $record)
-    {
-        $record += array(
-            'data' => null,
-            'status' => Job::FREE,
-            'expire' => 0,
-            'identifier' => null,
-        );
-        $job = new Job(unserialize($record['data']), $record['identifier']);
-        foreach (['status', 'expire'] as $prop) {
-            $refl = new \ReflectionProperty(Job::class, $prop);
-            $refl->setAccessible(true);
-            $refl->setValue($job, $record[$prop]);
-        }
-
-        return $job;
-    }
 }

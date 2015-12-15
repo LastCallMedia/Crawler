@@ -5,7 +5,6 @@ namespace LastCall\Crawler;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Queue\Job;
 use LastCall\Crawler\Session\SessionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -82,13 +81,12 @@ class Crawler
 
     private function getRequestWorkerFn()
     {
-        while ($job = $this->queue->pop()) {
-            $request = $job->getData();
+        while ($request = $this->queue->pop()) {
             try {
                 $this->session->onRequestSending($request);
-                $promise = $this->client->sendAsync($job->getData())
-                    ->then($this->getRequestFulfilledFn($request, $job),
-                        $this->getRequestRejectedFn($request, $job));
+                $promise = $this->client->sendAsync($request)
+                    ->then($this->getRequestFulfilledFn($request),
+                        $this->getRequestRejectedFn($request));
                 yield $promise;
             } catch (\Exception $e) {
                 $this->session->onRequestException($request, $e, null);
@@ -97,10 +95,10 @@ class Crawler
         }
     }
 
-    private function getRequestFulfilledFn(RequestInterface $request, Job $job)
+    private function getRequestFulfilledFn(RequestInterface $request)
     {
-        return function (ResponseInterface $response) use ($request, $job) {
-            $this->queue->complete($job);
+        return function (ResponseInterface $response) use ($request) {
+            $this->queue->complete($request);
 
             try {
                 $this->session->onRequestSuccess($request, $response);
@@ -113,10 +111,10 @@ class Crawler
         };
     }
 
-    private function getRequestRejectedFn(RequestInterface $request, Job $job)
+    private function getRequestRejectedFn(RequestInterface $request)
     {
-        return function ($reason) use ($request, $job) {
-            $this->queue->complete($job);
+        return function ($reason) use ($request) {
+            $this->queue->complete($request);
             // Delegate processing of the item out to the session.
             if ($reason instanceof BadResponseException) {
                 $response = $reason->getResponse();

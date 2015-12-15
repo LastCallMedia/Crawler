@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Test\Queue;
 
 
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Queue\Job;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 
 trait QueueTestTrait
@@ -38,13 +37,11 @@ trait QueueTestTrait
     {
         $queue = $this->getQueue();
         $assert = $this->getAssert();
-        $queue->push($this->getRequest());
-        $job = $queue->pop();
-        $assert->assertInstanceOf(Job::class, $job);
-        $assert->assertEquals('GEThttps://lastcallmedia.com',
-            $job->getIdentifier());
-        $assert->greaterThan(time(), $job->getExpire());
-        $assert->assertNull($queue->pop());
+        $pushedRequest = $this->getRequest();
+        $queue->push($pushedRequest);
+        $poppedRequest = $queue->pop();
+        $assert->assertEquals($pushedRequest, $poppedRequest);
+        $assert->assertEquals(1, $queue->count($queue::PENDING));
     }
 
     public function testComplete()
@@ -52,10 +49,9 @@ trait QueueTestTrait
         $assert = $this->getAssert();
         $queue = $this->getQueue();
         $queue->push($this->getRequest());
-        $job = $queue->pop();
-        $queue->complete($job);
-        $assert->equalTo(Job::COMPLETE, $job->getStatus());
-        $assert->equalTo(0, $job->getExpire());
+        $request = $queue->pop();
+        $queue->complete($request);
+        $assert->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testRelease()
@@ -65,8 +61,7 @@ trait QueueTestTrait
         $queue->push($this->getRequest());
         $job = $queue->pop();
         $queue->release($job);
-        $assert->equalTo(Job::FREE, $job->getStatus());
-        $assert->equalTo(0, $job->getExpire());
+        $assert->assertEquals(1, $queue->count($queue::FREE));
     }
 
     public function testCount()
@@ -79,9 +74,9 @@ trait QueueTestTrait
 
         $queue->complete($queue->pop());
         $queue->pop();
-        $assert->assertEquals(1, $queue->count(Job::FREE));
-        $assert->assertEquals(1, $queue->count(Job::CLAIMED));
-        $assert->assertEquals(1, $queue->count(Job::COMPLETE));
+        $assert->assertEquals(1, $queue->count($queue::FREE));
+        $assert->assertEquals(1, $queue->count($queue::PENDING));
+        $assert->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     /**
@@ -91,7 +86,7 @@ trait QueueTestTrait
     public function testCompleteJobNotOnQueue()
     {
         $queue = $this->getQueue();
-        $queue->complete(new Job('foo', 'bar'));
+        $queue->complete(new Request('GET', 'foo'));
     }
 
     /**
@@ -101,7 +96,7 @@ trait QueueTestTrait
     public function testReleaseJobNotOnQueue()
     {
         $queue = $this->getQueue();
-        $queue->release(new Job('foo', 'barbaz'));
+        $queue->release(new Request('GET', 'foo'));
     }
 
 }

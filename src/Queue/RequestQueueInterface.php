@@ -7,6 +7,9 @@ use Psr\Http\Message\RequestInterface;
 
 interface RequestQueueInterface
 {
+    const FREE = 1;
+    const PENDING = 2;
+    const COMPLETE = 3;
 
     /**
      * @param \Psr\Http\Message\RequestInterface $request
@@ -16,23 +19,30 @@ interface RequestQueueInterface
     public function push(RequestInterface $request);
 
     /**
-     * @return Job|null
+     * @return RequestInterface|null
      */
-    public function pop();
+    public function pop($leaseTime = 30);
 
     /**
-     * @param \LastCall\Crawler\Queue\Job $job
+     * @param RequestInterface
      *
      * @return bool
      */
-    public function complete(Job $job);
+    public function complete(RequestInterface $request);
 
     /**
-     * @param \LastCall\Crawler\Queue\Job $job
+     * @param RequestInterface
      *
      * @return bool
      */
-    public function release(Job $job);
+    public function release(RequestInterface $request);
 
-    public function count($status = Job::FREE);
+    /**
+     * Count the number of requests in the queue.
+     *
+     * @param int $status
+     *
+     * @return int
+     */
+    public function count($status = self::FREE);
 }

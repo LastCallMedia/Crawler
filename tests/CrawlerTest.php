@@ -10,7 +10,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Queue\Job;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\SessionInterface;
 use Prophecy\Argument;
@@ -80,7 +79,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
-        $this->assertEquals(1, $queue->count(Job::COMPLETE));
+        $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
 
@@ -98,7 +97,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
-        $this->assertEquals(1, $queue->count(Job::COMPLETE));
+        $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testExceptionEventIsFiredOnSuccesfulResponseException()
@@ -117,7 +116,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
-        $this->assertEquals(1, $queue->count(Job::COMPLETE));
+        $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testExceptionEventIsFiredOnFailureResponseException()
@@ -138,7 +137,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($session->reveal());
         $crawler->start(1, 'http://google.com')->wait();
-        $this->assertEquals(1, $queue->count(Job::COMPLETE));
+        $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
 

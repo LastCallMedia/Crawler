@@ -9,14 +9,16 @@ use Psr\Http\Message\RequestInterface;
 class ArrayRequestQueue implements RequestQueueInterface
 {
 
-    private $jobs = [];
+    private $incomplete = [];
+    private $pending = [];
+    private $complete = [];
+    private $expires = [];
 
     public function push(RequestInterface $request)
     {
-        $key = $request->getMethod() . $request->getUri();
-        if (!isset($this->jobs[$key])) {
-            $job = new Job($request, $key);
-            $this->jobs[$key] = $job;
+        $key = $this->getKey($request);
+        if (!isset($this->incomplete[$key]) && !isset($this->pending[$key]) && !isset($this->complete[$key])) {
+            $this->incomplete[$key] = $request;
 
             return true;
         }
@@ -24,54 +26,58 @@ class ArrayRequestQueue implements RequestQueueInterface
         return false;
     }
 
-    public function pop()
+    private function getKey(RequestInterface $request)
     {
-        $now = time();
-        foreach ($this->jobs as $job) {
-            if ($job->getStatus() === Job::FREE && $job->getExpire() < $now) {
-                $job->setExpire(time() + 30);
-
-                return $job;
-            }
-        }
+        return $request->getMethod() . $request->getUri();
     }
 
-    public function complete(Job $job)
+    public function pop($leaseTime = 30)
     {
-        $managedJob = $this->getJob($job->getIdentifier());
-        $managedJob->setStatus(Job::COMPLETE);
-        $managedJob->setExpire(0);
-    }
+        if (!empty($this->incomplete)) {
+            $request = array_pop($this->incomplete);
+            $key = $this->getKey($request);
+            $this->expires[$key] = time() + $leaseTime;
 
-    private function getJob($identifier)
-    {
-        if (!isset($this->jobs[$identifier])) {
-            throw new \RuntimeException('This job is not managed by this queue');
+            return $this->pending[$key] = $request;
         }
 
-        return $this->jobs[$identifier];
+        return null;
     }
 
-    public function release(Job $job)
+    public function complete(RequestInterface $request)
     {
-        $managedJob = $this->getJob($job->getIdentifier());
-        $managedJob->setStatus(Job::FREE);
-        $managedJob->setExpire(0);
+        $key = $this->getKey($request);
+        if (isset($this->pending[$key])) {
+            $this->complete[$key] = $this->pending[$key];
+            unset($this->pending[$key], $this->expires[$key]);
+
+            return;
+        }
+        throw new \RuntimeException('This job is not managed by this queue');
     }
 
-    public function count($status = Job::FREE)
+    public function release(RequestInterface $request)
     {
-        return array_reduce($this->jobs,
-            function ($count, Job $job) use ($status) {
-                switch ($status) {
-                    case Job::FREE:
-                        return $job->getStatus() === Job::FREE && $job->getExpire() <= time() ? $count + 1 : $count;
-                    case Job::CLAIMED:
-                        return $job->getStatus() === Job::FREE && $job->getExpire() > time() ? $count + 1 : $count;
-                    case Job::COMPLETE:
-                        return $job->getStatus() === Job::COMPLETE ? $count + 1 : $count;
-                }
-            }, 0);
+        $key = $this->getKey($request);
+        if (isset($this->pending[$key])) {
+            $this->incomplete[$key] = $this->pending[$key];
+            unset($this->pending[$key], $this->expires[$key]);
+
+            return;
+        }
+        throw new \RuntimeException('This job is not managed by this queue');
+    }
+
+    public function count($status = self::FREE)
+    {
+        switch ($status) {
+            case self::FREE:
+                return count($this->incomplete);
+            case self::PENDING:
+                return count($this->pending);
+            case self::COMPLETE:
+                return count($this->complete);
+        }
     }
 
 }
