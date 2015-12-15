@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Session;
 
 
+use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\CrawlerEvents;
@@ -65,9 +66,25 @@ class Session implements SessionInterface
         }
     }
 
-    public function getStartUrl($startUrl = null)
+    public function init($baseUrl = null)
     {
-        return $startUrl ?: $this->configuration->getBaseUrl();
+        $baseUrl = $baseUrl ?: $this->configuration->getBaseUrl();
+        $this->addRequest(new Request('GET', $baseUrl));
+    }
+
+    public function next()
+    {
+        return $this->getQueue()->pop();
+    }
+
+    public function complete(RequestInterface $request)
+    {
+        return $this->getQueue()->complete($request);
+    }
+
+    public function release(RequestInterface $request)
+    {
+        return $this->getQueue()->release($request);
     }
 
     public function addRequest(RequestInterface $request)

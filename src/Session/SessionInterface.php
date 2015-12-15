@@ -15,13 +15,24 @@ interface SessionInterface
 {
 
     /**
-     * Get the start URL for this session.
+     * Prepare the session for crawling.
      *
-     * @param string $startUrl
+     * @param null $startUrl
      *
-     * @return string
+     * @return mixed
      */
-    public function getStartUrl($startUrl = null);
+    public function init($startUrl = null);
+
+    /**
+     * Retrieve the next request.
+     *
+     * @return RequestInterface|null
+     */
+    public function next();
+
+    public function complete(RequestInterface $request);
+
+    public function release(RequestInterface $request);
 
     /**
      * Add a request to the current session.

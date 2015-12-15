@@ -44,17 +44,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         return $configuration;
     }
 
-    public function testSetsUrl()
-    {
-        $configuration = $this->mockConfig();
-        $configuration->getBaseUrl()->willReturn('http://google.com');
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $session = new Session($configuration->reveal(), $dispatcher->reveal());
-        $this->assertEquals('http://google.com', $session->getStartUrl());
-        $this->assertEquals('http://google.com/1',
-            $session->getStartUrl('http://google.com/1'));
-    }
-
     public function testAddRequest()
     {
         $request = new Request('GET', 'http://google.com');

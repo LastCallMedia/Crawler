@@ -10,7 +10,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\SessionInterface;
 use Prophecy\Argument;
 use Psr\Http\Message\RequestInterface;
@@ -29,19 +28,26 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockSession($queue = null, $client = null)
     {
-        if (!$queue) {
-            $queue = $this->getMock(RequestQueueInterface::class);
-        }
         if (!$client) {
             $client = $this->prophesize(ClientInterface::class);
         }
+        if(!$queue) {
+            $queue = new ArrayRequestQueue();
+        }
 
         $session = $this->prophesize(SessionInterface::class);
-        $session->getStartUrl(Argument::type('string'))->willReturnArgument(0);
-        $session->getQueue()->willReturn($queue);
         $session->getClient()->willReturn($client);
         $session->isFinished()->will(function () use ($queue) {
             return $queue->count() === 0;
+        });
+        $session->next()->will(function () use ($queue) {
+            return $queue->pop();
+        });
+        $session->complete(Argument::type(RequestInterface::class))->will(function ($args) use ($queue) {
+            return $queue->complete($args[0]);
+        });
+        $session->init(Argument::type('string'))->will(function($args) use ($queue) {
+            $queue->push(new Request('GET', $args[0]));
         });
 
         return $session;
@@ -71,17 +77,15 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $client = $this->mockClient([new Response(200)]);
 
         $session = $this->getMockSession($queue, $client);
-
         $session->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
         $session->onRequestSuccess(Argument::type(RequestInterface::class),
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
-        $crawler->start(1, 'http://google.com')->wait();
+        $crawler->start(1, 'https://lastcallmedia.com')->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
-
 
     public function testItemIsCompletedOnFailure()
     {
@@ -96,7 +100,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
-        $crawler->start(1, 'http://google.com')->wait();
+        $crawler->start(1, 'https://lastcallmedia.com')->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
@@ -115,7 +119,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
-        $crawler->start(1, 'http://google.com')->wait();
+        $crawler->start(1, 'https://lastcallmedia.com')->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
@@ -136,7 +140,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
-        $crawler->start(1, 'http://google.com')->wait();
+        $crawler->start(1, 'https://lastcallmedia.com')->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
@@ -154,7 +158,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type('Exception'), null)->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal());
-        $crawler->start(1, 'http://google.com')->wait();
+        $crawler->start(1, 'https://lastcallmedia.com')->wait();
 
         // @todo: Should this job be completed?
 //        $this->assertEquals(1, $queue->count(Job::COMPLETE));
@@ -178,14 +182,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             &$count
         ) {
             $request = $args[0];
-            if ($request->getUri() == 'http://google.com/1') {
+            if ($request->getUri() == 'https://lastcallmedia.com/1') {
                 $queue->push(new Request('GET', 'http://google.com/2'));
             }
             $count++;
         });
 
         $crawler = new Crawler($session->reveal());
-        $crawler->start(5, 'http://google.com/1')->wait();
+        $crawler->start(5, 'https://lastcallmedia.com/1')->wait();
 
         $this->assertEquals(2, $count);
     }
