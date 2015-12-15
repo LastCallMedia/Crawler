@@ -51,13 +51,6 @@ interface SessionInterface
     public function getQueue();
 
     /**
-     * Gets the Guzzle HTTP client configured for this session.
-     *
-     * @return ClientInterface
-     */
-    public function getClient();
-
-    /**
      * Check whether the session has completed.
      *
      * @return bool

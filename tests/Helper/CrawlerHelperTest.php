@@ -88,7 +88,7 @@ class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
         $helper = new CrawlerHelper();
         $config = new Configuration('https://lastcallmedia.com');
         $session = new Session($config, new EventDispatcher());
-        $helper->getCrawler($session);
+        $helper->getCrawler($session, $config);
     }
 
     private function writeTempConfig($code)

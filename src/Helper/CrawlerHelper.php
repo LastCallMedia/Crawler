@@ -35,10 +35,11 @@ class CrawlerHelper extends Helper
      * @return \LastCall\Crawler\Crawler
      */
     public function getCrawler(
-        SessionInterface $session
+        SessionInterface $session,
+        ConfigurationInterface $config
     ) {
 
-        return new Crawler($session);
+        return new Crawler($session, $config->getClient());
     }
 
     /**

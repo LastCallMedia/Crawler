@@ -34,7 +34,7 @@ class ClearCommand extends Command
         $config = $helper->getConfiguration($input->getArgument('config'),
             $output);
         $session = $helper->getSession($config, false);
-        $crawler = $helper->getCrawler($session);
+        $crawler = $helper->getCrawler($session, $config);
         $crawler->teardown();
         $crawler->setUp();
         $io->success('Cleared');

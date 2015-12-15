@@ -80,7 +80,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $cb = function () {
         };
+        $queue = $this->prophesize(RequestQueueInterface::class);
         $configuration = $this->prophesize(ConfigurationInterface::class);
+        $configuration->getQueue()->willReturn($queue);
         $configuration->getListeners()->willReturn([
             'foo' => [[$cb, 10]]
         ]);
@@ -94,11 +96,13 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $subscriberMock = $this->prophesize(EventSubscriberInterface::class);
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        
         $subscriber = $subscriberMock->reveal();
         $dispatcher->addSubscriber($subscriber)->shouldBeCalled();
 
         $configuration = $this->prophesize(ConfigurationInterface::class);
+        $configuration->getQueue()->willReturn($queue);
         $configuration->getListeners()->willReturn([]);
         $configuration->getSubscribers()->willReturn([$subscriber]);
         new Session($configuration->reveal(), $dispatcher->reveal());

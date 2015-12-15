@@ -2,6 +2,7 @@
 
 namespace LastCall\Crawler;
 
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
 use LastCall\Crawler\Session\SessionInterface;
@@ -29,10 +30,10 @@ class Crawler
      *
      * @param \LastCall\Crawler\Session\SessionInterface $session
      */
-    public function __construct(SessionInterface $session)
+    public function __construct(SessionInterface $session, ClientInterface $client)
     {
         $this->session = $session;
-        $this->client = $session->getClient();
+        $this->client = $client;
     }
 
     /**

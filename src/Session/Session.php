@@ -45,6 +45,7 @@ class Session implements SessionInterface
         $this->attachListeners($configuration, $dispatcher);
         $this->configuration = $configuration;
         $this->dispatcher = $dispatcher;
+        $this->queue = $configuration->getQueue();
     }
 
     private function attachListeners(
@@ -74,22 +75,22 @@ class Session implements SessionInterface
 
     public function next()
     {
-        return $this->getQueue()->pop();
+        return $this->queue->pop();
     }
 
     public function complete(RequestInterface $request)
     {
-        return $this->getQueue()->complete($request);
+        return $this->queue->complete($request);
     }
 
     public function release(RequestInterface $request)
     {
-        return $this->getQueue()->release($request);
+        return $this->queue->release($request);
     }
 
     public function addRequest(RequestInterface $request)
     {
-        $this->configuration->getQueue()->push($request);
+        return $this->queue->push($request);
     }
 
     public function getQueue()
@@ -97,14 +98,9 @@ class Session implements SessionInterface
         return $this->configuration->getQueue();
     }
 
-    public function getClient()
-    {
-        return $this->configuration->getClient();
-    }
-
     public function isFinished()
     {
-        return $this->getQueue()->count() === 0;
+        return $this->queue->count() === 0;
     }
 
     private function getHandler(UriInterface $uri)
@@ -114,18 +110,16 @@ class Session implements SessionInterface
 
     public function onSetup()
     {
-        $queue = $this->getQueue();
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onSetup();
+        if ($this->queue instanceof SetupTeardownInterface) {
+            $this->queue->onSetup();
         }
         $this->dispatcher->dispatch(CrawlerEvents::SETUP);
     }
 
     public function onTeardown()
     {
-        $queue = $this->getQueue();
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onTeardown();
+        if ($this->queue instanceof SetupTeardownInterface) {
+            $this->queue->onTeardown();
         }
         $this->dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
@@ -134,7 +128,7 @@ class Session implements SessionInterface
     {
         $this->dispatcher->dispatch($eventName, $event);
         foreach ($event->getAdditionalRequests() as $request) {
-            $this->getQueue()->push($request);
+            $this->queue->push($request);
         }
     }
 
