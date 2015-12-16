@@ -42,6 +42,17 @@ trait QueueTestTrait
         $poppedRequest = $queue->pop();
         $assert->assertEquals($pushedRequest, $poppedRequest);
         $assert->assertEquals(1, $queue->count($queue::PENDING));
+        $assert->assertEquals(0, $queue->count());
+        $assert->assertNull($queue->pop());
+    }
+
+    public function testPopExpires() {
+        $queue = $this->getQueue();
+        $assert = $this->getAssert();
+        $queue->push($this->getRequest());
+        $assert->assertInstanceOf(Request::class, $queue->pop(0));
+        $assert->assertEquals(1, $queue->count($queue::FREE));
+        $assert->assertInstanceOf(Request::class, $queue->pop());
     }
 
     public function testComplete()

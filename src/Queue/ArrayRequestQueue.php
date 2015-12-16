@@ -33,8 +33,9 @@ class ArrayRequestQueue implements RequestQueueInterface
 
     public function pop($leaseTime = 30)
     {
+        $this->expire();
         if (!empty($this->incomplete)) {
-            $request = array_pop($this->incomplete);
+            $request = array_shift($this->incomplete);
             $key = $this->getKey($request);
             $this->expires[$key] = time() + $leaseTime;
 
@@ -46,6 +47,7 @@ class ArrayRequestQueue implements RequestQueueInterface
 
     public function complete(RequestInterface $request)
     {
+        $this->expire();
         $key = $this->getKey($request);
         if (isset($this->pending[$key])) {
             $this->complete[$key] = $this->pending[$key];
@@ -58,6 +60,7 @@ class ArrayRequestQueue implements RequestQueueInterface
 
     public function release(RequestInterface $request)
     {
+        $this->expire();
         $key = $this->getKey($request);
         if (isset($this->pending[$key])) {
             $this->incomplete[$key] = $this->pending[$key];
@@ -70,6 +73,7 @@ class ArrayRequestQueue implements RequestQueueInterface
 
     public function count($status = self::FREE)
     {
+        $this->expire();
         switch ($status) {
             case self::FREE:
                 return count($this->incomplete);
@@ -77,6 +81,17 @@ class ArrayRequestQueue implements RequestQueueInterface
                 return count($this->pending);
             case self::COMPLETE:
                 return count($this->complete);
+        }
+    }
+
+    private function expire() {
+        $time = time();
+        $expiring = array_filter($this->expires, function($expiration) use ($time) {
+            return $expiration <= $time;
+        });
+        foreach($expiring as $key => $expiration) {
+            $this->incomplete[$key] = $this->pending[$key];
+            unset($this->pending[$key], $this->expires[$key]);
         }
     }
 
