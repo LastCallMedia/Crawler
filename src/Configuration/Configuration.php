@@ -8,10 +8,12 @@ use LastCall\Crawler\Queue\Driver\ArrayDriver;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Configuration extends AbstractConfiguration
 {
+    protected $attachOutputFns = [];
 
     public function __construct($baseUrl = null)
     {
@@ -57,5 +59,17 @@ class Configuration extends AbstractConfiguration
     public function addListener($eventName, callable $listener, $priority = 0)
     {
         $this->listeners[$eventName][] = [$listener, $priority];
+    }
+
+    public function onAttachOutput(callable $fn)
+    {
+        $this->attachOutputFns[] = $fn;
+    }
+
+    public function attachOutput(OutputInterface $output)
+    {
+        foreach ($this->attachOutputFns as $fn) {
+            $fn($output);
+        }
     }
 }

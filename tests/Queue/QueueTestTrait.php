@@ -46,7 +46,8 @@ trait QueueTestTrait
         $assert->assertNull($queue->pop());
     }
 
-    public function testPopExpires() {
+    public function testPopExpires()
+    {
         $queue = $this->getQueue();
         $assert = $this->getAssert();
         $queue->push($this->getRequest());

@@ -83,6 +83,7 @@ class CrawlerHelper extends Helper
             throw new \RuntimeException(sprintf('Configuration must implement %s',
                 ConfigurationInterface::class));
         }
+        $configuration->attachOutput($output);
 
         return $configuration;
     }

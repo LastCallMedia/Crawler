@@ -7,6 +7,8 @@ use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -71,5 +73,22 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config->addListener('foo', $listener, 10);
         $this->assertEquals(['foo' => [[$listener, 10]]],
             $config->getListeners());
+    }
+
+    public function testAttachOutput()
+    {
+        $success = false;
+        $config = new Configuration();
+        $injectedOutput = new NullOutput();
+        $fn = function (OutputInterface $output) use (
+            $injectedOutput,
+            &$success
+        ) {
+            $this->assertSame($injectedOutput, $output);
+            $success = true;
+        };
+        $config->onAttachOutput($fn);
+        $config->attachOutput($injectedOutput);
+        $this->assertTrue($success);
     }
 }

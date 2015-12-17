@@ -8,6 +8,7 @@ use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Url\Matcher;
 use LastCall\Crawler\Url\Normalizer;
 use LastCall\Crawler\Url\URLHandler;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 
@@ -54,20 +55,19 @@ $urlHandler = new URLHandler('https://lastcallmedia.com', NULL,
                 $matcher, $normalizer);
 $config->setUrlHandler($urlHandler);
 
-// Make errors visible by adding an exception logger.  You can
+// Make errors and requests visible by adding loggers.  You can
 // use any PSR-3 compatible logger, but we'll use the console
-// logger here for visibility:
-$consoleLogger = new ConsoleLogger($output);
-$exceptionLogger = new ExceptionLogger($consoleLogger);
-$config->addSubscriber($exceptionLogger);
+// logger here for visibility.  By default, there won't be much
+// shown, so you may want to crank up the console verbosity by
+// using the verbose flag (-vvv).
+$config->onAttachOutput(function(OutputInterface $output) use ($config) {
+    $consoleLogger = new ConsoleLogger($output);
+    $exceptionLogger = new ExceptionLogger($consoleLogger);
+    $config->addSubscriber($exceptionLogger);
 
-
-// Last but not least, let's make the progress more visible by
-// adding a request logger that logs to the console output.
-// By default, there won't be much shown, so you may want to
-// crank up the console verbosity using the verbose flag (-vvv).
-$logHandler = new RequestLogger($consoleLogger);
-$config->addSubscriber($logHandler);
+    $logHandler = new RequestLogger($consoleLogger);
+    $config->addSubscriber($logHandler);
+});
 
 
 // Return the Configuration so the CLI runner can run it.

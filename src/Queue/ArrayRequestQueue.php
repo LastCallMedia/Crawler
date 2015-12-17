@@ -45,6 +45,19 @@ class ArrayRequestQueue implements RequestQueueInterface
         return null;
     }
 
+    private function expire()
+    {
+        $time = time();
+        $expiring = array_filter($this->expires,
+            function ($expiration) use ($time) {
+                return $expiration <= $time;
+            });
+        foreach ($expiring as $key => $expiration) {
+            $this->incomplete[$key] = $this->pending[$key];
+            unset($this->pending[$key], $this->expires[$key]);
+        }
+    }
+
     public function complete(RequestInterface $request)
     {
         $this->expire();
@@ -81,17 +94,6 @@ class ArrayRequestQueue implements RequestQueueInterface
                 return count($this->pending);
             case self::COMPLETE:
                 return count($this->complete);
-        }
-    }
-
-    private function expire() {
-        $time = time();
-        $expiring = array_filter($this->expires, function($expiration) use ($time) {
-            return $expiration <= $time;
-        });
-        foreach($expiring as $key => $expiration) {
-            $this->incomplete[$key] = $this->pending[$key];
-            unset($this->pending[$key], $this->expires[$key]);
         }
     }
 

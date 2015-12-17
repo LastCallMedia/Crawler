@@ -18,13 +18,20 @@ namespace {
 
     class SampleSubclassConfiguration extends AbstractConfiguration {
 
-        public function __construct(OutputInterface $output)
+        public function __construct()
         {
             $this->queue = new ArrayRequestQueue();
-            $this->subscribers = $this->createSubscribers($output);
+            $this->subscribers = $this->createSubscribers();
             $this->baseUrl = 'https://lastcallmedia.com';
             $this->client = new Client(['allow_redirects' => false]);
             $this->urlHandler = $this->createUrlHandler();
+        }
+
+        public function attachOutput(OutputInterface $output)
+        {
+            $consoleLogger = new ConsoleLogger($output);
+            $this->subscribers[] = new ExceptionLogger($consoleLogger);
+            $this->subscribers[] = new RequestLogger($consoleLogger);
         }
 
         private function createUrlHandler() {
@@ -35,27 +42,18 @@ namespace {
             return new URLHandler('https://lastcallmedia.com', NULL, $matcher, $normalizer);
         }
 
-        private function createSubscribers(OutputInterface $output) {
+        private function createSubscribers() {
             $moduleHandler = new ModuleHandler();
             $moduleHandler->addParser(new XPathParser());
             $moduleHandler->addProcessor(new LinkProcessor());
 
-            $consoleLogger = new ConsoleLogger($output);
-            $exceptionLogger = new ExceptionLogger($consoleLogger);
-
-            $requestLogger = new RequestLogger($consoleLogger);
-
-            return [
-                $exceptionLogger,
-                $requestLogger,
-                $moduleHandler
-            ];
+            return [ $moduleHandler ];
         }
     }
 
     // Returning here for simplicy, but the actual instance creation
     // should happen in a bare PHP file that you include from the command line.
-    $config = new SampleSubclassConfiguration($output);
+    $config = new SampleSubclassConfiguration();
     return $config;
 }
 
