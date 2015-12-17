@@ -20,7 +20,7 @@ interface SessionInterface
      *
      * @return mixed
      */
-    public function init($startUrl = null);
+    public function init($startUrl = '');
 
     /**
      * Retrieve the next request.

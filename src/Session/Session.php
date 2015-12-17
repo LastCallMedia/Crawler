@@ -33,6 +33,11 @@ class Session implements SessionInterface
     private $dispatcher;
 
     /**
+     * @var \LastCall\Crawler\Queue\RequestQueueInterface
+     */
+    private $queue;
+
+    /**
      * Session constructor.
      *
      * @param \LastCall\Crawler\Configuration\ConfigurationInterface      $configuration
@@ -70,7 +75,7 @@ class Session implements SessionInterface
     public function init($baseUrl = null)
     {
         $baseUrl = $baseUrl ?: $this->configuration->getBaseUrl();
-        $this->addRequest(new Request('GET', $baseUrl));
+        $this->queue->push(new Request('GET', $baseUrl));
     }
 
     public function next()

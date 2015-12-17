@@ -14,6 +14,7 @@ use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -74,6 +75,28 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $session = new Session($config->reveal(), $dispatcher->reveal());
         $this->assertEquals($expected, $session->isFinished());
+    }
+
+    public function getInitTests() {
+        return [
+            ['', 'https://lastcallmedia.com'],
+            ['https://lastcallmedia.com/1', 'https://lastcallmedia.com/1'],
+        ];
+    }
+
+    /**
+     * @dataProvider getInitTests
+     */
+    public function testInit($baseUrl, $expectedadd) {
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $queue->push(Argument::that(function(RequestInterface $request) use($expectedadd) {
+            return (string) $request->getUri() === $expectedadd;
+        }))->shouldBeCalled();
+        $config = $this->mockConfig([], [], $queue);
+        $config->getBaseUrl()->willReturn('https://lastcallmedia.com');
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $session->init($baseUrl);
     }
 
     public function testAddsListeners()
