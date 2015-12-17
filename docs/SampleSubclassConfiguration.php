@@ -16,7 +16,8 @@ namespace {
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;
 
-    class SampleSubclassConfiguration extends AbstractConfiguration {
+    class SampleSubclassConfiguration extends AbstractConfiguration
+    {
 
         public function __construct()
         {
@@ -34,26 +35,31 @@ namespace {
             $this->subscribers[] = new RequestLogger($consoleLogger);
         }
 
-        private function createUrlHandler() {
+        private function createUrlHandler()
+        {
             $matcher = new Matcher(['https://lastcallmedia.com']);
             $normalizer = new Normalizer([
                 Normalizer::normalizeCase('lower')
             ]);
-            return new URLHandler('https://lastcallmedia.com', NULL, $matcher, $normalizer);
+
+            return new URLHandler('https://lastcallmedia.com', null, $matcher,
+                $normalizer);
         }
 
-        private function createSubscribers() {
+        private function createSubscribers()
+        {
             $moduleHandler = new ModuleHandler();
             $moduleHandler->addParser(new XPathParser());
             $moduleHandler->addProcessor(new LinkProcessor());
 
-            return [ $moduleHandler ];
+            return [$moduleHandler];
         }
     }
 
     // Returning here for simplicy, but the actual instance creation
     // should happen in a bare PHP file that you include from the command line.
     $config = new SampleSubclassConfiguration();
+
     return $config;
 }
 

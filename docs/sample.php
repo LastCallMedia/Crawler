@@ -1,6 +1,7 @@
 <?php
 
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Handler\Module\ModuleHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
@@ -8,11 +9,10 @@ use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Url\Matcher;
 use LastCall\Crawler\Url\Normalizer;
 use LastCall\Crawler\Url\URLHandler;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use LastCall\Crawler\Handler\Logging\ExceptionLogger;
+use Symfony\Component\Console\Output\OutputInterface;
 
-include_once __DIR__ .'/../vendor/autoload.php';
+include_once __DIR__ . '/../vendor/autoload.php';
 
 
 // Create a new configuration, using our website as a base URL.
@@ -51,8 +51,8 @@ $normalizer = new Normalizer([
 
 // The URLHandler wraps up the Matcher and the Normalizer in a
 // nice little package that can be passed around between events.
-$urlHandler = new URLHandler('https://lastcallmedia.com', NULL,
-                $matcher, $normalizer);
+$urlHandler = new URLHandler('https://lastcallmedia.com', null, $matcher,
+    $normalizer);
 $config->setUrlHandler($urlHandler);
 
 // Make errors and requests visible by adding loggers.  You can
@@ -60,7 +60,7 @@ $config->setUrlHandler($urlHandler);
 // logger here for visibility.  By default, there won't be much
 // shown, so you may want to crank up the console verbosity by
 // using the verbose flag (-vvv).
-$config->onAttachOutput(function(OutputInterface $output) use ($config) {
+$config->onAttachOutput(function (OutputInterface $output) use ($config) {
     $consoleLogger = new ConsoleLogger($output);
     $exceptionLogger = new ExceptionLogger($consoleLogger);
     $config->addSubscriber($exceptionLogger);
