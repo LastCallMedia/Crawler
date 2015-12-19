@@ -93,6 +93,15 @@ trait QueueTestTrait
 
     /**
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unexpected status 15
+     */
+    public function testCountInvalidStatus() {
+        $queue = $this->getQueue();
+        $queue->count(15);
+    }
+
+    /**
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage This job is not managed by this queue
      */
     public function testCompleteJobNotOnQueue()

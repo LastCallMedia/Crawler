@@ -27,6 +27,8 @@ interface RequestQueueInterface
      * @param RequestInterface
      *
      * @return bool
+     *
+     * @throws \RuntimeException When the request is not in a pending state.
      */
     public function complete(RequestInterface $request);
 
@@ -34,6 +36,8 @@ interface RequestQueueInterface
      * @param RequestInterface
      *
      * @return bool
+     *
+     * @throws \RuntimeException When the request is not in a pending state.
      */
     public function release(RequestInterface $request);
 
@@ -43,6 +47,8 @@ interface RequestQueueInterface
      * @param int $status
      *
      * @return int
+     *
+     * @throws \RuntimeException When status is not one of the accepted statuses.
      */
     public function count($status = self::FREE);
 }

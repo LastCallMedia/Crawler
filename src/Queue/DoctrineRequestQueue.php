@@ -143,12 +143,13 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
                         self::FREE,
                         time()
                     ))->fetchColumn();
-            default:
+            case self::COMPLETE:
                 return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ?",
                     array(
                         self::COMPLETE
                     ))->fetchColumn();
         }
+        throw new \RuntimeException(sprintf('Unexpected status %s', (string) $status));
     }
 
     protected function getConnection()
