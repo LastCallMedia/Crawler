@@ -16,8 +16,7 @@ abstract class CommandTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockHelperSet(
         $configuration,
-        $crawler,
-        $profile = false
+        $crawler
     ) {
         $session = $this->prophesize(SessionInterface::class)->reveal();
 
@@ -26,7 +25,7 @@ abstract class CommandTest extends \PHPUnit_Framework_TestCase
         $crawlerHelper->getConfiguration('test.php',
             Argument::type(OutputInterface::class))->willReturn($configuration);
 
-        $crawlerHelper->getSession($configuration, $profile)
+        $crawlerHelper->getSession($configuration)
             ->willReturn($session);
 
         $crawlerHelper->getCrawler($session, $configuration)
@@ -34,13 +33,6 @@ abstract class CommandTest extends \PHPUnit_Framework_TestCase
 
         $profilerHelper = $this->prophesize(ProfilerHelper::class);
         $profilerHelper->getName()->willReturn('profiler');
-        if ($profile) {
-            $profilerHelper->renderProfile(Argument::type(OutputStyle::class))
-                ->shouldBeCalled();
-        } else {
-            $profilerHelper->renderProfile(Argument::type(OutputStyle::class))
-                ->shouldNotBeCalled();
-        }
 
 
         $set = $this->prophesize(HelperSet::class);

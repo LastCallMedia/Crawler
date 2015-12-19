@@ -28,7 +28,7 @@ class TeardownCommand extends Command
         $helper = $this->getHelper('crawler');
         $config = $helper->getConfiguration($input->getArgument('config'),
             $output);
-        $session = $helper->getSession($config, false);
+        $session = $helper->getSession($config);
         $crawler = $helper->getCrawler($session, $config);
         $crawler->teardown();
         $io = new SymfonyStyle($input, $output);

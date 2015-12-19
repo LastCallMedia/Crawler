@@ -23,8 +23,6 @@ class CrawlCommand extends Command
             'The path to the crawler configuration.');
         $this->addOption('chunk', null, InputOption::VALUE_OPTIONAL,
             'The amount of items to process.', 5);
-        $this->addOption('profile', 'p', InputOption::VALUE_NONE,
-            'Whether to profile the run');
         $this->addOption('reset', 'r', InputOption::VALUE_NONE,
             'Reset the migration prior to running');
         parent::configure();
@@ -39,8 +37,7 @@ class CrawlCommand extends Command
         $helper = $this->getHelper('crawler');
         $configuration = $helper->getConfiguration($input->getArgument('config'),
             $output);
-        $session = $helper->getSession($configuration,
-            $input->getOption('profile'));
+        $session = $helper->getSession($configuration);
 
         $crawler = $helper->getCrawler($session, $configuration);
 
@@ -56,9 +53,5 @@ class CrawlCommand extends Command
         $promise->wait();
         $io = new SymfonyStyle($input, $output);
         $io->success('Crawling complete.');
-
-        if ($input->getOption('profile')) {
-            $this->getHelper('profiler')->renderProfile($io);
-        }
     }
 }

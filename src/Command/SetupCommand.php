@@ -28,7 +28,7 @@ class SetupCommand extends Command
         $helper = $this->getHelper('crawler');
         $config = $helper->getConfiguration($input->getArgument('config'),
             $output);
-        $session = $helper->getSession($config, false);
+        $session = $helper->getSession($config);
         $crawler = $helper->getCrawler($session, $config);
         $crawler->setup();
         $io = new SymfonyStyle($input, $output);
