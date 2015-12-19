@@ -7,7 +7,6 @@ use LastCall\Crawler\Command\CrawlCommand;
 use LastCall\Crawler\Command\SetupCommand;
 use LastCall\Crawler\Command\TeardownCommand;
 use LastCall\Crawler\Helper\CrawlerHelper;
-use LastCall\Crawler\Helper\ProfilerHelper;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -27,7 +26,6 @@ class Application extends BaseApplication
     {
         $helpers = parent::getDefaultHelperSet();
         $helpers->set(new CrawlerHelper());
-        $helpers->set(new ProfilerHelper());
 
         return $helpers;
     }

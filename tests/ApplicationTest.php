@@ -26,7 +26,5 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $this->assertInstanceOf('LastCall\Crawler\Helper\CrawlerHelper',
             $application->getHelperSet()->get('crawler'));
-        $this->assertInstanceOf('LastCall\Crawler\Helper\ProfilerHelper',
-            $application->getHelperSet()->get('profiler'));
     }
 }

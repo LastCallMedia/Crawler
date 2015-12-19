@@ -25,19 +25,14 @@ abstract class CommandTest extends \PHPUnit_Framework_TestCase
         $crawlerHelper->getConfiguration('test.php',
             Argument::type(OutputInterface::class))->willReturn($configuration);
 
-        $crawlerHelper->getSession($configuration)
-            ->willReturn($session);
+        $crawlerHelper->getSession($configuration)->willReturn($session);
 
         $crawlerHelper->getCrawler($session, $configuration)
             ->willReturn($crawler);
 
-        $profilerHelper = $this->prophesize(ProfilerHelper::class);
-        $profilerHelper->getName()->willReturn('profiler');
-
 
         $set = $this->prophesize(HelperSet::class);
         $set->get('crawler')->willReturn($crawlerHelper);
-        $set->get('profiler')->willReturn($profilerHelper);
 
         return $set->reveal();
     }

@@ -44,19 +44,4 @@ class WorkCommandTest extends CommandTest
         $tester = new CommandTester($command);
         $tester->execute(array('config' => 'test.php', '--reset' => true));
     }
-
-//    public function testInvokesProfiler()
-//    {
-//        $configuration = $this->prophesize(ConfigurationInterface::class);
-//        $crawler = $this->prophesize(Crawler::class);
-//        $crawler->start(Argument::any(), Argument::any())
-//            ->willReturn(new FulfilledPromise('foo'));
-//
-//        $command = new CrawlCommand();
-//        $command->setHelperSet($this->getMockHelperSet($configuration, $crawler,
-//            true));
-//        $tester = new CommandTester($command);
-//        $tester->execute(['config' => 'test.php', '--profile' => true]);
-//    }
-
 }

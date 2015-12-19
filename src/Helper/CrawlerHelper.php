@@ -47,20 +47,12 @@ class CrawlerHelper extends Helper
      * Create a crawler session for a configuration.
      *
      * @param \LastCall\Crawler\Configuration\ConfigurationInterface $config
-     * @param bool                                                   $profile
      *
      * @return \LastCall\Crawler\Session\Session
      */
-    public function getSession(ConfigurationInterface $config, $profile = false)
+    public function getSession(ConfigurationInterface $config)
     {
-        $dispatcher = new EventDispatcher();
-        if ($profile && $this->getHelperSet()->has('profiler')) {
-            /** @var ProfilerHelper $profiler */
-            $profiler = $this->getHelperSet()->get('profiler');
-            $dispatcher = $profiler->getTraceableDispatcher($dispatcher);
-        }
-
-        return new Session($config, $dispatcher);
+        return new Session($config, new EventDispatcher());
     }
 
     /**

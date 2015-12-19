@@ -7,14 +7,10 @@ use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use LastCall\Crawler\Session\Session;
-use LastCall\Crawler\Session\SessionInterface;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,23 +60,6 @@ class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
         $config = $helper->getConfiguration($file, $output);
         $this->assertInstanceOf(ConfigurationInterface::class, $config);
         $this->assertEquals('http://google.com', $config->getBaseUrl());
-    }
-
-    public function testGetProfilingCrawler()
-    {
-        $helper = new CrawlerHelper();
-        $profilerHelper = $this->prophesize(ProfilerHelper::class);
-        $profilerHelper->getName()->willReturn('profiler');
-        $profilerHelper->getTraceableDispatcher(Argument::type(EventDispatcherInterface::class))
-            ->willReturn(new TraceableEventDispatcher(new EventDispatcher(),
-                new Stopwatch()))
-            ->shouldBeCalled();
-        $profilerHelper->setHelperSet(Argument::any())->willReturn(null);
-
-        $set = new HelperSet([$helper, $profilerHelper->reveal()]);
-        $config = new Configuration('https://lastcallmedia.com');
-        $this->assertInstanceOf(SessionInterface::class,
-            $helper->getSession($config, true));
     }
 
     public function testGetCrawler()
