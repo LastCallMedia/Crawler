@@ -48,7 +48,8 @@ interface RequestQueueInterface
      *
      * @return int
      *
-     * @throws \RuntimeException When status is not one of the accepted statuses.
+     * @throws \RuntimeException When status is not one of the accepted
+     *                           statuses.
      */
     public function count($status = self::FREE);
 }

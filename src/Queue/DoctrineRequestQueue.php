@@ -149,7 +149,8 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
                         self::COMPLETE
                     ))->fetchColumn();
         }
-        throw new \RuntimeException(sprintf('Unexpected status %s', (string) $status));
+        throw new \RuntimeException(sprintf('Unexpected status %s',
+            (string)$status));
     }
 
     protected function getConnection()

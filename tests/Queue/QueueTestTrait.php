@@ -95,7 +95,8 @@ trait QueueTestTrait
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Unexpected status 15
      */
-    public function testCountInvalidStatus() {
+    public function testCountInvalidStatus()
+    {
         $queue = $this->getQueue();
         $queue->count(15);
     }

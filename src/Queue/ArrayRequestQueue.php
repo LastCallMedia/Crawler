@@ -95,7 +95,8 @@ class ArrayRequestQueue implements RequestQueueInterface
             case self::COMPLETE:
                 return count($this->complete);
         }
-        throw new \RuntimeException(sprintf('Unexpected status %s', (string) $status));
+        throw new \RuntimeException(sprintf('Unexpected status %s',
+            (string)$status));
     }
 
 }
