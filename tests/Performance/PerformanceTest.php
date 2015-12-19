@@ -21,8 +21,6 @@ use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Queue\Driver\ArrayDriver;
-use LastCall\Crawler\Queue\Driver\DoctrineDriver;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
@@ -167,7 +165,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         ConfigurationInterface $configuration,
         $category
     ) {
-        $session = new Session($configuration, new EventDispatcher());
+        $session = Session::createFromConfig($configuration, new EventDispatcher());
         $crawler = new Crawler($session, $configuration->getClient());
         $stopwatch = new Stopwatch();
         $stopwatch->start(__FUNCTION__, $category);
