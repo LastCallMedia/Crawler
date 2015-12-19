@@ -7,11 +7,13 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Handler\Module\ModuleHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Test\Resources\DummyProcessor;
 use LastCall\Crawler\Url\URLHandler;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use Prophecy\Argument;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
@@ -82,5 +84,25 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($event, $processor->getCalls()[0][0]);
         $this->assertInstanceOf(DomCrawler::class,
             $processor->getCalls()[0][1]);
+    }
+
+    public function testCallsSetup() {
+        $processor = $this->prophesize(ModuleProcessorInterface::class);
+        $processor->willImplement(SetupTeardownInterface::class);
+        $processor->getSubscribedMethods()->willReturn([]);
+        $processor->onSetup()->shouldBeCalled();
+
+        $handler = new ModuleHandler([], [$processor->reveal()]);
+        $handler->onSetup();
+    }
+
+    public function testCallsTeardown() {
+        $processor = $this->prophesize(ModuleProcessorInterface::class);
+        $processor->willImplement(SetupTeardownInterface::class);
+        $processor->getSubscribedMethods()->willReturn([]);
+        $processor->onTeardown()->shouldBeCalled();
+
+        $handler = new ModuleHandler([], [$processor->reveal()]);
+        $handler->onTeardown();
     }
 }

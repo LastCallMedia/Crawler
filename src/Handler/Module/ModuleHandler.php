@@ -4,6 +4,7 @@
 namespace LastCall\Crawler\Handler\Module;
 
 
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\CrawlerHandlerInterface;
@@ -25,6 +26,8 @@ class ModuleHandler implements CrawlerHandlerInterface
     {
         return [
             CrawlerEvents::SUCCESS => 'onSuccess',
+            CrawlerEvents::SETUP => 'onSetup',
+            CrawlerEvents::TEARDOWN => 'onTeardown',
         ];
     }
 
@@ -136,6 +139,16 @@ class ModuleHandler implements CrawlerHandlerInterface
         return $this->parsers[$parserId];
     }
 
+    private function getSetupTeardownObjects() {
+        $objects = [];
+        foreach($this->processors as $processor) {
+            if($processor instanceof SetupTeardownInterface) {
+                $objects[] = $processor;
+            }
+        }
+        return $objects;
+    }
+
     /**
      * @param \LastCall\Crawler\Event\CrawlerResponseEvent $event
      */
@@ -154,6 +167,18 @@ class ModuleHandler implements CrawlerHandlerInterface
                     $callable($event, $fragments);
                 }
             }
+        }
+    }
+
+    public function onSetup() {
+        foreach($this->getSetupTeardownObjects() as $object) {
+            $object->onSetup();
+        }
+    }
+
+    public function onTeardown() {
+        foreach($this->getSetupTeardownObjects() as $object) {
+            $object->onTeardown();
         }
     }
 }
