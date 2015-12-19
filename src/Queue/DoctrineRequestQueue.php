@@ -34,9 +34,6 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         return $request->getMethod() . $request->getUri();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function push(RequestInterface $request)
     {
         $key = $this->getKey($request);
@@ -89,42 +86,28 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         return $return;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function complete(RequestInterface $request)
     {
         $key = $this->getKey($request);
-        if ($this->existsAndIsPending($key)) {
-            $this->connection->update($this->table, [
-                'expire' => 0,
-                'status' => self::COMPLETE,
-            ], [
-                'identifier' => $key,
-            ]);
 
-            return;
-        }
-        $this->throwNotManaged();
+        return $this->updateIfExistsAndIsPending($key, [
+            'expire' => 0,
+            'status' => self::COMPLETE,
+        ], [
+            'identifier' => $key,
+        ]);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function release(RequestInterface $request)
     {
         $key = $this->getKey($request);
-        if ($this->existsAndIsPending($key)) {
-            $this->connection->update($this->table, [
-                'expire' => 0,
-                'status' => self::FREE,
-            ], [
-                'identifier' => $key,
-            ]);
 
-            return;
-        }
-        $this->throwNotManaged();
+        return $this->updateIfExistsAndIsPending($key, [
+            'expire' => 0,
+            'status' => self::FREE,
+        ], [
+            'identifier' => $key
+        ]);
     }
 
     public function count($status = self::FREE)
@@ -178,20 +161,19 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
             ))->fetchColumn();
     }
 
-    private function existsAndIsPending($identifier)
-    {
+    private function updateIfExistsAndIsPending(
+        $key,
+        array $data,
+        array $identifier
+    ) {
         $sql = "SELECT 1 FROM {$this->table} WHERE identifier = ? AND status = ? AND expire > ?";
+        $exists = $this->connection->executeQuery($sql,
+            [$key, self::FREE, time()])->fetchColumn();
 
-        return $this->connection->executeQuery($sql, [
-            $identifier,
-            self::FREE,
-            time()
-        ])->fetchColumn();
-    }
-
-    private function throwNotManaged()
-    {
-        throw new \RuntimeException('This job is not managed by this queue');
+        if ($exists) {
+            return $this->connection->update($this->table, $data, $identifier);
+        }
+        throw new \RuntimeException('This request is not managed by this queue.');
     }
 
 }

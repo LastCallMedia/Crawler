@@ -68,7 +68,7 @@ class ArrayRequestQueue implements RequestQueueInterface
 
             return;
         }
-        throw new \RuntimeException('This job is not managed by this queue');
+        throw new \RuntimeException('This request is not managed by this queue');
     }
 
     public function release(RequestInterface $request)
@@ -81,7 +81,7 @@ class ArrayRequestQueue implements RequestQueueInterface
 
             return;
         }
-        throw new \RuntimeException('This job is not managed by this queue');
+        throw new \RuntimeException('This request is not managed by this queue');
     }
 
     public function count($status = self::FREE)

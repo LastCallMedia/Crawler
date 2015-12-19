@@ -103,7 +103,7 @@ trait QueueTestTrait
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage This job is not managed by this queue
+     * @expectedExceptionMessage This request is not managed by this queue
      */
     public function testCompleteJobNotOnQueue()
     {
@@ -113,7 +113,7 @@ trait QueueTestTrait
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage This job is not managed by this queue
+     * @expectedExceptionMessage This request is not managed by this queue
      */
     public function testReleaseJobNotOnQueue()
     {
