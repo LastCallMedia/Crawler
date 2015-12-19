@@ -5,18 +5,18 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 
 use GuzzleHttp\Psr7\Request;
+use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\CrawlerHandlerInterface;
-use LastCall\Crawler\Handler\RedirectDetectionTrait;
 use LastCall\Crawler\Url\TraceableUri;
 use Psr\Http\Message\RequestInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Retries the original, denormalized form of a URL that results in
  * either failure or a redirect back to the original form.
  */
-class DenormalizedUrlDiscoverer implements CrawlerHandlerInterface
+class DenormalizedUrlDiscoverer implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
 

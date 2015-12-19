@@ -7,16 +7,16 @@ namespace LastCall\Crawler\Handler\Module;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\CrawlerHandlerInterface;
 use LastCall\Crawler\Module\ModuleSubscription;
 use LastCall\Crawler\Module\Parser\ModuleParserInterface;
 use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Delegates parsing and processing of subsections (modules)
  * of the response.
  */
-class ModuleHandler implements CrawlerHandlerInterface
+class ModuleHandler implements EventSubscriberInterface
 {
 
     /**

@@ -4,18 +4,18 @@
 namespace LastCall\Crawler\Handler\Logging;
 
 
+use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\CrawlerHandlerInterface;
-use LastCall\Crawler\Handler\RedirectDetectionTrait;
 use LastCall\Crawler\Url\TraceableUri;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Logs requests sent and completed to a PSR-3 compatible logger.
  */
-class RequestLogger implements CrawlerHandlerInterface
+class RequestLogger implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
     private $logger;

@@ -5,22 +5,19 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 
 use GuzzleHttp\Psr7\Request;
+use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\CrawlerHandlerInterface;
-use LastCall\Crawler\Handler\RedirectDetectionTrait;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Add in URLs that are redirected to, as long as they are matched
  * by the URLHandler.
  */
-class RedirectDiscoverer implements CrawlerHandlerInterface
+class RedirectDiscoverer implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return array(
