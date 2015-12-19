@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Test\Session;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Common\SetupTeardownInterface;
-use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
@@ -20,7 +19,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 
 class SessionTest extends \PHPUnit_Framework_TestCase
@@ -49,12 +47,11 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRequest()
     {
-        $request = new Request('GET', 'http://google.com');
+        $request = new Request('GET', 'https://lastcallmedia.com');
         $queue = $this->prophesize(RequestQueueInterface::class);
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
         $queue->push($request)->shouldBeCalled();
-        $configuration = $this->mockConfig([], [], $queue);
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $session = new Session($configuration->reveal(), $dispatcher->reveal());
+        $session = new Session($urlHandler, $queue->reveal());
         $session->addRequest($request);
     }
 
@@ -73,9 +70,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->count()->willReturn($count);
-        $config = $this->mockConfig([], [], $queue);
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, $queue->reveal());
         $this->assertEquals($expected, $session->isFinished());
     }
 
@@ -98,53 +94,18 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         ) {
             return (string)$request->getUri() === $expectedadd;
         }))->shouldBeCalled();
-        $config = $this->mockConfig([], [], $queue);
-        $config->getBaseUrl()->willReturn('https://lastcallmedia.com');
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, $queue->reveal());
         $session->init($baseUrl);
     }
-
-    public function testAddsListeners()
-    {
-        $cb = function () {
-        };
-        $queue = $this->prophesize(RequestQueueInterface::class);
-        $configuration = $this->prophesize(ConfigurationInterface::class);
-        $configuration->getQueue()->willReturn($queue);
-        $configuration->getListeners()->willReturn([
-            'foo' => [[$cb, 10]]
-        ]);
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->addListener('foo', $cb, 10)->shouldBeCalled();
-        $configuration->getSubscribers()->willReturn([]);
-        new Session($configuration->reveal(), $dispatcher->reveal());
-    }
-
-    public function testAddsSubscribers()
-    {
-        $subscriberMock = $this->prophesize(EventSubscriberInterface::class);
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $queue = $this->prophesize(RequestQueueInterface::class);
-
-        $subscriber = $subscriberMock->reveal();
-        $dispatcher->addSubscriber($subscriber)->shouldBeCalled();
-
-        $configuration = $this->prophesize(ConfigurationInterface::class);
-        $configuration->getQueue()->willReturn($queue);
-        $configuration->getListeners()->willReturn([]);
-        $configuration->getSubscribers()->willReturn([$subscriber]);
-        new Session($configuration->reveal(), $dispatcher->reveal());
-    }
-
 
     public function testSetup()
     {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::SETUP)->shouldBeCalledTimes(1);
-        $config = $this->prophesize(ConfigurationInterface::class);
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
 
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $session = new Session($urlHandler, null, $dispatcher->reveal());
         $session->onSetup();
     }
 
@@ -152,9 +113,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::TEARDOWN)->shouldBeCalledTimes(1);
-        $config = $this->prophesize(ConfigurationInterface::class);
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
 
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $session = new Session($urlHandler, null, $dispatcher->reveal());
         $session->onTeardown();
     }
 
@@ -163,11 +124,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'https://lastcallmedia.com');
         $queue = new ArrayRequestQueue();
         $queue->push($request);
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->setQueue($queue);
-        $dispatcher = new EventDispatcher();
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
 
-        $session = new Session($config, $dispatcher);
+        $session = new Session($urlHandler, $queue);
         $this->assertSame($request, $session->next());
     }
 
@@ -176,10 +135,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'https://lastcallmedia.com');
         $queue = new ArrayRequestQueue();
         $queue->push($request);
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->setQueue($queue);
 
-        $session = new Session($config, new EventDispatcher());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+
+        $session = new Session($urlHandler, $queue);
         $popped = $session->next();
         $session->complete($popped);
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
@@ -190,10 +149,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'https://lastcallmedia.com');
         $queue = new ArrayRequestQueue();
         $queue->push($request);
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->setQueue($queue);
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
 
-        $session = new Session($config, new EventDispatcher());
+        $session = new Session($urlHandler, $queue);
         $popped = $session->next();
         $session->release($popped);
         $this->assertEquals(1, $queue->count($queue::FREE));
@@ -205,9 +163,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch(CrawlerEvents::SENDING,
             Argument::type(CrawlerEvent::class))->shouldBeCalledTimes(1);
 
-        $config = $this->mockConfig();
-
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, null, $dispatcher->reveal());
         $session->onRequestSending(new Request('GET', 'http://google.com'));
     }
 
@@ -218,8 +175,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             Argument::type(CrawlerResponseEvent::class))
             ->shouldBeCalledTimes(1);
 
-        $config = $this->mockConfig();
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, null, $dispatcher->reveal());
         $session->onRequestSuccess(new Request('GET', 'http://google.com'),
             new Response());
     }
@@ -231,8 +188,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             Argument::type(CrawlerResponseEvent::class))
             ->shouldBeCalledTimes(1);
 
-        $config = $this->mockConfig();
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, null, $dispatcher->reveal());
         $session->onRequestFailure(new Request('GET', 'http://google.com'),
             new Response());
     }
@@ -244,8 +201,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             Argument::type(CrawlerExceptionEvent::class))
             ->shouldBeCalledTimes(1);
 
-        $config = $this->mockConfig();
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, null, $dispatcher->reveal());
         $session->onRequestException(new Request('GET', 'http://google.com'),
             new \Exception('foo'), new Response());
     }
@@ -253,40 +210,39 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testAddsAdditionalRequests()
     {
         $newRequest = new Request('GET', 'https://lastcallmedia.com');
-        $fn = function (CrawlerEvent $event) use ($newRequest) {
-            $event->addAdditionalRequest($newRequest);
-        };
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(CrawlerEvents::SENDING,
+            function (CrawlerEvent $event) use ($newRequest) {
+                $event->addAdditionalRequest($newRequest);
+            });
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->push($newRequest)->shouldBeCalled();
-        $config = $this->mockConfig([], [], $queue);
-        $config->getListeners()->willReturn([
-            CrawlerEvents::SENDING => [[$fn, 0]]
-        ]);
-        $session = new Session($config->reveal(), new EventDispatcher());
+
+        $session = new Session($urlHandler, $queue->reveal(), $dispatcher);
         $session->onRequestSending(new Request('GET', 'http://google.com'));
     }
 
     public function testSetsUpQueue()
     {
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->willImplement(SetupTeardownInterface::class);
         $queue->onSetup()->shouldBeCalled();
 
-        $config = $this->mockConfig([], [], $queue);
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, $queue->reveal());
         $session->onSetup();
     }
 
     public function testTearsDownQueue()
     {
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $queue = $this->prophesize(RequestQueueInterface::class);
         $queue->willImplement(SetupTeardownInterface::class);
         $queue->onTeardown()->shouldBeCalled();
 
-        $config = $this->mockConfig([], [], $queue);
-        $session = new Session($config->reveal(), $dispatcher->reveal());
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $session = new Session($urlHandler, $queue->reveal());
         $session->onTeardown();
     }
 }

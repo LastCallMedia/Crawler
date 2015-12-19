@@ -52,7 +52,9 @@ class CrawlerHelper extends Helper
      */
     public function getSession(ConfigurationInterface $config)
     {
-        return new Session($config, new EventDispatcher());
+        $dispatcher = new EventDispatcher();
+
+        return Session::createFromConfig($config, $dispatcher);
     }
 
     /**

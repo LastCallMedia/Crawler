@@ -10,9 +10,13 @@ use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
+use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -23,9 +27,9 @@ class Session implements SessionInterface
 {
 
     /**
-     * @var \LastCall\Crawler\Configuration\ConfigurationInterface
+     * @var \LastCall\Crawler\Url\URLHandler
      */
-    private $configuration;
+    private $urlHandler;
 
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -37,27 +41,11 @@ class Session implements SessionInterface
      */
     private $queue;
 
-    /**
-     * Session constructor.
-     *
-     * @param \LastCall\Crawler\Configuration\ConfigurationInterface      $configuration
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-     */
-    public function __construct(
-        ConfigurationInterface $configuration,
+    public static function createFromConfig(
+        ConfigurationInterface $config,
         EventDispatcherInterface $dispatcher
     ) {
-        $this->attachListeners($configuration, $dispatcher);
-        $this->configuration = $configuration;
-        $this->dispatcher = $dispatcher;
-        $this->queue = $configuration->getQueue();
-    }
-
-    private function attachListeners(
-        ConfigurationInterface $configuration,
-        EventDispatcherInterface $dispatcher
-    ) {
-        if ($listenersArr = $configuration->getListeners()) {
+        if ($listenersArr = $config->getListeners()) {
             foreach ($listenersArr as $eventName => $listeners) {
                 foreach ($listeners as $listenerData) {
                     $dispatcher->addListener($eventName, $listenerData[0],
@@ -65,16 +53,36 @@ class Session implements SessionInterface
                 }
             }
         }
-        if ($subscribersArr = $configuration->getSubscribers()) {
+        if ($subscribersArr = $config->getSubscribers()) {
             foreach ($subscribersArr as $subscriber) {
                 $dispatcher->addSubscriber($subscriber);
             }
         }
+
+        return new self($config->getUrlHandler(), $config->getQueue(),
+            $dispatcher);
+    }
+
+    /**
+     * Session constructor.
+     *
+     * @param \LastCall\Crawler\Url\URLHandler                                 $urlHandler
+     * @param \LastCall\Crawler\Queue\RequestQueueInterface|null               $queue
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
+     */
+    public function __construct(
+        URLHandler $urlHandler,
+        RequestQueueInterface $queue = null,
+        EventDispatcherInterface $dispatcher = null
+    ) {
+        $this->urlHandler = $urlHandler;
+        $this->dispatcher = $dispatcher ?: new EventDispatcher();
+        $this->queue = $queue ?: new ArrayRequestQueue();
     }
 
     public function init($baseUrl = null)
     {
-        $baseUrl = $baseUrl ?: $this->configuration->getBaseUrl();
+        $baseUrl = $baseUrl ?: $this->urlHandler->getBaseUrl();
         $this->queue->push(new Request('GET', $baseUrl));
     }
 
@@ -105,7 +113,7 @@ class Session implements SessionInterface
 
     private function getHandler(UriInterface $uri)
     {
-        return $this->configuration->getUrlHandler()->forUrl($uri);
+        return $this->urlHandler->forUrl($uri);
     }
 
     public function onSetup()

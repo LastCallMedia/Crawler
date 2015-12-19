@@ -4,13 +4,12 @@ namespace LastCall\Crawler\Test\Helper;
 
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
-use LastCall\Crawler\Session\Session;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,8 +65,9 @@ class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new CrawlerHelper();
         $config = new Configuration('https://lastcallmedia.com');
-        $session = new Session($config, new EventDispatcher());
-        $helper->getCrawler($session, $config);
+        $session = $helper->getSession($config);
+        $this->assertInstanceOf(Crawler::class,
+            $helper->getCrawler($session, $config));
     }
 
     private function writeTempConfig($code)
