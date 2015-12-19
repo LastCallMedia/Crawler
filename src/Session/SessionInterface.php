@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Session;
 
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -41,13 +40,6 @@ interface SessionInterface
      * @return void
      */
     public function addRequest(RequestInterface $request);
-
-    /**
-     * Get the request queue.
-     *
-     * @return RequestQueueInterface
-     */
-    public function getQueue();
 
     /**
      * Check whether the session has completed.

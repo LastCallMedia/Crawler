@@ -98,11 +98,6 @@ class Session implements SessionInterface
         return $this->queue->push($request);
     }
 
-    public function getQueue()
-    {
-        return $this->configuration->getQueue();
-    }
-
     public function isFinished()
     {
         return $this->queue->count() === 0;

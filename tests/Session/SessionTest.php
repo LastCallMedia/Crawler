@@ -5,11 +5,13 @@ namespace LastCall\Crawler\Test\Session;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Common\SetupTeardownInterface;
+use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Url\URLHandler;
@@ -77,7 +79,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $session->isFinished());
     }
 
-    public function getInitTests() {
+    public function getInitTests()
+    {
         return [
             ['', 'https://lastcallmedia.com'],
             ['https://lastcallmedia.com/1', 'https://lastcallmedia.com/1'],
@@ -87,10 +90,13 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInitTests
      */
-    public function testInit($baseUrl, $expectedadd) {
+    public function testInit($baseUrl, $expectedadd)
+    {
         $queue = $this->prophesize(RequestQueueInterface::class);
-        $queue->push(Argument::that(function(RequestInterface $request) use($expectedadd) {
-            return (string) $request->getUri() === $expectedadd;
+        $queue->push(Argument::that(function (RequestInterface $request) use (
+            $expectedadd
+        ) {
+            return (string)$request->getUri() === $expectedadd;
         }))->shouldBeCalled();
         $config = $this->mockConfig([], [], $queue);
         $config->getBaseUrl()->willReturn('https://lastcallmedia.com');
@@ -150,6 +156,47 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $session = new Session($config->reveal(), $dispatcher->reveal());
         $session->onTeardown();
+    }
+
+    public function testNext()
+    {
+        $request = new Request('GET', 'https://lastcallmedia.com');
+        $queue = new ArrayRequestQueue();
+        $queue->push($request);
+        $config = new Configuration('https://lastcallmedia.com');
+        $config->setQueue($queue);
+        $dispatcher = new EventDispatcher();
+
+        $session = new Session($config, $dispatcher);
+        $this->assertSame($request, $session->next());
+    }
+
+    public function testComplete()
+    {
+        $request = new Request('GET', 'https://lastcallmedia.com');
+        $queue = new ArrayRequestQueue();
+        $queue->push($request);
+        $config = new Configuration('https://lastcallmedia.com');
+        $config->setQueue($queue);
+
+        $session = new Session($config, new EventDispatcher());
+        $popped = $session->next();
+        $session->complete($popped);
+        $this->assertEquals(1, $queue->count($queue::COMPLETE));
+    }
+
+    public function testRelease()
+    {
+        $request = new Request('GET', 'https://lastcallmedia.com');
+        $queue = new ArrayRequestQueue();
+        $queue->push($request);
+        $config = new Configuration('https://lastcallmedia.com');
+        $config->setQueue($queue);
+
+        $session = new Session($config, new EventDispatcher());
+        $popped = $session->next();
+        $session->release($popped);
+        $this->assertEquals(1, $queue->count($queue::FREE));
     }
 
     public function testOnRequestSending()
