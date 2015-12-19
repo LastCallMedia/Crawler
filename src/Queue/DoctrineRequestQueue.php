@@ -21,9 +21,9 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
      */
     private $connection;
 
-    private $table = 'Job';
+    private $table = 'queue';
 
-    public function __construct(Connection $connection, $table = 'Job')
+    public function __construct(Connection $connection, $table = 'queue')
     {
         $this->connection = $connection;
         $this->table = $table;
