@@ -2,6 +2,7 @@
 
 namespace LastCall\Crawler\Event;
 
+use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -44,6 +45,9 @@ class CrawlerEvent extends Event
     }
 
     /**
+     * Add a request to crawl a single URL, specifying the request
+     * that is used.
+     *
      * @param \Psr\Http\Message\RequestInterface $request
      */
     public function addAdditionalRequest(RequestInterface $request)
@@ -52,6 +56,8 @@ class CrawlerEvent extends Event
     }
 
     /**
+     * Get the URLs that were discovered during handling the event.
+     *
      * @return \Psr\Http\Message\RequestInterface[]
      */
     public function getAdditionalRequests()

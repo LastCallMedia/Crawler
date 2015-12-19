@@ -31,6 +31,11 @@ class ArrayRequestQueue implements RequestQueueInterface
         return $request->getMethod() . $request->getUri();
     }
 
+    private function releasePending($key) {
+        $this->incomplete[$key] = $this->pending[$key];
+        unset($this->pending[$key], $this->expires[$key]);
+    }
+
     public function pop($leaseTime = 30)
     {
         $this->expire();
@@ -53,8 +58,7 @@ class ArrayRequestQueue implements RequestQueueInterface
                 return $expiration <= $time;
             });
         foreach ($expiring as $key => $expiration) {
-            $this->incomplete[$key] = $this->pending[$key];
-            unset($this->pending[$key], $this->expires[$key]);
+            $this->releasePending($key);
         }
     }
 
@@ -76,8 +80,7 @@ class ArrayRequestQueue implements RequestQueueInterface
         $this->expire();
         $key = $this->getKey($request);
         if (isset($this->pending[$key])) {
-            $this->incomplete[$key] = $this->pending[$key];
-            unset($this->pending[$key], $this->expires[$key]);
+            $this->releasePending($key);
 
             return;
         }

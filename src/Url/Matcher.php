@@ -112,9 +112,7 @@ class Matcher
     {
         if ($path = parse_url($url, PHP_URL_PATH)) {
             if ($ext = pathinfo($path, PATHINFO_EXTENSION)) {
-                if ($pattern = $this->compilePattern($type)) {
-                    return (bool)preg_match($pattern, $ext);
-                }
+                return $this->matchesPattern($type, $ext, $default);
             }
         }
 
