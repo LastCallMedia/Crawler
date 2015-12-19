@@ -171,7 +171,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
             [$key, self::FREE, time()])->fetchColumn();
 
         if ($exists) {
-            return $this->connection->update($this->table, $data, $identifier);
+            return (bool)$this->connection->update($this->table, $data, $identifier);
         }
         throw new \RuntimeException('This request is not managed by this queue.');
     }
