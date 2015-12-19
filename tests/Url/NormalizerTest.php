@@ -178,6 +178,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid case 'foo'
      */
     public function testNormalizeCaseInvalid()
     {

@@ -6,6 +6,9 @@ use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Contains data about an exception during the crawl cycle.
+ */
 class CrawlerExceptionEvent extends CrawlerEvent
 {
 

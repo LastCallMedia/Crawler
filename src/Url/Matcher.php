@@ -2,6 +2,9 @@
 
 namespace LastCall\Crawler\Url;
 
+/**
+ * Handles path matching for discovered URLs.
+ */
 class Matcher
 {
 

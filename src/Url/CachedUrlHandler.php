@@ -2,6 +2,9 @@
 
 namespace LastCall\Crawler\Url;
 
+/**
+ * An alternate URL handler that caches results.
+ */
 class CachedUrlHandler extends URLHandler
 {
 

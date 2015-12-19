@@ -58,6 +58,8 @@ interface ConfigurationInterface
      * This function is not guaranteed to be called.  The configuration
      * should not error out if console output is not attached.
      *
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return void
      */
     public function attachOutput(OutputInterface $output);

@@ -29,6 +29,7 @@ class Crawler
      * Crawler constructor.
      *
      * @param \LastCall\Crawler\Session\SessionInterface $session
+     * @param \GuzzleHttp\ClientInterface                $client
      */
     public function __construct(
         SessionInterface $session,

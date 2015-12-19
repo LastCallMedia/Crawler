@@ -20,9 +20,6 @@ class DenormalizedUrlDiscoverer implements CrawlerHandlerInterface
 {
     use RedirectDetectionTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -31,6 +28,16 @@ class DenormalizedUrlDiscoverer implements CrawlerHandlerInterface
         );
     }
 
+    /**
+     * Check whether the request has previous forms that can be
+     * tried.
+     *
+     * @see \LastCall\Crawler\Url\TraceableUri
+     *
+     * @param \Psr\Http\Message\RequestInterface $request
+     *
+     * @return bool
+     */
     private function hasPreviousForms(RequestInterface $request)
     {
         $uri = $request->getUri();
@@ -40,6 +47,8 @@ class DenormalizedUrlDiscoverer implements CrawlerHandlerInterface
 
     /**
      * Act on redirect of a response.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerResponseEvent $event
      */
     public function onSuccess(CrawlerResponseEvent $event)
     {
@@ -60,7 +69,9 @@ class DenormalizedUrlDiscoverer implements CrawlerHandlerInterface
     }
 
     /**
-     * @param \LastCall\Crawler\Event\CrawlerEvent $event
+     * Act on request failure.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerResponseEvent $event
      */
     public function onFailure(CrawlerResponseEvent $event)
     {

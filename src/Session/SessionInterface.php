@@ -15,7 +15,7 @@ interface SessionInterface
     /**
      * Prepare the session for crawling.
      *
-     * @param null $startUrl
+     * @param string $startUrl
      *
      * @return mixed
      */

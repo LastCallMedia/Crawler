@@ -2,6 +2,9 @@
 
 namespace LastCall\Crawler\Configuration;
 
+/**
+ * A partially prefabricated configuration object to extend.
+ */
 abstract class AbstractConfiguration implements ConfigurationInterface
 {
 

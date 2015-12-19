@@ -5,6 +5,9 @@ namespace LastCall\Crawler\Url;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Transforms discovered URLs to a standard form.
+ */
 class Normalizer
 {
 
@@ -124,7 +127,8 @@ class Normalizer
     public static function normalizeCase($case = 'lower')
     {
         if (!in_array($case, array('upper', 'lower'))) {
-            throw new \InvalidArgumentException('Invalid case type');
+            throw new \InvalidArgumentException(sprintf('Invalid case \'%s\'',
+                (string)$case));
         }
 
         return function (UriInterface $uri) use ($case) {

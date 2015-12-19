@@ -30,6 +30,7 @@ class CrawlerHelper extends Helper
     /**
      * Get a crawler instance for a session.
      *
+     * @param SessionInterface       $session
      * @param ConfigurationInterface $config
      *
      * @return \LastCall\Crawler\Crawler
@@ -54,6 +55,7 @@ class CrawlerHelper extends Helper
     {
         $dispatcher = new EventDispatcher();
         if ($profile && $this->getHelperSet()->has('profiler')) {
+            /** @var ProfilerHelper $profiler */
             $profiler = $this->getHelperSet()->get('profiler');
             $dispatcher = $profiler->getTraceableDispatcher($dispatcher);
         }

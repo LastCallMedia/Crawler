@@ -4,6 +4,10 @@ namespace LastCall\Crawler\Url;
 
 use Psr\Http\Message\UriInterface;
 
+/**
+ * An implementation of UriInterface that tracks the transformations
+ * it undergoes.
+ */
 class TraceableUri implements UriInterface
 {
 

@@ -2,6 +2,10 @@
 
 namespace LastCall\Crawler\Common;
 
+/**
+ * Wires setup and teardown handlers to creation/destruction of tables
+ * in a Doctrine connection.
+ */
 trait DoctrineSetupTeardownTrait
 {
 
