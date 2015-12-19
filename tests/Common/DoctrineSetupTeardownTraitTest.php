@@ -35,7 +35,7 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
             ->tablesExist(['foo']));
     }
 
-    public function testSetupTearsDownTable()
+    public function testTeardownRemovesTable()
     {
         $table = new Table('foo');
         $table->addColumn('id', 'integer');
@@ -65,6 +65,18 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
             ->tablesExist(['foo']));
         $columns = $connection->getSchemaManager()->listTableColumns('foo');
         $this->assertEquals(['id'], array_keys($columns));
+    }
+
+    public function testTeardownDoesntFailOnNonexistentTable()
+    {
+        $table = new Table('foo');
+        $table->addColumn('id', 'integer');
+        $connection = DriverManager::getConnection([
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+        ]);
+        $mock = $this->getTraitMock([$table], $connection);
+        $mock->onTeardown();
     }
 
 }

@@ -139,13 +139,15 @@ class ModuleHandler implements CrawlerHandlerInterface
         return $this->parsers[$parserId];
     }
 
-    private function getSetupTeardownObjects() {
+    private function getSetupTeardownObjects()
+    {
         $objects = [];
-        foreach($this->processors as $processor) {
-            if($processor instanceof SetupTeardownInterface) {
+        foreach ($this->processors as $processor) {
+            if ($processor instanceof SetupTeardownInterface) {
                 $objects[] = $processor;
             }
         }
+
         return $objects;
     }
 
@@ -170,14 +172,16 @@ class ModuleHandler implements CrawlerHandlerInterface
         }
     }
 
-    public function onSetup() {
-        foreach($this->getSetupTeardownObjects() as $object) {
+    public function onSetup()
+    {
+        foreach ($this->getSetupTeardownObjects() as $object) {
             $object->onSetup();
         }
     }
 
-    public function onTeardown() {
-        foreach($this->getSetupTeardownObjects() as $object) {
+    public function onTeardown()
+    {
+        foreach ($this->getSetupTeardownObjects() as $object) {
             $object->onTeardown();
         }
     }

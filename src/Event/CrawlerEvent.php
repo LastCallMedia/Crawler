@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Event;
 
-use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\Event;

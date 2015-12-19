@@ -30,8 +30,12 @@ trait DoctrineSetupTeardownTrait
     public function onTeardown()
     {
         $connection = $this->getConnection();
+        $sm = $connection->getSchemaManager();
         foreach ($this->getTables() as $table) {
-            $connection->getSchemaManager()->dropTable($table->getName());
+            $tn = $table->getName();
+            if ($sm->tablesExist([$tn])) {
+                $sm->dropTable($tn);
+            }
         }
     }
 
