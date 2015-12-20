@@ -49,7 +49,7 @@ Discovery:
 
 Reporting
 
-* [PerformanceReporter](../src/Handler/Reporting/PerformanceReporter.php)
+* [CrawlerStatusReporter](../src/Handler/Reporting/CrawlerStatusReporter.php)
 
 The ModuleHandler also allows for additional processing to be done on subtrees of a page.  For example, the [LinkProcessor](../src/Module/Processor/LinkProcessor.php) hooks into the ModuleHandler to parse and re-add links.
 

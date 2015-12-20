@@ -9,6 +9,7 @@ use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Url\Matcher;
 use LastCall\Crawler\Url\Normalizer;
 use LastCall\Crawler\Url\URLHandler;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -56,18 +57,11 @@ $urlHandler = new URLHandler('https://lastcallmedia.com', null, $matcher,
 $config->setUrlHandler($urlHandler);
 
 // Make errors and requests visible by adding loggers.  You can
-// use any PSR-3 compatible logger, but we'll use the console
-// logger here for visibility.  By default, there won't be much
-// shown, so you may want to crank up the console verbosity by
-// using the verbose flag (-vvv).
-$config->onAttachOutput(function (OutputInterface $output) use ($config) {
-    $consoleLogger = new ConsoleLogger($output);
-    $exceptionLogger = new ExceptionLogger($consoleLogger);
-    $config->addSubscriber($exceptionLogger);
-
-    $logHandler = new RequestLogger($consoleLogger);
-    $config->addSubscriber($logHandler);
-});
+// use any PSR-3 compatible logger.  Here we're using a null logger,
+// but you could replace this with Monolog.
+$logger = new NullLogger();
+$config->addSubscriber(new RequestLogger($logger));
+$config->addSubscriber(new ExceptionLogger($logger));
 
 
 // Return the Configuration so the CLI runner can run it.

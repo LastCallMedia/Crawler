@@ -14,10 +14,11 @@ namespace {
     use LastCall\Crawler\Url\Matcher;
     use LastCall\Crawler\Url\Normalizer;
     use LastCall\Crawler\Url\URLHandler;
+    use Psr\Log\NullLogger;
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;
 
-    class SampleSubclassConfiguration extends AbstractConfiguration implements OutputAwareInterface
+    class SampleSubclassConfiguration extends AbstractConfiguration
     {
 
         public function __construct()
@@ -27,13 +28,6 @@ namespace {
             $this->baseUrl = 'https://lastcallmedia.com';
             $this->client = new Client(['allow_redirects' => false]);
             $this->urlHandler = $this->createUrlHandler();
-        }
-
-        public function setOutput(OutputInterface $output)
-        {
-            $consoleLogger = new ConsoleLogger($output);
-            $this->subscribers[] = new ExceptionLogger($consoleLogger);
-            $this->subscribers[] = new RequestLogger($consoleLogger);
         }
 
         private function createUrlHandler()
@@ -49,11 +43,15 @@ namespace {
 
         private function createSubscribers()
         {
+            $logger = new NullLogger();
+            $requestLogger = new RequestLogger($logger);
+            $exceptionLogger = new ExceptionLogger($logger);
+
             $moduleHandler = new ModuleHandler();
             $moduleHandler->addParser(new XPathParser());
             $moduleHandler->addProcessor(new LinkProcessor());
 
-            return [$moduleHandler];
+            return [$requestLogger, $exceptionLogger, $moduleHandler];
         }
     }
 

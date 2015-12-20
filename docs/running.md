@@ -13,9 +13,3 @@ Example of using the crawl command to run the sample configuration:
 ```bash
 bin/crawler crawl docs/sample.php
 ```
-
-However, this won't produce any output as long as everything is going well.  You can crank up the verbosity by using the verbose flag
-
-```bash
-bin/crawler crawl docs/sample.php -vvv
-```
