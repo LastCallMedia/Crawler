@@ -9,7 +9,17 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+env:
+  - SYMFONY_VERSION=~2.7
+  - SYMFONY_VERSION=~3.0
+
 install:
+  - composer require symfony/console:${SYMFONY_VERSION} --no-update
+  - composer require symfony/event-dispatcher:${SYMFONY_VERSION} --no-update
+  - composer require symfony/dom-crawler:${SYMFONY_VERSION} --no-update
+  - composer require symfony/filesystem:${SYMFONY_VERSION} --no-update
+  - composer require symfony/stopwatch:${SYMFONY_VERSION} --no-update
+  - composer require symfony/css-selector:${SYMFONY_VERSION} --no-update
   - composer install --prefer-source
 
 script:
