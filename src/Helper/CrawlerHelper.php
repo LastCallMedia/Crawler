@@ -6,17 +6,24 @@ namespace LastCall\Crawler\Helper;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\Handler\Reporting\CrawlerStatusReporter;
+use LastCall\Crawler\Reporter\ReporterInterface;
 use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Session\SessionInterface;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Console helper for instantiating crawlers and configurations
  */
 class CrawlerHelper extends Helper
 {
+    public function __construct(EventDispatcherInterface $dispatcher = null)
+    {
+        $this->dispatcher = $dispatcher ?: new EventDispatcher();
+    }
 
     /**
      * Get the name of the helper.
@@ -51,11 +58,16 @@ class CrawlerHelper extends Helper
      *
      * @return \LastCall\Crawler\Session\Session
      */
-    public function getSession(ConfigurationInterface $config)
-    {
-        $dispatcher = new EventDispatcher();
+    public function getSession(
+        ConfigurationInterface $config,
+        ReporterInterface $reporter = null
+    ) {
+        if ($reporter) {
+            $this->dispatcher->addSubscriber(new CrawlerStatusReporter($config->getQueue(),
+                [$reporter]));
+        }
 
-        return Session::createFromConfig($config, $dispatcher);
+        return Session::createFromConfig($config, $this->dispatcher);
     }
 
     /**

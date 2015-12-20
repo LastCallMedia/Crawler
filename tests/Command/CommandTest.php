@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Test\Command;
 
 use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
+use LastCall\Crawler\Reporter\ReporterInterface;
 use LastCall\Crawler\Session\SessionInterface;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -25,7 +26,10 @@ abstract class CommandTest extends \PHPUnit_Framework_TestCase
         $crawlerHelper->getConfiguration('test.php',
             Argument::type(OutputInterface::class))->willReturn($configuration);
 
-        $crawlerHelper->getSession($configuration)->willReturn($session);
+        $crawlerHelper->getSession($configuration,
+            Argument::that(function ($arg) {
+                return $arg === null || $arg instanceof ReporterInterface;
+            }))->willReturn($session);
 
         $crawlerHelper->getCrawler($session, $configuration)
             ->willReturn($crawler);

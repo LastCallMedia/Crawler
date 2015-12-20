@@ -4,7 +4,7 @@ namespace LastCall\Crawler\Test;
 
 use GuzzleHttp\Promise\FulfilledPromise;
 use LastCall\Crawler\Command\CrawlCommand;
-use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Helper\ConfigurationHelper;
 use LastCall\Crawler\Test\Command\CommandTest;
@@ -16,7 +16,7 @@ class WorkCommandTest extends CommandTest
 
     public function testRunsCrawler()
     {
-        $configuration = $this->prophesize(ConfigurationInterface::class);
+        $configuration = new Configuration('https://lastcallmedia.com');
         $crawler = $this->prophesize(Crawler::class);
         $crawler->start(5, null)
             ->willReturn(new FulfilledPromise('foo'))
@@ -31,7 +31,7 @@ class WorkCommandTest extends CommandTest
 
     public function testClearsCrawler()
     {
-        $configuration = $this->prophesize(ConfigurationInterface::class);
+        $configuration = new Configuration('https://lastcallmedia.com');
         $crawler = $this->prophesize(Crawler::class);
         $crawler->teardown()->shouldBeCalled();
         $crawler->setUp()->shouldBeCalled();

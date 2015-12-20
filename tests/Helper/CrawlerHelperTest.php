@@ -2,14 +2,17 @@
 
 namespace LastCall\Crawler\Test\Helper;
 
+use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Helper\CrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
+use LastCall\Crawler\Reporter\ReporterInterface;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,6 +62,19 @@ class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
         $config = $helper->getConfiguration($file, $output);
         $this->assertInstanceOf(ConfigurationInterface::class, $config);
         $this->assertEquals('http://google.com', $config->getBaseUrl());
+    }
+
+    public function testGetSessionWithReporter()
+    {
+        $config = new Configuration('https://lastcallmedia.com');
+        $dispatcher = new EventDispatcher();
+        $reporter = $this->prophesize(ReporterInterface::class);
+
+        $helper = new CrawlerHelper($dispatcher);
+        $session = $helper->getSession($config, $reporter->reveal());
+        $reporter->report(Argument::type('array'))->shouldBeCalled();
+        $session->onRequestSending(new Request('GET',
+            'https://lastcallmedia.com'));
     }
 
     public function testGetCrawler()

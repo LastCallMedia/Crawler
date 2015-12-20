@@ -2,6 +2,7 @@
 
 namespace LastCall\Crawler\Command;
 
+use LastCall\Crawler\Reporter\ConsoleOutputReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,13 +38,18 @@ class CrawlCommand extends Command
         $helper = $this->getHelper('crawler');
         $configuration = $helper->getConfiguration($input->getArgument('config'),
             $output);
-        $session = $helper->getSession($configuration);
+
+        $reporter = new ConsoleOutputReporter($output);
+        $session = $helper->getSession($configuration, $reporter);
 
         $crawler = $helper->getCrawler($session, $configuration);
+
+        $io = new SymfonyStyle($input, $output);
 
         if ($input->getOption('reset')) {
             $crawler->teardown();
             $crawler->setUp();
+            $io->success('Resetting');
         }
 
         $chunk = $input->getOption('chunk');
@@ -51,7 +57,6 @@ class CrawlCommand extends Command
         $promise = $crawler->start($chunk, $seed);
 
         $promise->wait();
-        $io = new SymfonyStyle($input, $output);
         $io->success('Crawling complete.');
     }
 }
