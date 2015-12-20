@@ -88,7 +88,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             $success = true;
         };
         $config->onAttachOutput($fn);
-        $config->attachOutput($injectedOutput);
+        $config->setOutput($injectedOutput);
         $this->assertTrue($success);
     }
 }

@@ -3,15 +3,15 @@
 namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
+use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Queue\Driver\ArrayDriver;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Configuration extends AbstractConfiguration
+class Configuration extends AbstractConfiguration implements OutputAwareInterface
 {
     protected $attachOutputFns = [];
 
@@ -66,7 +66,7 @@ class Configuration extends AbstractConfiguration
         $this->attachOutputFns[] = $fn;
     }
 
-    public function attachOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output)
     {
         foreach ($this->attachOutputFns as $fn) {
             $fn($output);

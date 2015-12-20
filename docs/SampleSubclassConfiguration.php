@@ -3,6 +3,7 @@
 namespace {
 
     use GuzzleHttp\Client;
+    use LastCall\Crawler\Common\OutputAwareInterface;
     use LastCall\Crawler\Configuration\AbstractConfiguration;
     use LastCall\Crawler\Handler\Logging\ExceptionLogger;
     use LastCall\Crawler\Handler\Logging\RequestLogger;
@@ -16,7 +17,7 @@ namespace {
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;
 
-    class SampleSubclassConfiguration extends AbstractConfiguration
+    class SampleSubclassConfiguration extends AbstractConfiguration implements OutputAwareInterface
     {
 
         public function __construct()
@@ -28,7 +29,7 @@ namespace {
             $this->urlHandler = $this->createUrlHandler();
         }
 
-        public function attachOutput(OutputInterface $output)
+        public function setOutput(OutputInterface $output)
         {
             $consoleLogger = new ConsoleLogger($output);
             $this->subscribers[] = new ExceptionLogger($consoleLogger);

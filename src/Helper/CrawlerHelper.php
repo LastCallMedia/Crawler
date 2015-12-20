@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Helper;
 
 
+use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Session\Session;
@@ -79,7 +80,9 @@ class CrawlerHelper extends Helper
             throw new \RuntimeException(sprintf('Configuration must implement %s',
                 ConfigurationInterface::class));
         }
-        $configuration->attachOutput($output);
+        if ($configuration instanceof OutputAwareInterface) {
+            $configuration->setOutput($output);
+        }
 
         return $configuration;
     }

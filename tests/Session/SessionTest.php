@@ -5,18 +5,19 @@ namespace LastCall\Crawler\Test\Session;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Common\SetupTeardownInterface;
-use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -24,25 +25,32 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
 
-    private function mockConfig(
-        array $listeners = [],
-        array $subscribers = [],
-        $queue = null
-    ) {
-        if (!$queue) {
-            $queue = $this->prophesize(RequestQueueInterface::class);
-        }
-        $urlHandler = $this->prophesize(URLHandler::class);
-        $urlHandler->forUrl(Argument::type(UriInterface::class))
-            ->willReturn($urlHandler);
+    public function testCreateFromConfig()
+    {
+        $subscriber = new RequestLogger(new NullLogger());
+        $listener = function () {
+        };
+        $queue = new ArrayRequestQueue();
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $dispatcher = new EventDispatcher();
 
-        $configuration = $this->prophesize(ConfigurationInterface::class);
-        $configuration->getListeners()->willReturn($listeners);
-        $configuration->getSubscribers()->willReturn($subscribers);
-        $configuration->getQueue()->willReturn($queue);
-        $configuration->getUrlHandler()->willReturn($urlHandler);
+        $config = new Configuration('https://lastcallmedia.com');
+        $config->addSubscriber($subscriber);
+        $config->addListener(CrawlerEvents::SUCCESS, $listener);
+        $config->setQueue($queue);
+        $config->setUrlHandler($urlHandler);
 
-        return $configuration;
+
+        $session = Session::createFromConfig($config, $dispatcher);
+        $listeners = $dispatcher->getListeners(CrawlerEvents::SUCCESS);
+        $this->assertSame($subscriber, $listeners[1][0]);
+        $this->assertSame($listener, $listeners[0]);
+        $queueRefl = new \ReflectionProperty(Session::class, 'queue');
+        $queueRefl->setAccessible(true);
+        $this->assertSame($queue, $queueRefl->getValue($session));
+        $urlHandlerRefl = new \ReflectionProperty(Session::class, 'urlHandler');
+        $urlHandlerRefl->setAccessible(true);
+        $this->assertSame($urlHandler, $urlHandlerRefl->getValue($session));
     }
 
     public function testAddRequest()

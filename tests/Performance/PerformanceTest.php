@@ -165,7 +165,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         ConfigurationInterface $configuration,
         $category
     ) {
-        $session = Session::createFromConfig($configuration, new EventDispatcher());
+        $session = Session::createFromConfig($configuration,
+            new EventDispatcher());
         $crawler = new Crawler($session, $configuration->getClient());
         $stopwatch = new Stopwatch();
         $stopwatch->start(__FUNCTION__, $category);
