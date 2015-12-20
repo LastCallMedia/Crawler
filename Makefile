@@ -21,5 +21,6 @@ tag:
 	php -l src/Application.php
 	git add src/Application.php
 	git commit -m "$(TAG) release"
+	git tag "$(TAG)"
 
 .PHONY: coverage coverage-show
