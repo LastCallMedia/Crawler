@@ -19,11 +19,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application extends BaseApplication
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     *      $dispatcher
-     */
-    private $dispatcher;
 
     public function __construct($name = 'LCM Crawler', $version = '1.0')
     {
