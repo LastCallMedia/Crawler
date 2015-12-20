@@ -19,10 +19,11 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class Application extends BaseApplication
 {
+    const VERSION = '1.0.2';
 
-    public function __construct($name = 'LCM Crawler', $version = '1.0')
+    public function __construct()
     {
-        parent::__construct($name, $version);
+        parent::__construct('LCM Crawler', self::VERSION);
     }
 
     protected function getDefaultInputDefinition()
