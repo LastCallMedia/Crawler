@@ -14,10 +14,7 @@ interface CrawlerHelperInterface
     /**
      * Get the configuration.
      *
-     * @param string          $filename
-     * @param OutputInterface $output
-     *
-     * @return ConfigurationInterface
+     * @return \LastCall\Crawler\Configuration\ConfigurationInterface
      */
     public function getConfiguration();
 
@@ -25,6 +22,7 @@ interface CrawlerHelperInterface
      * Create a crawler session for a configuration.
      *
      * @param \LastCall\Crawler\Configuration\ConfigurationInterface $config
+     * @param \LastCall\Crawler\Reporter\ReporterInterface           $reporter
      *
      * @return \LastCall\Crawler\Session\Session
      */
@@ -36,8 +34,8 @@ interface CrawlerHelperInterface
     /**
      * Get a crawler instance for a session.
      *
-     * @param SessionInterface       $session
      * @param ConfigurationInterface $config
+     * @param SessionInterface       $session
      *
      * @return \LastCall\Crawler\Crawler
      */

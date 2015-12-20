@@ -22,22 +22,11 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         callable $setupListener,
         callable $teardownListener
     ) {
-        $helper = $this->prophesize(InputAwareCrawlerHelper::class);
-
         $config = new Configuration('https://lastcallmedia.com');
         $config->addListener(CrawlerEvents::SETUP, $setupListener);
         $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
 
         return new PreloadedCrawlerHelper($config);
-        $helper->getConfiguration('test.php', Argument::any())
-            ->willReturn($config);
-        $helper->getSession($config)->willReturn($session);
-        $helper->getName()->willReturn('crawler');
-        $helper->setHelperSet(Argument::any())->will(function () {
-            return true;
-        });
-
-        return $helper;
     }
 
     public function getCommands()
