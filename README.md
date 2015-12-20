@@ -19,7 +19,7 @@ You can also add the dependency directly to your project's composer.json:
 ```json
     {
         "require": {
-            "lastcall/last-call-crawler": "dev-master"
+            "lastcall/last-call-crawler": "~1.0"
         }
     }
 ```
