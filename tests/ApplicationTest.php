@@ -5,6 +5,7 @@ namespace LastCall\Crawler\Test;
 
 use LastCall\Crawler\Application;
 use LastCall\Crawler\Command\SetupTeardownCommand;
+use LastCall\Crawler\Helper\CrawlerHelperInterface;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testDefaultHelpers()
     {
         $application = new Application();
-        $this->assertInstanceOf('LastCall\Crawler\Helper\CrawlerHelper',
+        $this->assertInstanceOf(CrawlerHelperInterface::class,
             $application->getHelperSet()->get('crawler'));
     }
 }

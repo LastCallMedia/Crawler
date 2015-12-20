@@ -12,62 +12,58 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SetupTeardownCommand extends Command
 {
-    private $tearsDown = TRUE;
-    private $setsUp = TRUE;
+    private $tearsDown = true;
+    private $setsUp = true;
 
-    public static function setup() {
-        return new static(
-            'setup',
-            FALSE,
-            TRUE,
-            'Sets up the crawler for a new session.'
-        );
-    }
-
-    public static function teardown() {
-        return new static(
-            'teardown',
-            TRUE,
-            FALSE,
-            'Tears down the crawler.'
-        );
-    }
-
-    public static function reset() {
-        return new static(
-            'reset',
-            TRUE,
-            TRUE,
-            'Reset the crawler session and prepare it for a new run.'
-        );
-    }
-
-    public function __construct($name, $tearsDown = TRUE, $setsUp = TRUE, $description = '')
+    public static function setup()
     {
+        return new static('setup', false, true,
+            'Sets up the crawler for a new session.');
+    }
+
+    public static function teardown()
+    {
+        return new static('teardown', true, false, 'Tears down the crawler.');
+    }
+
+    public static function reset()
+    {
+        return new static('reset', true, true,
+            'Reset the crawler session and prepare it for a new run.');
+    }
+
+    public function __construct(
+        $name,
+        $tearsDown = true,
+        $setsUp = true,
+        $description = ''
+    ) {
         parent::__construct($name);
         $this->tearsDown = $tearsDown;
         $this->setsUp = $setsUp;
         $this->setDescription($description);
     }
 
-    public function configure() {
-        $this->addArgument('config', InputArgument::REQUIRED, 'The path to the crawler configuration.');
+    public function configure()
+    {
+        $this->addArgument('config', InputArgument::REQUIRED,
+            'The path to the crawler configuration.');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) {
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
         $io = new SymfonyStyle($input, $output);
 
-        /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
+        /** @var \LastCall\Crawler\Helper\CrawlerHelperInterface $helper */
         $helper = $this->getHelper('crawler');
-        $config = $helper->getConfiguration($input->getArgument('config'),
-            $output);
+        $config = $helper->getConfiguration();
         $session = $helper->getSession($config);
 
-        if($this->tearsDown) {
+        if ($this->tearsDown) {
             $session->onTeardown();
             $io->success('Teardown complete.');
         }
-        if($this->setsUp) {
+        if ($this->setsUp) {
             $session->onSetup();
             $io->success('Setup complete.');
         }

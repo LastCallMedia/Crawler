@@ -2,8 +2,10 @@
 
 namespace LastCall\Crawler\Command;
 
+use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Reporter\ConsoleOutputReporter;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,9 +22,7 @@ class CrawlCommand extends Command
         }
 
         $this->setDescription('Work through items in the request queue.');
-        $this->addArgument('config', InputArgument::REQUIRED,
-            'The path to the crawler configuration.');
-        $this->addOption('chunk', null, InputOption::VALUE_OPTIONAL,
+        $this->addOption('chunk', null, InputOption::VALUE_REQUIRED,
             'The amount of items to process.', 5);
         $this->addOption('reset', 'r', InputOption::VALUE_NONE,
             'Reset the migration prior to running');
@@ -34,24 +34,26 @@ class CrawlCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
 
-        /** @var \LastCall\Crawler\Helper\CrawlerHelper $helper */
+        /** @var \LastCall\Crawler\Helper\CrawlerHelperInterface $helper */
         $helper = $this->getHelper('crawler');
-        $configuration = $helper->getConfiguration($input->getArgument('config'),
-            $output);
+        $configuration = $helper->getConfiguration();
+
+        if ($configuration instanceof OutputAwareInterface) {
+            $configuration->setOutput($output);
+        }
 
         $reporter = new ConsoleOutputReporter($output);
         $session = $helper->getSession($configuration, $reporter);
 
-        $crawler = $helper->getCrawler($session, $configuration);
-
         $io = new SymfonyStyle($input, $output);
 
         if ($input->getOption('reset')) {
-            $crawler->teardown();
-            $crawler->setUp();
+            $session->onTeardown();
+            $session->onSetup();
             $io->success('Resetting');
         }
 
+        $crawler = $helper->getCrawler($configuration, $session);
         $chunk = $input->getOption('chunk');
         $seed = $input->getArgument('seed');
         $promise = $crawler->start($chunk, $seed);

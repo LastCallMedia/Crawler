@@ -7,12 +7,12 @@ use LastCall\Crawler\Command\CrawlCommand;
 use LastCall\Crawler\Command\SetupCommand;
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Command\TeardownCommand;
-use LastCall\Crawler\Helper\CrawlerHelper;
+use LastCall\Crawler\Helper\InputAwareCrawlerHelper;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Crawler application
@@ -25,6 +25,16 @@ class Application extends BaseApplication
         parent::__construct($name, $version);
     }
 
+    protected function getDefaultInputDefinition()
+    {
+        $definition = parent::getDefaultInputDefinition();
+        $definition->addOption(new InputOption('config', 'c',
+            InputOption::VALUE_REQUIRED, 'Path to a configuration file.',
+            'crawler.php'));
+
+        return $definition;
+    }
+
     /**
      * Get the default helper set.
      *
@@ -33,7 +43,7 @@ class Application extends BaseApplication
     public function getDefaultHelperSet()
     {
         $helpers = parent::getDefaultHelperSet();
-        $helpers->set(new CrawlerHelper());
+        $helpers->set(new InputAwareCrawlerHelper());
 
         return $helpers;
     }

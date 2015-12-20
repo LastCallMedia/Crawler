@@ -6,60 +6,88 @@ use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Helper\CrawlerHelper;
+use LastCall\Crawler\Helper\InputAwareCrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use LastCall\Crawler\Reporter\ReporterInterface;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedException File does not exist:
-     *                    /some/config/that/doesnt/exist.php
-     */
-    public function testGetInvalidConfigurationFile()
+    private function getInput($filename)
     {
-        $helper = new CrawlerHelper();
-        $helper->getConfiguration('/some/config/that/doesnt/exist.php',
-            new NullOutput());
+        $definition = new InputDefinition([
+            new InputOption('config', 'c', InputOption::VALUE_REQUIRED,
+                'config.php')
+        ]);
+
+        return new ArrayInput(['--config' => $filename], $definition);
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Console\Exception\LogicException
+     * @expectedExceptionMessage Unable to load configuration - input has not
+     *                           been set.
+     */
+    public function testGetConfigurationWithoutInput()
+    {
+        $helper = new InputAwareCrawlerHelper();
+        $helper->getConfiguration();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\InvalidOptionException
+     * @expectedExceptionMessage Configuration file
+     *                           /some/config/that/doesnt/exist.php does not
+     *                           exist
+     */
+    public function testGetInvalidConfigurationFile()
+    {
+        $helper = new InputAwareCrawlerHelper();
+        $helper->setInput($this->getInput('/some/config/that/doesnt/exist.php'));
+        $helper->getConfiguration();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
      * @expectedExceptionMessage Configuration was not returned.
      */
     public function testGetNotReturnedConfiguration()
     {
         $file = $this->writeTempConfig("<?php\n");
 
-        $helper = new CrawlerHelper();
-        $helper->getConfiguration($file, new NullOutput());
+        $helper = new InputAwareCrawlerHelper();
+        $helper->setInput($this->getInput($file));
+        $helper->getConfiguration();
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
      * @expectedExceptionMessage Configuration must implement
      *                           LastCall\Crawler\Configuration\ConfigurationInterface
      */
     public function testGetInvalidConfiguration()
     {
         $file = $this->writeTempConfig("<?php\nreturn new stdClass();");
-        $helper = new CrawlerHelper();
-        $helper->getConfiguration($file, new NullOutput());
+        $helper = new InputAwareCrawlerHelper();
+        $helper->setInput($this->getInput($file));
+        $helper->getConfiguration();
     }
 
     public function testGetConfiguration()
     {
         $file = $this->writeTempConfig(sprintf("<?php\nreturn new %s('http://google.com');",
             Configuration::class));
-        $helper = new CrawlerHelper();
-        $output = new NullOutput();
-        $config = $helper->getConfiguration($file, $output);
+        $helper = new InputAwareCrawlerHelper();
+        $helper->setInput($this->getInput($file));
+        $config = $helper->getConfiguration();
         $this->assertInstanceOf(ConfigurationInterface::class, $config);
         $this->assertEquals('http://google.com', $config->getBaseUrl());
     }
@@ -70,7 +98,7 @@ class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $reporter = $this->prophesize(ReporterInterface::class);
 
-        $helper = new CrawlerHelper($dispatcher);
+        $helper = new InputAwareCrawlerHelper($dispatcher);
         $session = $helper->getSession($config, $reporter->reveal());
         $reporter->report(Argument::type('array'))->shouldBeCalled();
         $session->onRequestSending(new Request('GET',
@@ -79,11 +107,11 @@ class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCrawler()
     {
-        $helper = new CrawlerHelper();
+        $helper = new InputAwareCrawlerHelper();
         $config = new Configuration('https://lastcallmedia.com');
         $session = $helper->getSession($config);
         $this->assertInstanceOf(Crawler::class,
-            $helper->getCrawler($session, $config));
+            $helper->getCrawler($config, $session));
     }
 
     private function writeTempConfig($code)

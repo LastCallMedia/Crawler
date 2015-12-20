@@ -2,7 +2,7 @@
 
 namespace LastCall\Crawler\Test\Command;
 
-use LastCall\Crawler\Helper\CrawlerHelper;
+use LastCall\Crawler\Helper\InputAwareCrawlerHelper;
 use LastCall\Crawler\Helper\ProfilerHelper;
 use LastCall\Crawler\Reporter\ReporterInterface;
 use LastCall\Crawler\Session\SessionInterface;
@@ -21,7 +21,7 @@ abstract class CommandTest extends \PHPUnit_Framework_TestCase
     ) {
         $session = $this->prophesize(SessionInterface::class)->reveal();
 
-        $crawlerHelper = $this->prophesize(CrawlerHelper::class);
+        $crawlerHelper = $this->prophesize(InputAwareCrawlerHelper::class);
         $crawlerHelper->getName()->willReturn('crawler');
         $crawlerHelper->getConfiguration('test.php',
             Argument::type(OutputInterface::class))->willReturn($configuration);

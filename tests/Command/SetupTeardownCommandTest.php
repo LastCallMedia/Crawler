@@ -6,8 +6,9 @@ namespace LastCall\Crawler\Test\Command;
 
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Configuration\Configuration;
-use LastCall\Crawler\Helper\CrawlerHelper;
-use LastCall\Crawler\Session\SessionInterface;
+use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Helper\InputAwareCrawlerHelper;
+use LastCall\Crawler\Helper\PreloadedCrawlerHelper;
 use Prophecy\Argument;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -17,57 +18,70 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
 {
-    protected function getCrawlerHelper($session) {
-        $helper = $this->prophesize(CrawlerHelper::class);
+    protected function getCrawlerHelper(
+        callable $setupListener,
+        callable $teardownListener
+    ) {
+        $helper = $this->prophesize(InputAwareCrawlerHelper::class);
 
         $config = new Configuration('https://lastcallmedia.com');
-        $helper->getConfiguration('test.php', Argument::any())->willReturn($config);
+        $config->addListener(CrawlerEvents::SETUP, $setupListener);
+        $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
+
+        return new PreloadedCrawlerHelper($config);
+        $helper->getConfiguration('test.php', Argument::any())
+            ->willReturn($config);
         $helper->getSession($config)->willReturn($session);
         $helper->getName()->willReturn('crawler');
-        $helper->setHelperSet(Argument::any())->will(function() { return TRUE; });
+        $helper->setHelperSet(Argument::any())->will(function () {
+            return true;
+        });
 
         return $helper;
     }
 
-    public function getCommands() {
+    public function getCommands()
+    {
         return [
-            [SetupTeardownCommand::setup(), FALSE, TRUE],
-            [SetupTeardownCommand::teardown(), TRUE, FALSE],
-            [SetupTeardownCommand::reset(), TRUE, TRUE],
+            [SetupTeardownCommand::setup(), false, true],
+            [SetupTeardownCommand::teardown(), true, false],
+            [SetupTeardownCommand::reset(), true, true],
         ];
     }
 
     /**
      * @dataProvider getCommands
      */
-    public function testCommand(Command $command, $teardownExpected, $setupExpected) {
-        $session = $this->prophesize(SessionInterface::class);
+    public function testCommand(
+        Command $command,
+        $teardownExpected,
+        $setupExpected
+    ) {
+        $setupCalled = $teardownCalled = false;
+        $setupListener = function () use (&$setupCalled) {
+            $setupCalled = true;
+        };
+        $teardownListener = function () use (&$teardownCalled) {
+            $teardownCalled = true;
+        };
+        $config = new Configuration('https://lastcallmedia.com');
+        $config->addListener(CrawlerEvents::SETUP, $setupListener);
+        $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
 
-        if($teardownExpected) {
-            $session->onTeardown()->shouldBeCalled();
-        }
-        else {
-            $session->onTeardown()->shouldNotBeCalled();
-        }
-
-        if($setupExpected) {
-            $session->onSetup()->shouldBeCalled();
-        }
-        else {
-            $session->onSetup()->shouldNotBeCalled();
-        }
-
-        $command->setHelperSet(
-            new HelperSet([$this->getCrawlerHelper($session)->reveal()])
-        );
+        $command->setHelperSet(new HelperSet([
+                new PreloadedCrawlerHelper($config)
+            ]));
 
         $tester = new CommandTester($command);
         $tester->execute(['config' => 'test.php']);
 
-        if($teardownExpected) {
+        $this->assertEquals($teardownExpected, $teardownCalled);
+        $this->assertEquals($setupExpected, $setupCalled);
+
+        if ($teardownExpected) {
             $this->assertContains('Teardown complete', $tester->getDisplay());
         }
-        if($setupExpected) {
+        if ($setupExpected) {
             $this->assertContains('Setup complete', $tester->getDisplay());
         }
     }
