@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CrawlerHelperTest extends \PHPUnit_Framework_TestCase
+class InputAwareCrawlerHelperTest extends \PHPUnit_Framework_TestCase
 {
 
     private function getInput($filename)

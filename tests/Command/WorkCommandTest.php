@@ -14,7 +14,7 @@ use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class WorkCommandTest extends CommandTest
+class WorkCommandTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testRunsCrawler()
