@@ -60,7 +60,7 @@ class LinkProcessor implements ModuleProcessorInterface
             if (strpos($url, 'http') === 0) {
                 return $url;
             } elseif (strpos($url, '#') === 0) {
-                return $this->currentUrl->withFragment($url);
+                return $request->getUri()->withFragment($url);
             } elseif (strpos($url, 'mailto:') === 0 || strpos($url,
                     'javascript:') === 0
             ) {
