@@ -19,6 +19,9 @@ use LastCall\Crawler\Url\Normalizer;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * A crawler configuration based on the Pimple DI container.
+ */
 class Configuration extends Container implements ConfigurationInterface, OutputAwareInterface
 {
     public function __construct($baseUrl = null)
