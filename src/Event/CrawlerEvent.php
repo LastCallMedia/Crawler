@@ -15,11 +15,6 @@ class CrawlerEvent extends Event
     private $request;
 
     /**
-     * @var \LastCall\Crawler\Url\URLHandler
-     */
-    private $urlHandler;
-
-    /**
      * @var \Psr\Http\Message\RequestInterface[]
      */
     private $discoveredRequests = [];

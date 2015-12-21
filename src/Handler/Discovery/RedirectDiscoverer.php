@@ -14,8 +14,7 @@ use LastCall\Crawler\Url\NormalizerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Add in URLs that are redirected to, as long as they are matched
- * by the URLHandler.
+ * Add in URLs that are redirected to, as long as they are matched.
  */
 class RedirectDiscoverer implements EventSubscriberInterface
 {

@@ -64,7 +64,7 @@ class Session implements SessionInterface
     /**
      * Session constructor.
      *
-     * @param \LastCall\Crawler\Url\URLHandler                                 $urlHandler
+     * @param string                                                           $baseUrl
      * @param \LastCall\Crawler\Queue\RequestQueueInterface|null               $queue
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
      */
