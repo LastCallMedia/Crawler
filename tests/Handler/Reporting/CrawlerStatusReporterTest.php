@@ -11,7 +11,6 @@ use LastCall\Crawler\Handler\Reporting\CrawlerStatusReporter;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Reporter\ReporterInterface;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Url\URLHandler;
 
 class CrawlerStatusReporterTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,9 +19,8 @@ class CrawlerStatusReporterTest extends \PHPUnit_Framework_TestCase
     private function getEvent()
     {
         $request = new Request('GET', 'https://lastcallmedia.com');
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
 
-        return new CrawlerEvent($request, $urlHandler);
+        return new CrawlerEvent($request);
     }
 
     public function getReportTests()

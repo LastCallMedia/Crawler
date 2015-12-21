@@ -13,7 +13,6 @@ use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Test\Resources\DummyProcessor;
-use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
@@ -76,8 +75,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
         $html = '<html><a>Foo</a></html>';
         $req = new Request('GET', 'https://lastcallmedia.com');
         $res = new Response(200, [], $html);
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
-        $event = new CrawlerResponseEvent($req, $res, $urlHandler);
+        $event = new CrawlerResponseEvent($req, $res);
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
 
         $this->assertCount(1, $processor->getCalls());

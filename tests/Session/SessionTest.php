@@ -48,9 +48,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $queueRefl = new \ReflectionProperty(Session::class, 'queue');
         $queueRefl->setAccessible(true);
         $this->assertSame($queue, $queueRefl->getValue($session));
-        $urlHandlerRefl = new \ReflectionProperty(Session::class, 'urlHandler');
-        $urlHandlerRefl->setAccessible(true);
-        $this->assertSame($urlHandler, $urlHandlerRefl->getValue($session));
+        $baseUrlRefl = new \ReflectionProperty(Session::class, 'baseUrl');
+        $baseUrlRefl->setAccessible(true);
+        $this->assertEquals('https://lastcallmedia.com', $baseUrlRefl->getValue($session));
     }
 
     public function testAddRequest()
@@ -102,8 +102,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         ) {
             return (string)$request->getUri() === $expectedadd;
         }))->shouldBeCalled();
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
-        $session = new Session($urlHandler, $queue->reveal());
+        $session = new Session('https://lastcallmedia.com', $queue->reveal());
         $session->init($baseUrl);
     }
 

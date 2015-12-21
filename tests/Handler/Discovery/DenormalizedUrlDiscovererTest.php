@@ -19,8 +19,6 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
 
     public function testRetriesOnFailure()
     {
-        $urlHandler = new URLHandler('http://google.com');
-
         $originalUri = new TraceableUri(new Uri('http://google.com/index.html'));
         $uri = $originalUri->withPath('');
         $request = new Request('GET', $uri);
@@ -28,7 +26,7 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
 
         $handler = new DenormalizedUrlDiscoverer();
 
-        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response);
         $this->invokeEvent($handler, CrawlerEvents::FAILURE, $event);
 
         $added = $event->getAdditionalRequests();
@@ -65,12 +63,10 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
      */
     public function testRetry(TraceableUri $uri, $location, $expected)
     {
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
-
         $request = new Request('GET', $uri);
         $response = new Response(301, ['Location' => $location]);
 
-        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response);
 
         $handler = new DenormalizedUrlDiscoverer();
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);

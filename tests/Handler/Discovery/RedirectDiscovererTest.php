@@ -22,7 +22,7 @@ class RedirectDiscovererTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request('GET', 'http://google.com');
         $response = new Response(301, ['Location' => '/foo']);
-        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response);
 
         $handler = new RedirectDiscoverer($urlHandler);
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);

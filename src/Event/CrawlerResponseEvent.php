@@ -16,10 +16,9 @@ class CrawlerResponseEvent extends CrawlerEvent
 
     public function __construct(
         RequestInterface $request,
-        ResponseInterface $response,
-        URLHandler $handler
+        ResponseInterface $response
     ) {
-        parent::__construct($request, $handler);
+        parent::__construct($request);
         $this->response = $response;
     }
 

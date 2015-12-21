@@ -54,7 +54,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'https://lastcallmedia.com');
         $response = new Response();
         $urlHandler = new URLHandler('https://lastcallmedia.com');
-        $event = new CrawlerResponseEvent($request, $response, $urlHandler);
+        $event = new CrawlerResponseEvent($request, $response);
 
         $links = (new DomCrawler($html))->filterXPath('descendant-or-self::a[@href]');
         $processor = new LinkProcessor($urlHandler);

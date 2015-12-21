@@ -26,21 +26,14 @@ class CrawlerEvent extends Event
     private $discoveredRequests = [];
 
     public function __construct(
-        RequestInterface $request,
-        URLHandler $handler
+        RequestInterface $request
     ) {
         $this->request = $request;
-        $this->urlHandler = $handler;
     }
 
     public function getRequest()
     {
         return $this->request;
-    }
-
-    public function getUrlHandler()
-    {
-        return $this->urlHandler;
     }
 
     /**

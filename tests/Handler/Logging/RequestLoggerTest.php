@@ -13,7 +13,6 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Url\TraceableUri;
-use LastCall\Crawler\Url\URLHandler;
 use Psr\Log\LoggerInterface;
 
 class RequestLoggerTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +24,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'https://lastcallmedia.com');
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RequestLogger($logger->reveal());
-        $event = new CrawlerEvent($request, new URLHandler('foo'));
+        $event = new CrawlerEvent($request);
         $this->invokeEvent($handler, CrawlerEvents::SENDING, $event);
         $logger->debug('Sending https://lastcallmedia.com', [
             'url' => 'https://lastcallmedia.com',
@@ -40,7 +39,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', $uri);
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RequestLogger($logger->reveal());
-        $event = new CrawlerEvent($request, new URLHandler('foo'));
+        $event = new CrawlerEvent($request);
         $this->invokeEvent($handler, CrawlerEvents::SENDING, $event);
         $logger->debug('Sending https://lastcallmedia.com as a retry for https://lastcallmedia.com#foo',
             [
@@ -55,8 +54,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $response = new Response(200);
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RequestLogger($logger->reveal());
-        $event = new CrawlerResponseEvent($request, $response,
-            new URLHandler('foo'));
+        $event = new CrawlerResponseEvent($request, $response);
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
         $logger->debug('Received https://lastcallmedia.com', [
             'url' => 'https://lastcallmedia.com',
@@ -70,8 +68,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $response = new Response(301, ['Location' => '/foo']);
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RequestLogger($logger->reveal());
-        $event = new CrawlerResponseEvent($request, $response,
-            new URLHandler('foo'));
+        $event = new CrawlerResponseEvent($request, $response);
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
         $logger->info('Received https://lastcallmedia.com redirecting to /foo',
             [
@@ -88,8 +85,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RequestLogger($logger->reveal());
 
-        $event = new CrawlerResponseEvent($request, $response,
-            new URLHandler('foo'));
+        $event = new CrawlerResponseEvent($request, $response);
         $this->invokeEvent($handler, CrawlerEvents::FAILURE, $event);
         $logger->warning('Failure https://lastcallmedia.com', [
             'url' => 'https://lastcallmedia.com',

@@ -19,10 +19,9 @@ class CrawlerExceptionEvent extends CrawlerEvent
     public function __construct(
         RequestInterface $request,
         ResponseInterface $response = null,
-        \Exception $exception,
-        URLHandler $handler
+        \Exception $exception
     ) {
-        parent::__construct($request, $handler);
+        parent::__construct($request);
         $this->response = $response;
         $this->exception = $exception;
     }

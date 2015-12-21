@@ -27,9 +27,9 @@ class Session implements SessionInterface
 {
 
     /**
-     * @var \LastCall\Crawler\Url\URLHandler
+     * @var string
      */
-    private $urlHandler;
+    private $baseUrl;
 
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -59,7 +59,7 @@ class Session implements SessionInterface
             }
         }
 
-        return new self($config->getUrlHandler(), $config->getQueue(),
+        return new self($config->getBaseUrl(), $config->getQueue(),
             $dispatcher);
     }
 
@@ -71,18 +71,18 @@ class Session implements SessionInterface
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
      */
     public function __construct(
-        URLHandler $urlHandler,
+        $baseUrl,
         RequestQueueInterface $queue = null,
         EventDispatcherInterface $dispatcher = null
     ) {
-        $this->urlHandler = $urlHandler;
+        $this->baseUrl = $baseUrl;
         $this->dispatcher = $dispatcher ?: new EventDispatcher();
         $this->queue = $queue ?: new ArrayRequestQueue();
     }
 
     public function init($baseUrl = null)
     {
-        $baseUrl = $baseUrl ?: $this->urlHandler->getBaseUrl();
+        $baseUrl = $baseUrl ?: $this->baseUrl;
         $this->queue->push(new Request('GET', $baseUrl));
     }
 
@@ -111,11 +111,6 @@ class Session implements SessionInterface
         return $this->queue->count() === 0;
     }
 
-    private function getHandler(UriInterface $uri)
-    {
-        return $this->urlHandler->forUrl($uri);
-    }
-
     public function onSetup()
     {
         if ($this->queue instanceof SetupTeardownInterface) {
@@ -142,8 +137,7 @@ class Session implements SessionInterface
 
     public function onRequestSending(RequestInterface $request)
     {
-        $handler = $this->getHandler($request->getUri());
-        $event = new CrawlerEvent($request, $handler);
+        $event = new CrawlerEvent($request);
         $this->dispatch(CrawlerEvents::SENDING, $event);
     }
 
@@ -151,8 +145,7 @@ class Session implements SessionInterface
         RequestInterface $request,
         ResponseInterface $response
     ) {
-        $handler = $this->getHandler($request->getUri());
-        $event = new CrawlerResponseEvent($request, $response, $handler);
+        $event = new CrawlerResponseEvent($request, $response);
         $this->dispatch(CrawlerEvents::SUCCESS, $event);
     }
 
@@ -160,8 +153,7 @@ class Session implements SessionInterface
         RequestInterface $request,
         ResponseInterface $response
     ) {
-        $handler = $this->getHandler($request->getUri());
-        $event = new CrawlerResponseEvent($request, $response, $handler);
+        $event = new CrawlerResponseEvent($request, $response);
         $this->dispatch(CrawlerEvents::FAILURE, $event);
     }
 
@@ -170,9 +162,7 @@ class Session implements SessionInterface
         \Exception $exception,
         ResponseInterface $response = null
     ) {
-        $handler = $this->getHandler($request->getUri());
-        $event = new CrawlerExceptionEvent($request, $response, $exception,
-            $handler);
+        $event = new CrawlerExceptionEvent($request, $response, $exception);
         $this->dispatch(CrawlerEvents::EXCEPTION, $event);
     }
 
