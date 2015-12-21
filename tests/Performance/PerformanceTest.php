@@ -140,6 +140,37 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getQueues
      */
+    public function testQueueCount(RequestQueueInterface $queue) {
+        if ($queue instanceof SetupTeardownInterface) {
+            $queue->onSetup();
+        }
+        for($i = 0; $i < 1000; $i++) {
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            if($i % 3) {
+                $queue->complete($queue->pop());
+            }
+            if($i % 5) {
+                $queue->pop();
+            }
+        }
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('queue', get_class($queue) . '::count()');
+        for($i = 0; $i < 1000; $i++) {
+            $queue->count($queue::FREE);
+            $queue->count($queue::COMPLETE);
+            $queue->count($queue::PENDING);
+        }
+        $stopwatch->stop('queue');
+        if ($queue instanceof SetupTeardownInterface) {
+            $queue->onTeardown();
+        }
+        $event = $stopwatch->getEvent('queue');
+        $this->logDataPoint($event);
+    }
+
+    /**
+     * @dataProvider getQueues
+     */
     public function testQueueComplete(RequestQueueInterface $queue)
     {
         if ($queue instanceof SetupTeardownInterface) {
