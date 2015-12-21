@@ -33,15 +33,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($client, $config->getClient());
     }
 
-    public function testUrlHandler()
-    {
-        $config = new Configuration();
-        $this->assertInstanceOf(URLHandler::class, $config->getUrlHandler());
-        $handler = $this->prophesize(URLHandler::class)->reveal();
-        $config->setUrlHandler($handler);
-        $this->assertSame($handler, $config->getUrlHandler());
-    }
-
     public function testQueue()
     {
         $config = new Configuration();

@@ -19,11 +19,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     protected $client;
 
     /**
-     * @var \LastCall\Crawler\Url\UrlHandler
-     */
-    protected $urlHandler;
-
-    /**
      * @var \LastCall\Crawler\Queue\RequestQueueInterface
      */
     protected $queue;
@@ -36,11 +31,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     public function getClient()
     {
         return $this->client;
-    }
-
-    public function getUrlHandler()
-    {
-        return $this->urlHandler;
     }
 
     public function getQueue()

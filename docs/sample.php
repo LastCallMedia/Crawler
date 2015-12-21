@@ -33,10 +33,9 @@ $normalizer = new Normalizer([
 ]);
 
 // The URLHandler wraps up the Matcher and the Normalizer in a
-// nice little package that can be passed around between events.
+// nice little package that can be passed around between objects.
 $urlHandler = new URLHandler('https://lastcallmedia.com', null, $matcher,
     $normalizer);
-$config->setUrlHandler($urlHandler);
 
 
 // "Modules" are units of content broken out of the response

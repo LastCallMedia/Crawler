@@ -31,14 +31,12 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $listener = function () {
         };
         $queue = new ArrayRequestQueue();
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
         $dispatcher = new EventDispatcher();
 
         $config = new Configuration('https://lastcallmedia.com');
         $config->addSubscriber($subscriber);
         $config->addListener(CrawlerEvents::SUCCESS, $listener);
         $config->setQueue($queue);
-        $config->setUrlHandler($urlHandler);
 
 
         $session = Session::createFromConfig($config, $dispatcher);

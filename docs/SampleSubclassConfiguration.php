@@ -43,13 +43,15 @@ namespace {
 
         private function createSubscribers()
         {
+            $urlHandler = $this->createUrlHandler();
+
             $logger = new NullLogger();
             $requestLogger = new RequestLogger($logger);
             $exceptionLogger = new ExceptionLogger($logger);
 
             $moduleHandler = new ModuleHandler();
             $moduleHandler->addParser(new XPathParser());
-            $moduleHandler->addProcessor(new LinkProcessor($this->urlHandler));
+            $moduleHandler->addProcessor(new LinkProcessor($urlHandler));
 
             return [$requestLogger, $exceptionLogger, $moduleHandler];
         }

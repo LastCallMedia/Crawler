@@ -18,13 +18,6 @@ interface ConfigurationInterface
     public function getClient();
 
     /**
-     * Get the URL Handler to be used for this configuration.
-     *
-     * @return \LastCall\Crawler\Url\UrlHandler
-     */
-    public function getUrlHandler();
-
-    /**
      * Get the queue to be used for this configuration.
      *
      * @return \LastCall\Crawler\Queue\RequestQueueInterface

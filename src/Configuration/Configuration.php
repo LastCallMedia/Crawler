@@ -20,19 +20,11 @@ class Configuration extends AbstractConfiguration implements OutputAwareInterfac
         $this->baseUrl = $baseUrl;
         $this->client = new Client(['allow_redirects' => false]);
         $this->queue = new ArrayRequestQueue();
-        $this->urlHandler = new URLHandler($baseUrl);
     }
 
     public function setClient(Client $client)
     {
         $this->client = $client;
-
-        return $this;
-    }
-
-    public function setUrlHandler(URLHandler $handler)
-    {
-        $this->urlHandler = $handler;
 
         return $this;
     }
