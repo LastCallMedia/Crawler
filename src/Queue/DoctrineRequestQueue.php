@@ -93,8 +93,6 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         return $this->updateIfExistsAndIsPending($key, [
             'expire' => 0,
             'status' => self::COMPLETE,
-        ], [
-            'identifier' => $key,
         ]);
     }
 
@@ -105,8 +103,6 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         return $this->updateIfExistsAndIsPending($key, [
             'expire' => 0,
             'status' => self::FREE,
-        ], [
-            'identifier' => $key
         ]);
     }
 
@@ -163,16 +159,12 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
 
     private function updateIfExistsAndIsPending(
         $key,
-        array $data,
-        array $identifier
+        array $data
     ) {
-        $sql = "SELECT 1 FROM {$this->table} WHERE identifier = ? AND status = ? AND expire > ?";
-        $exists = $this->connection->executeQuery($sql,
-            [$key, self::FREE, time()])->fetchColumn();
-
-        if ($exists) {
-            return (bool)$this->connection->update($this->table, $data,
-                $identifier);
+        $sql = "UPDATE {$this->table} SET status = ?, expire = ? WHERE identifier = ? AND status = ? AND expire > ?";
+        $ret = $this->connection->executeUpdate($sql, [$data['status'], $data['expire'], $key, self::FREE, time()]);
+        if($ret === 1) {
+            return TRUE;
         }
         throw new \RuntimeException('This request is not managed by this queue.');
     }
