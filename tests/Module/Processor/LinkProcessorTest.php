@@ -8,16 +8,18 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
-use LastCall\Crawler\Url\URLHandler;
+use LastCall\Crawler\Url\Matcher;
+use LastCall\Crawler\Url\Normalizer;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testSubscribesToRightMethod()
     {
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
+        $matcher = new Matcher();
+        $normalizer = new Normalizer();
 
-        $processor = new LinkProcessor($urlHandler);
+        $processor = new LinkProcessor($matcher, $normalizer);
         $methods = $processor->getSubscribedMethods();
         $this->assertCount(1, $methods);
         /** @var \LastCall\Crawler\Module\ModuleSubscription $method */
@@ -53,11 +55,13 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request('GET', 'https://lastcallmedia.com');
         $response = new Response();
-        $urlHandler = new URLHandler('https://lastcallmedia.com');
         $event = new CrawlerResponseEvent($request, $response);
 
         $links = (new DomCrawler($html))->filterXPath('descendant-or-self::a[@href]');
-        $processor = new LinkProcessor($urlHandler);
+
+        $matcher = new Matcher();
+        $normalizer = new Normalizer();
+        $processor = new LinkProcessor($matcher, $normalizer);
         $processor->processLinks($event, $links);
 
         $added = [];

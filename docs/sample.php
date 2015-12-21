@@ -8,7 +8,6 @@ use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Url\Matcher;
 use LastCall\Crawler\Url\Normalizer;
-use LastCall\Crawler\Url\URLHandler;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,13 +28,9 @@ $matcher = new Matcher(['https://lastcallmedia.com']);
 // queue for processing.  This helps filter out any duplicate
 // URLs.
 $normalizer = new Normalizer([
-    Normalizer::normalizeCase()
+    Normalizer::normalizeCase(),
+    Normalizer::stripFragment(),
 ]);
-
-// The URLHandler wraps up the Matcher and the Normalizer in a
-// nice little package that can be passed around between objects.
-$urlHandler = new URLHandler('https://lastcallmedia.com', null, $matcher,
-    $normalizer);
 
 
 // "Modules" are units of content broken out of the response
@@ -49,7 +44,7 @@ $moduleHandler->addParser(new XPathParser());
 
 // Add the LinkProcessor to handle scanning for links
 // in the HTML and adding them back to the queue.
-$moduleHandler->addProcessor(new LinkProcessor($urlHandler));
+$moduleHandler->addProcessor(new LinkProcessor($matcher, $normalizer));
 
 // Add the ModuleHandler to the configuration.
 // The ModuleHandler will be invoked on every successful

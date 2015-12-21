@@ -9,7 +9,8 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Url\URLHandler;
+use LastCall\Crawler\Url\MatcherInterface;
+use LastCall\Crawler\Url\NormalizerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -27,11 +28,12 @@ class RedirectDiscoverer implements EventSubscriberInterface
         );
     }
 
-    private $urlHandler;
-
-    public function __construct(URLHandler $urlHandler)
-    {
-        $this->urlHandler = $urlHandler;
+    public function __construct(
+        MatcherInterface $matcher,
+        NormalizerInterface $normalizer
+    ) {
+        $this->matcher = $matcher;
+        $this->normalizer = $normalizer;
     }
 
     public function onResponse(CrawlerResponseEvent $event)
@@ -39,13 +41,12 @@ class RedirectDiscoverer implements EventSubscriberInterface
         $response = $event->getResponse();
         if ($this->isRedirectResponse($response)) {
             $request = $event->getRequest();
-            $urlHandler = $this->urlHandler->forUrl($request->getUri());
 
             $location = $response->getHeaderLine('Location');
             $location = Uri::resolve($request->getUri(), $location);
 
-            if ($urlHandler->includesUrl($location) && $urlHandler->isCrawlable($location)) {
-                $normalUrl = $urlHandler->normalizeUrl($location);
+            if ($this->matcher->matches($location) && $this->matcher->matchesHtml($location)) {
+                $normalUrl = $this->normalizer->normalize($location);
                 $request = new Request('GET', $normalUrl);
                 $event->addAdditionalRequest($request);
             }

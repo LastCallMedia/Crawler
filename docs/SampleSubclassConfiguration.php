@@ -12,7 +12,6 @@ namespace {
     use LastCall\Crawler\Queue\ArrayRequestQueue;
     use LastCall\Crawler\Url\Matcher;
     use LastCall\Crawler\Url\Normalizer;
-    use LastCall\Crawler\Url\URLHandler;
     use Psr\Log\NullLogger;
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;
@@ -24,26 +23,18 @@ namespace {
         public function __construct()
         {
             $this->queue = new ArrayRequestQueue();
-            $this->urlHandler = $this->createUrlHandler();
             $this->subscribers = $this->createSubscribers();
             $this->baseUrl = 'https://lastcallmedia.com';
             $this->client = new Client(['allow_redirects' => false]);
         }
 
-        private function createUrlHandler()
+        private function createSubscribers()
         {
             $matcher = new Matcher(['https://lastcallmedia.com']);
             $normalizer = new Normalizer([
-                Normalizer::normalizeCase('lower')
+                Normalizer::normalizeCase(),
+                Normalizer::stripFragment(),
             ]);
-
-            return new URLHandler('https://lastcallmedia.com', null, $matcher,
-                $normalizer);
-        }
-
-        private function createSubscribers()
-        {
-            $urlHandler = $this->createUrlHandler();
 
             $logger = new NullLogger();
             $requestLogger = new RequestLogger($logger);
@@ -51,7 +42,7 @@ namespace {
 
             $moduleHandler = new ModuleHandler();
             $moduleHandler->addParser(new XPathParser());
-            $moduleHandler->addProcessor(new LinkProcessor($urlHandler));
+            $moduleHandler->addProcessor(new LinkProcessor($matcher, $normalizer));
 
             return [$requestLogger, $exceptionLogger, $moduleHandler];
         }

@@ -24,7 +24,8 @@ use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
-use LastCall\Crawler\Url\URLHandler;
+use LastCall\Crawler\Url\Matcher;
+use LastCall\Crawler\Url\Normalizer;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -90,12 +91,16 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
 
     public function testLinkDiscovery()
     {
-        $urlHandler = new URLHandler('http://example.com');
+        $matcher = new Matcher(['http://example.com']);
+        $normalizer = new Normalizer([
+            Normalizer::normalizeCase(),
+            Normalizer::stripFragment(),
+        ]);
         $configuration = new Configuration('http://example.com/index.html');
         $configuration->setQueue($this->getQueue());
         $configuration->setClient($this->getClient());
         $configuration->addSubscriber(new ModuleHandler([new XPathParser()],
-            [new LinkProcessor($urlHandler)]));
+            [new LinkProcessor($matcher, $normalizer)]));
         $event = $this->runConfiguration($configuration, 'Link Discovery');
 
         $this->logDataPoint($event);

@@ -5,9 +5,12 @@ namespace LastCall\Crawler\Module\Processor;
 
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Module\ModuleSubscription;
-use LastCall\Crawler\Url\URLHandler;
+use LastCall\Crawler\Url\MatcherInterface;
+use LastCall\Crawler\Url\NormalizerInterface;
+use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements ModuleProcessorInterface
@@ -21,11 +24,15 @@ class LinkProcessor implements ModuleProcessorInterface
         ];
     }
 
-    private $urlHandler;
+    private $matcher;
+    private $normalizer;
 
-    public function __construct(URLHandler $urlHandler)
-    {
-        $this->urlHandler = $urlHandler;
+    public function __construct(
+        MatcherInterface $matcher,
+        NormalizerInterface $normalizer
+    ) {
+        $this->matcher = $matcher;
+        $this->normalizer = $normalizer;
     }
 
     public function processLinks(
@@ -35,24 +42,34 @@ class LinkProcessor implements ModuleProcessorInterface
         $urls = array_unique($crawler->extract(['href']));
 
         $request = $event->getRequest();
-        $handler = $this->urlHandler->forUrl($request->getUri());
 
-        foreach ($this->processUrls($urls, $handler) as $url) {
-            $request = new Request('GET', $url);
-            $event->addAdditionalRequest($request);
-        }
-    }
-
-    public function processUrls(array $urls, URLHandler $handler)
-    {
         foreach ($urls as $url) {
-            if ($url = $handler->absolutizeUrl($url)) {
-                if ($handler->includesUrl($url)) {
-                    if ($handler->isCrawlable($url)) {
-                        yield $handler->normalizeUrl($url);
-                    }
+            if ($url = $this->absolutizeUrl($url, $request)) {
+                if ($this->matcher->matches($url) && $this->matcher->matchesHtml($url)) {
+                    $url = $this->normalizer->normalize($url);
+                    $newRequest = new Request('GET', $url);
+                    $event->addAdditionalRequest($newRequest);
                 }
             }
         }
+    }
+
+    private function absolutizeUrl($url, RequestInterface $request)
+    {
+        if (is_string($url)) {
+            if (strpos($url, 'http') === 0) {
+                return $url;
+            } elseif (strpos($url, '#') === 0) {
+                return $this->currentUrl->withFragment($url);
+            } elseif (strpos($url, 'mailto:') === 0 || strpos($url,
+                    'javascript:') === 0
+            ) {
+                return false;
+            }
+        } elseif ($url instanceof UriInterface && $url->getScheme()) {
+            return $url;
+        }
+
+        return Uri::resolve($request->getUri(), $url);
     }
 }
