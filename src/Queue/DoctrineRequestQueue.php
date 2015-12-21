@@ -145,6 +145,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $table->addColumn('expire', 'integer');
         $table->addColumn('data', 'object');
         $table->setPrimaryKey(['identifier']);
+        $table->addIndex(['status', 'expire'], 'status_expire');
 
         return [$table];
     }
