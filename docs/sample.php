@@ -19,24 +19,6 @@ include_once __DIR__ . '/../vendor/autoload.php';
 // Create a new configuration, using our website as a base URL.
 $config = new Configuration('https://lastcallmedia.com');
 
-// "Modules" are units of content broken out of the response
-// by a parser.  They are handed off to a processor to do
-// something with.  The ModuleHandler is what coordinates
-// the Parsers and the Processors.
-$moduleHandler = new ModuleHandler();
-
-// Add the XPathParser, required by the LinkProcessor
-$moduleHandler->addParser(new XPathParser());
-
-// Add the LinkProcessor to handle scanning for links
-// in the HTML and adding them back to the queue.
-$moduleHandler->addProcessor(new LinkProcessor());
-
-// Add the ModuleHandler to the configuration.
-// The ModuleHandler will be invoked on every successful
-// response.
-$config->addSubscriber($moduleHandler);
-
 // The Matcher determines what URLs are included in the crawl.
 // When a new URL is found by the LinkProcessor, it checks with
 // the matcher to see if it matches the pattern.  Without
@@ -55,6 +37,25 @@ $normalizer = new Normalizer([
 $urlHandler = new URLHandler('https://lastcallmedia.com', null, $matcher,
     $normalizer);
 $config->setUrlHandler($urlHandler);
+
+
+// "Modules" are units of content broken out of the response
+// by a parser.  They are handed off to a processor to do
+// something with.  The ModuleHandler is what coordinates
+// the Parsers and the Processors.
+$moduleHandler = new ModuleHandler();
+
+// Add the XPathParser, required by the LinkProcessor
+$moduleHandler->addParser(new XPathParser());
+
+// Add the LinkProcessor to handle scanning for links
+// in the HTML and adding them back to the queue.
+$moduleHandler->addProcessor(new LinkProcessor($urlHandler));
+
+// Add the ModuleHandler to the configuration.
+// The ModuleHandler will be invoked on every successful
+// response.
+$config->addSubscriber($moduleHandler);
 
 // Make errors and requests visible by adding loggers.  You can
 // use any PSR-3 compatible logger.  Here we're using a null logger,

@@ -15,7 +15,9 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testSubscribesToRightMethod()
     {
-        $processor = new LinkProcessor();
+        $urlHandler = new URLHandler('https://lastcallmedia.com');
+
+        $processor = new LinkProcessor($urlHandler);
         $methods = $processor->getSubscribedMethods();
         $this->assertCount(1, $methods);
         /** @var \LastCall\Crawler\Module\ModuleSubscription $method */
@@ -55,7 +57,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
         $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
         $links = (new DomCrawler($html))->filterXPath('descendant-or-self::a[@href]');
-        $processor = new LinkProcessor();
+        $processor = new LinkProcessor($urlHandler);
         $processor->processLinks($event, $links);
 
         $added = [];

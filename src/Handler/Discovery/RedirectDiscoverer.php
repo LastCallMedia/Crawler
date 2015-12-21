@@ -5,9 +5,11 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -25,13 +27,23 @@ class RedirectDiscoverer implements EventSubscriberInterface
         );
     }
 
+    private $urlHandler;
+
+    public function __construct(URLHandler $urlHandler)
+    {
+        $this->urlHandler = $urlHandler;
+    }
+
     public function onResponse(CrawlerResponseEvent $event)
     {
         $response = $event->getResponse();
         if ($this->isRedirectResponse($response)) {
-            $urlHandler = $event->getUrlHandler();
+            $request = $event->getRequest();
+            $urlHandler = $this->urlHandler->forUrl($request->getUri());
 
-            $location = $urlHandler->absolutizeUrl($response->getHeaderLine('Location'));
+            $location = $response->getHeaderLine('Location');
+            $location = Uri::resolve($request->getUri(), $location);
+
             if ($urlHandler->includesUrl($location) && $urlHandler->isCrawlable($location)) {
                 $normalUrl = $urlHandler->normalizeUrl($location);
                 $request = new Request('GET', $normalUrl);

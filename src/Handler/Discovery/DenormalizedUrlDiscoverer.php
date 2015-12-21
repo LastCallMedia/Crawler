@@ -5,6 +5,7 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
@@ -55,8 +56,9 @@ class DenormalizedUrlDiscoverer implements EventSubscriberInterface
         $response = $event->getResponse();
         if ($this->isRedirectResponse($response) && $this->hasPreviousForms($event->getRequest())) {
             $location = $response->getHeaderLine('Location');
-            $urlHandler = $event->getUrlHandler();
-            $location = (string)$urlHandler->absolutizeUrl($location);
+
+            $request = $event->getRequest();
+            $location = (string)Uri::resolve($request->getUri(), $location);
 
             $uri = $event->getRequest()->getUri();
             while ($uri = $uri->getPrevious()) {

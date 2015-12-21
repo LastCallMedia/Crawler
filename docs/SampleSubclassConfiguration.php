@@ -24,10 +24,10 @@ namespace {
         public function __construct()
         {
             $this->queue = new ArrayRequestQueue();
+            $this->urlHandler = $this->createUrlHandler();
             $this->subscribers = $this->createSubscribers();
             $this->baseUrl = 'https://lastcallmedia.com';
             $this->client = new Client(['allow_redirects' => false]);
-            $this->urlHandler = $this->createUrlHandler();
         }
 
         private function createUrlHandler()
@@ -49,7 +49,7 @@ namespace {
 
             $moduleHandler = new ModuleHandler();
             $moduleHandler->addParser(new XPathParser());
-            $moduleHandler->addProcessor(new LinkProcessor());
+            $moduleHandler->addProcessor(new LinkProcessor($this->urlHandler));
 
             return [$requestLogger, $exceptionLogger, $moduleHandler];
         }

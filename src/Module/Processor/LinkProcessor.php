@@ -21,13 +21,21 @@ class LinkProcessor implements ModuleProcessorInterface
         ];
     }
 
+    private $urlHandler;
+
+    public function __construct(URLHandler $urlHandler)
+    {
+        $this->urlHandler = $urlHandler;
+    }
+
     public function processLinks(
         CrawlerResponseEvent $event,
         DomCrawler $crawler
     ) {
         $urls = array_unique($crawler->extract(['href']));
 
-        $handler = $event->getUrlHandler();
+        $request = $event->getRequest();
+        $handler = $this->urlHandler->forUrl($request->getUri());
 
         foreach ($this->processUrls($urls, $handler) as $url) {
             $request = new Request('GET', $url);

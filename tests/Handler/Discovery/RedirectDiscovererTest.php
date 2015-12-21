@@ -24,7 +24,7 @@ class RedirectDiscovererTest extends \PHPUnit_Framework_TestCase
         $response = new Response(301, ['Location' => '/foo']);
         $event = new CrawlerResponseEvent($request, $response, $urlHandler);
 
-        $handler = new RedirectDiscoverer();
+        $handler = new RedirectDiscoverer($urlHandler);
         $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
 
         $added = $event->getAdditionalRequests();
