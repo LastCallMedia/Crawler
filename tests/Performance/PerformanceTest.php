@@ -121,7 +121,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         }
         $stopwatch = new Stopwatch();
         $stopwatch->start('queue', get_class($queue) . '::push()');
-        for ($i = 0; $i < 500; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
@@ -178,7 +178,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         }
         $stopwatch = new Stopwatch();
         $stopwatch->start('queue', get_class($queue) . '::complete()');
-        for ($i = 0; $i < 500; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $job = $queue->pop();
             $queue->complete($job);
