@@ -2,6 +2,8 @@
 
 namespace LastCall\Crawler\Common;
 
+use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
+
 /**
  * Wires setup and teardown handlers to creation/destruction of tables
  * in a Doctrine connection.
@@ -12,9 +14,10 @@ trait DoctrineSetupTeardownTrait
     public function onSetup()
     {
         $connection = $this->getConnection();
-        foreach ($this->getTables() as $table) {
-            $connection->getSchemaManager()->dropAndCreateTable($table);
-        }
+        $synchronizer = new SingleDatabaseSynchronizer($connection);
+        $schema = $this->getSchema();
+        $synchronizer->dropSchema($schema);
+        $synchronizer->createSchema($schema);
     }
 
     /**
@@ -23,20 +26,15 @@ trait DoctrineSetupTeardownTrait
     abstract protected function getConnection();
 
     /**
-     * @return \Doctrine\DBAL\Schema\Table[]
+     * @return \Doctrine\DBAL\Schema\Schema
      */
-    abstract protected function getTables();
+    abstract protected function getSchema();
 
     public function onTeardown()
     {
         $connection = $this->getConnection();
-        $sm = $connection->getSchemaManager();
-        foreach ($this->getTables() as $table) {
-            $tn = $table->getName();
-            if ($sm->tablesExist([$tn])) {
-                $sm->dropTable($tn);
-            }
-        }
+        $synchronizer = new SingleDatabaseSynchronizer($connection);
+        $synchronizer->dropSchema($this->getSchema());
     }
 
 }

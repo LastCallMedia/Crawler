@@ -7,6 +7,7 @@ namespace LastCall\Crawler\Queue;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 use LastCall\Crawler\Common\SetupTeardownInterface;
@@ -137,7 +138,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         return $this->connection;
     }
 
-    protected function getTables()
+    protected function getSchema()
     {
         $table = new Table($this->table);
         $table->addColumn('identifier', 'binary');
@@ -147,7 +148,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $table->setPrimaryKey(['identifier']);
         $table->addIndex(['status', 'expire'], 'status_expire');
 
-        return [$table];
+        return new Schema([$table]);
     }
 
     private function exists($identifier)
@@ -163,9 +164,10 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         array $data
     ) {
         $sql = "UPDATE {$this->table} SET status = ?, expire = ? WHERE identifier = ? AND status = ? AND expire > ?";
-        $ret = $this->connection->executeUpdate($sql, [$data['status'], $data['expire'], $key, self::FREE, time()]);
-        if($ret === 1) {
-            return TRUE;
+        $ret = $this->connection->executeUpdate($sql,
+            [$data['status'], $data['expire'], $key, self::FREE, time()]);
+        if ($ret === 1) {
+            return true;
         }
         throw new \RuntimeException('This request is not managed by this queue.');
     }

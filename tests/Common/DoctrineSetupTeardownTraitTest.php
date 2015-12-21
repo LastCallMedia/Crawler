@@ -4,16 +4,16 @@
 namespace LastCall\Crawler\Test\Common;
 
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\Schema;
 use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 
 
 class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
 {
-    private function getTraitMock($tables, $connection)
+    private function getTraitMock(Schema $schema, $connection)
     {
         $mock = $this->getMockForTrait(DoctrineSetupTeardownTrait::class);
-        $mock->expects($this->once())->method('getTables')->willReturn($tables);
+        $mock->expects($this->once())->method('getSchema')->willReturn($schema);
         $mock->expects($this->once())
             ->method('getConnection')
             ->willReturn($connection);
@@ -23,13 +23,16 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testSetupCreatesTable()
     {
-        $table = new Table('foo');
+        $schema = new Schema();
+        $table = $schema->createTable('foo');
         $table->addColumn('id', 'integer');
+
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ]);
-        $mock = $this->getTraitMock([$table], $connection);
+
+        $mock = $this->getTraitMock($schema, $connection);
         $mock->onSetup();
         $this->assertTrue($connection->getSchemaManager()
             ->tablesExist(['foo']));
@@ -37,14 +40,16 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testTeardownRemovesTable()
     {
-        $table = new Table('foo');
+        $schema = new Schema();
+        $table = $schema->createTable('foo');
         $table->addColumn('id', 'integer');
+
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ]);
         $connection->exec("CREATE TABLE foo(id INTEGER)");
-        $mock = $this->getTraitMock([$table], $connection);
+        $mock = $this->getTraitMock($schema, $connection);
         $mock->onTeardown();
         $this->assertFalse($connection->getSchemaManager()
             ->tablesExist(['foo']));
@@ -52,14 +57,16 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testSetupOverwritesTable()
     {
-        $table = new Table('foo');
+        $schema = new Schema();
+        $table = $schema->createTable('foo');
         $table->addColumn('id', 'integer');
+
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ]);
         $connection->exec("CREATE TABLE foo(id INTEGER, key INTEGER)");
-        $mock = $this->getTraitMock([$table], $connection);
+        $mock = $this->getTraitMock($schema, $connection);
         $mock->onSetup();
         $this->assertTrue($connection->getSchemaManager()
             ->tablesExist(['foo']));
@@ -69,13 +76,15 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testTeardownDoesntFailOnNonexistentTable()
     {
-        $table = new Table('foo');
+        $schema = new Schema();
+        $table = $schema->createTable('foo');
         $table->addColumn('id', 'integer');
+
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ]);
-        $mock = $this->getTraitMock([$table], $connection);
+        $mock = $this->getTraitMock($schema, $connection);
         $mock->onTeardown();
     }
 

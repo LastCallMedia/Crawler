@@ -75,7 +75,8 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         };
         $this['processors'] = function () {
             return [
-                'link' => new LinkProcessor($this['matcher'], $this['normalizer'])
+                'link' => new LinkProcessor($this['matcher'],
+                    $this['normalizer'])
             ];
         };
     }
