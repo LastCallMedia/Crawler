@@ -11,6 +11,7 @@ use LastCall\Crawler\Module\ModuleSubscription;
 use LastCall\Crawler\Url\MatcherInterface;
 use LastCall\Crawler\Url\NormalizerInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements ModuleProcessorInterface
