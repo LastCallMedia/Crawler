@@ -31,7 +31,8 @@
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",
         "symfony/filesystem": "~2.8|~3.0",
-        "psr/log": "^1.0"
+        "psr/log": "^1.0",
+        "pimple/pimple": "^3.0"
     },
     "suggests": {
         "doctrine/dbal": "Allow database backed queues",
