@@ -50,7 +50,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($queue, $queueRefl->getValue($session));
         $baseUrlRefl = new \ReflectionProperty(Session::class, 'baseUrl');
         $baseUrlRefl->setAccessible(true);
-        $this->assertEquals('https://lastcallmedia.com', $baseUrlRefl->getValue($session));
+        $this->assertEquals('https://lastcallmedia.com',
+            $baseUrlRefl->getValue($session));
     }
 
     public function testAddRequest()

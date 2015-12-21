@@ -11,7 +11,6 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Discovery\DenormalizedUrlDiscoverer;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Url\TraceableUri;
-use LastCall\Crawler\Url\URLHandler;
 
 class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
 {

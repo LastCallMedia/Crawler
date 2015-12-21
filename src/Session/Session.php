@@ -12,10 +12,8 @@ use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
-use LastCall\Crawler\Url\URLHandler;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
