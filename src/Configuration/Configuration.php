@@ -1,66 +1,119 @@
 <?php
 
+
 namespace LastCall\Crawler\Configuration;
+
 
 use GuzzleHttp\Client;
 use LastCall\Crawler\Common\OutputAwareInterface;
+use LastCall\Crawler\Handler\Logging\ExceptionLogger;
+use LastCall\Crawler\Handler\Logging\RequestLogger;
+use LastCall\Crawler\Handler\Module\ModuleHandler;
+use LastCall\Crawler\Module\Parser\CSSSelectorParser;
+use LastCall\Crawler\Module\Parser\XPathParser;
+use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Queue\RequestQueue;
-use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\Queue\DoctrineRequestQueue;
+use LastCall\Crawler\Url\Matcher;
+use LastCall\Crawler\Url\Normalizer;
+use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Configuration extends AbstractConfiguration implements OutputAwareInterface
+class Configuration extends Container implements ConfigurationInterface, OutputAwareInterface
 {
-    protected $attachOutputFns = [];
-
     public function __construct($baseUrl = null)
     {
-        $this->baseUrl = $baseUrl;
-        $this->client = new Client(['allow_redirects' => false]);
-        $this->queue = new ArrayRequestQueue();
-    }
+        parent::__construct([
+            'normalizers' => []
+        ]);
+        $this['baseUrl'] = $baseUrl;
+        $this['queue'] = function () {
+            if (isset($this['doctrine'])) {
+                return new DoctrineRequestQueue($this['doctrine']);
+            }
 
-    public function setClient(Client $client)
-    {
-        $this->client = $client;
+            return new ArrayRequestQueue();
+        };
+        $this['client'] = function () {
+            return new Client(['allow_redirects' => false]);
+        };
+        $this['listeners'] = function () {
+            return [];
+        };
+        $this['subscribers'] = function () {
+            $subscribers = [
+                'moduleHandler' => new ModuleHandler($this['parsers'],
+                    $this['processors'])
+            ];
 
-        return $this;
-    }
+            if (isset($this['logger'])) {
+                $subscribers['requestLogger'] = new RequestLogger($this['logger']);
+                $subscribers['exceptionLogger'] = new ExceptionLogger($this['logger']);
+            }
 
-    public function setQueue(RequestQueueInterface $queue)
-    {
-        $this->queue = $queue;
+            return $subscribers;
+        };
+        $this['matcher'] = function () {
+            return new Matcher([$this['baseUrl']]);
+        };
+        $this['normalizer'] = function () {
+            return new Normalizer($this['normalizers']);
+        };
+        $this['normalizers'] = [];
+        $this['parsers'] = function () {
+            $parsers = [
+                'xpath' => new XPathParser()
+            ];
+            if (class_exists('Symfony\Component\CssSelector\CssSelectorConverter')) {
+                $parsers['css'] = new CSSSelectorParser();
+            }
 
-        return $this;
-    }
-
-    public function setBaseUrl($baseUrl)
-    {
-        $this->baseUrl = $baseUrl;
-
-        return $this;
-    }
-
-    public function addSubscriber(EventSubscriberInterface $subscriber)
-    {
-        $this->subscribers[] = $subscriber;
-    }
-
-    public function addListener($eventName, callable $listener, $priority = 0)
-    {
-        $this->listeners[$eventName][] = [$listener, $priority];
-    }
-
-    public function onAttachOutput(callable $fn)
-    {
-        $this->attachOutputFns[] = $fn;
+            return $parsers;
+        };
+        $this['processors'] = function () {
+            return [
+                new LinkProcessor($this['matcher'], $this['normalizer'])
+            ];
+        };
     }
 
     public function setOutput(OutputInterface $output)
     {
-        foreach ($this->attachOutputFns as $fn) {
-            $fn($output);
-        }
+        $this['output'] = $output;
+    }
+
+    public function getBaseUrl()
+    {
+        return $this['baseUrl'];
+    }
+
+    public function getQueue()
+    {
+        return $this['queue'];
+    }
+
+    public function getClient()
+    {
+        return $this['client'];
+    }
+
+    public function getListeners()
+    {
+        return $this['listeners'];
+    }
+
+    public function getSubscribers()
+    {
+        return $this['subscribers'];
+    }
+
+    public function addListener($eventName, callable $callback, $priority = 0)
+    {
+        $this->extend('listeners',
+            function (array $listeners) use ($eventName, $callback, $priority) {
+                $listeners[$eventName][] = [$callback, $priority];
+
+                return $listeners;
+            });
     }
 }

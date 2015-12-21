@@ -2,49 +2,36 @@
 
 namespace {
 
-    use GuzzleHttp\Client;
-    use LastCall\Crawler\Configuration\AbstractConfiguration;
-    use LastCall\Crawler\Handler\Logging\ExceptionLogger;
-    use LastCall\Crawler\Handler\Logging\RequestLogger;
-    use LastCall\Crawler\Handler\Module\ModuleHandler;
-    use LastCall\Crawler\Module\Parser\XPathParser;
-    use LastCall\Crawler\Module\Processor\LinkProcessor;
-    use LastCall\Crawler\Queue\ArrayRequestQueue;
-    use LastCall\Crawler\Url\Matcher;
+    use LastCall\Crawler\Configuration\Configuration;
     use LastCall\Crawler\Url\Normalizer;
     use Psr\Log\NullLogger;
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;
 
 
-    class SampleSubclassConfiguration extends AbstractConfiguration
+    class SampleSubclassConfiguration extends Configuration
     {
 
         public function __construct()
         {
-            $this->queue = new ArrayRequestQueue();
-            $this->subscribers = $this->createSubscribers();
-            $this->baseUrl = 'https://lastcallmedia.com';
-            $this->client = new Client(['allow_redirects' => false]);
-        }
+            parent::__construct('https://lastcallmedia.com');
 
-        private function createSubscribers()
-        {
-            $matcher = new Matcher(['https://lastcallmedia.com']);
-            $normalizer = new Normalizer([
+            // Add some normalizers to clean up URLs.
+            $this['normalizers'] = [
                 Normalizer::normalizeCase(),
-                Normalizer::stripFragment(),
-            ]);
+                Normalizer::stripFragment()
+            ];
 
-            $logger = new NullLogger();
-            $requestLogger = new RequestLogger($logger);
-            $exceptionLogger = new ExceptionLogger($logger);
+            // Add a logger.  Normally, we'd use something like Monolog.
+            $this['logger'] = function() {
+                return new NullLogger();
+            };
 
-            $moduleHandler = new ModuleHandler();
-            $moduleHandler->addParser(new XPathParser());
-            $moduleHandler->addProcessor(new LinkProcessor($matcher, $normalizer));
-
-            return [$requestLogger, $exceptionLogger, $moduleHandler];
+            // Add an event subscriber.
+            $this->extend('subscribers', function($subscribers) {
+                $subscribers['mysubscriber'] = new MySubscriber();
+                return $subscribers;
+            });
         }
     }
 

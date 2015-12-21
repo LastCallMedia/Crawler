@@ -33,9 +33,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
 
         $config = new Configuration('https://lastcallmedia.com');
-        $config->addSubscriber($subscriber);
+        $config['queue'] = $queue;
+        $config['subscribers'] = [$subscriber];
         $config->addListener(CrawlerEvents::SUCCESS, $listener);
-        $config->setQueue($queue);
 
 
         $session = Session::createFromConfig($config, $dispatcher);

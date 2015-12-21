@@ -11,21 +11,16 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Common\SetupTeardownInterface;
-use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
-use LastCall\Crawler\Handler\Module\ModuleHandler;
-use LastCall\Crawler\Module\Parser\XPathParser;
-use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
-use LastCall\Crawler\Url\Matcher;
-use LastCall\Crawler\Url\Normalizer;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -80,10 +75,14 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
     public function testLogging()
     {
         $configuration = new Configuration('http://example.com/index.html');
-        $configuration->setQueue($this->getQueue());
-        $configuration->setClient($this->getClient());
-        $configuration->addSubscriber(new RequestLogger(new NullLogger()));
-        $configuration->addSubscriber(new ExceptionLogger(new NullLogger()));
+        $configuration['queue'] = $this->getQueue();
+        $configuration['client'] = $this->getClient();
+        $configuration['subscribers'] = function () {
+            return [
+                new RequestLogger(new NullLogger()),
+                new ExceptionLogger(new NullLogger())
+            ];
+        };
         $event = $this->runConfiguration($configuration, 'Logging');
 
         $this->logDataPoint($event);
@@ -91,16 +90,9 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
 
     public function testLinkDiscovery()
     {
-        $matcher = new Matcher(['http://example.com']);
-        $normalizer = new Normalizer([
-            Normalizer::normalizeCase(),
-            Normalizer::stripFragment(),
-        ]);
         $configuration = new Configuration('http://example.com/index.html');
-        $configuration->setQueue($this->getQueue());
-        $configuration->setClient($this->getClient());
-        $configuration->addSubscriber(new ModuleHandler([new XPathParser()],
-            [new LinkProcessor($matcher, $normalizer)]));
+        $configuration['queue'] = $this->getQueue();
+        $configuration['client'] = $this->getClient();
         $event = $this->runConfiguration($configuration, 'Link Discovery');
 
         $this->logDataPoint($event);
