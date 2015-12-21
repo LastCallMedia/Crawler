@@ -3,7 +3,6 @@
 namespace {
 
     use GuzzleHttp\Client;
-    use LastCall\Crawler\Common\OutputAwareInterface;
     use LastCall\Crawler\Configuration\AbstractConfiguration;
     use LastCall\Crawler\Handler\Logging\ExceptionLogger;
     use LastCall\Crawler\Handler\Logging\RequestLogger;
@@ -17,6 +16,7 @@ namespace {
     use Psr\Log\NullLogger;
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;
+
 
     class SampleSubclassConfiguration extends AbstractConfiguration
     {

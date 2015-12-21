@@ -1,26 +1,19 @@
 <?php
 
+
 namespace LastCall\Crawler\Url;
+
 
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
-/**
- * Transforms discovered URLs to a standard form.
- */
-class Normalizer
+class Normalizer implements NormalizerInterface
 {
-
     private $handlers = [];
 
     public function __construct(array $handlers = array())
     {
         $this->handlers = $handlers;
-    }
-
-    public function push(callable $pass)
-    {
-        $this->handlers[] = $pass;
     }
 
     public function normalize($url)
@@ -142,4 +135,5 @@ class Normalizer
             }
         };
     }
+
 }

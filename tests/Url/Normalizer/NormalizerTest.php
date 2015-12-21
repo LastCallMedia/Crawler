@@ -1,14 +1,11 @@
 <?php
 
-namespace LastCall\Crawler\Test\Url;
+
+namespace LastCall\Crawler\Test\Url\Normalizer;
+
 
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Url\ArrayMap;
-use LastCall\Crawler\Url\MapNormalizerPass;
 use LastCall\Crawler\Url\Normalizer;
-use LastCall\Crawler\Url\StripFragmentNormalizerPass;
-use LastCall\Crawler\Url\StripSSLNormalizerPass;
-use LastCall\Crawler\Url\StripTrailingSlashNormalizerPass;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,13 +27,15 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testCallsNormalizers()
     {
-        $normalizer = new Normalizer();
-        $success = 0;
-        $normalizer->push(function () use (&$success) {
-            $success++;
-        });
+        $success = false;
+        $normalizer = new Normalizer([
+            function () use (&$success) {
+                $success = true;
+            }
+        ]);
+
         $normalizer->normalize('http://foo.com');
-        $this->assertEquals(1, $success);
+        $this->assertTrue($success);
     }
 
     /**
@@ -190,4 +189,5 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
         $this->assertEquals($expected, (string)$url);
     }
+
 }

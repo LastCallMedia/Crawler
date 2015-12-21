@@ -7,7 +7,6 @@ use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
-use LastCall\Crawler\Url\URLHandler;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

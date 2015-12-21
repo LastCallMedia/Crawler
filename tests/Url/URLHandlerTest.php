@@ -3,6 +3,8 @@
 namespace LastCall\Crawler\Test\Url;
 
 use LastCall\Crawler\Url\CachedUrlHandler;
+use LastCall\Crawler\Url\Matcher;
+use LastCall\Crawler\Url\NormalizerInterface;
 use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Prophecy\Prediction\CallPrediction;
@@ -102,7 +104,7 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalize($base, $current, $toProcess, $expected)
     {
-        $normalizer = $this->prophesize('LastCall\Crawler\Url\Normalizer');
+        $normalizer = $this->prophesize(NormalizerInterface::class);
         $normalizer->normalize(Argument::any())
             ->should(new CallPrediction())
             ->will(new ReturnArgumentPromise());
@@ -120,7 +122,7 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
         $toProcess,
         $expected
     ) {
-        $normalizer = $this->prophesize('LastCall\Crawler\Url\Normalizer');
+        $normalizer = $this->prophesize(NormalizerInterface::class);
         $normalizer->normalize(Argument::any())
             ->should(new CallPrediction())
             ->will(new ReturnArgumentPromise());
@@ -132,13 +134,10 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testIncludesUrl()
     {
-        $matcher = $this->prophesize('LastCall\Crawler\Url\Matcher');
-        $matcher->matchesInclude('http://google.com')
-            ->should(new CallPrediction())
+        $matcher = $this->prophesize(Matcher::class);
+        $matcher->matches('http://google.com')
+            ->shouldBeCalled()
             ->willReturn(true);
-        $matcher->matchesExclude('http://google.com')
-            ->should(new CallPrediction())
-            ->willReturn(false);
         $handler = new URLHandler('http://google.com', null,
             $matcher->reveal());
         $this->assertEquals(true, $handler->includesUrl('http://google.com'));
@@ -146,9 +145,9 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCrawl()
     {
-        $matcher = $this->prophesize('LastCall\Crawler\Url\Matcher');
-        $matcher->matchesHTML('http://google.com')
-            ->should(new CallPrediction())
+        $matcher = $this->prophesize(Matcher::class);
+        $matcher->matchesHtml('http://google.com')
+            ->shouldBeCalled()
             ->willReturn(true);
         $handler = new URLHandler('http://example.com', null,
             $matcher->reveal());
@@ -157,9 +156,9 @@ class URLHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFile()
     {
-        $matcher = $this->prophesize('LastCall\Crawler\Url\Matcher');
+        $matcher = $this->prophesize(Matcher::class);
         $matcher->matchesFile('http://google.com/test.txt')
-            ->should(new CallPrediction())
+            ->shouldBeCalled()
             ->willReturn(true);
         $handler = new URLHandler('http://example.com', null,
             $matcher->reveal());

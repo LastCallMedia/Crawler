@@ -37,8 +37,8 @@ class URLHandler
     public function __construct(
         $baseUrl,
         $currentUrl = null,
-        Matcher $matcher = null,
-        Normalizer $normalizer = null
+        MatcherInterface $matcher = null,
+        NormalizerInterface $normalizer = null
     ) {
         $this->baseUrl = static::uriFor($baseUrl);
         $this->currentUrl = static::uriFor($currentUrl ? $currentUrl : $baseUrl);
@@ -95,8 +95,7 @@ class URLHandler
      */
     public function includesUrl($url)
     {
-        $_url = (string)$url; // Cast to a string here to avoid doing it 2x.
-        return $this->matcher->matchesInclude($_url) && !$this->matcher->matchesExclude($_url);
+        return $this->matcher->matches($url);
     }
 
     /**
@@ -122,7 +121,7 @@ class URLHandler
      */
     public function isCrawlable($url)
     {
-        return $this->matcher->matchesHTML($url);
+        return $this->matcher->matchesHtml($url);
     }
 
     /**

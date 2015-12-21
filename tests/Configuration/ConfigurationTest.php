@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Test\Configuration;
 use GuzzleHttp\Client;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Queue\RequestQueueInterface;
-use LastCall\Crawler\Url\URLHandler;
 use Prophecy\Argument;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;

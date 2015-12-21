@@ -1,13 +1,11 @@
 <?php
 
+
 namespace LastCall\Crawler\Url;
 
-/**
- * Handles path matching for discovered URLs.
- */
-class Matcher
-{
 
+class Matcher implements MatcherInterface
+{
     private $patterns = [
         'include' => [],
         'exclude' => [],
@@ -31,44 +29,28 @@ class Matcher
     private $compiled = [];
 
     public function __construct(
-        array $includePatterns = null,
-        array $excludePatterns = null,
+        array $includePatterns = [],
+        array $excludePatterns = [],
         array $htmlPatterns = null,
         array $filePatterns = null
     ) {
-        if (isset($includePatterns)) {
-            $this->patterns['include'] = $includePatterns;
-        }
-        if (isset($excludePatterns)) {
-            $this->patterns['exclude'] = $excludePatterns;
+        $this->patterns['include'] = $includePatterns;
+        $this->patterns['exclude'] = $excludePatterns;
+        if (isset($filePatterns)) {
+            $this->patterns['file'] = $filePatterns;
         }
         if (isset($htmlPatterns)) {
             $this->patterns['html'] = $htmlPatterns;
         }
-        if (isset($filePatterns)) {
-            $this->patterns['file'] = $filePatterns;
-        }
     }
 
-    public function addInclusionPattern($pattern)
+    public function matches($uri)
     {
-        $this->addPattern('include', $pattern);
-    }
+        // Cast to a string here so we don't have to do it 2x.
+        $uri = (string)$uri;
 
-    private function addPattern($type, $pattern)
-    {
-        $this->patterns[$type][] = $pattern;
-        $this->compiled[$type] = null;
-    }
-
-    public function addExclusionPattern($pattern)
-    {
-        $this->addPattern('exclude', $pattern);
-    }
-
-    public function matchesInclude($url)
-    {
-        return $this->matchesPattern('include', $url, true);
+        return $this->matchesPattern('include', $uri,
+            true) && !$this->matchesPattern('exclude', $uri, false);
     }
 
     private function matchesPattern($type, $value, $default)
@@ -98,14 +80,9 @@ class Matcher
         return $this->compiled[$type];
     }
 
-    public function matchesExclude($url)
+    public function matchesFile($uri)
     {
-        return $this->matchesPattern('exclude', $url, false);
-    }
-
-    public function matchesFile($url)
-    {
-        return $this->extensionMatchesPattern('file', $url, false);
+        return $this->extensionMatchesPattern('file', $uri, false);
     }
 
     private function extensionMatchesPattern($type, $url, $default)
@@ -119,9 +96,9 @@ class Matcher
         return $default;
     }
 
-    public function matchesHTML($url)
+    public function matchesHtml($uri)
     {
-        return $this->extensionMatchesPattern('html', $url, true);
+        return $this->extensionMatchesPattern('html', $uri, true);
     }
 
 }
