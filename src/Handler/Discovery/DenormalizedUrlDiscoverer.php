@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Url\TraceableUri;
+use LastCall\Crawler\Uri\TraceableUri;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

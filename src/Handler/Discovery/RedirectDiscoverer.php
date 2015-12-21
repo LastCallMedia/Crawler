@@ -9,8 +9,8 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Url\MatcherInterface;
-use LastCall\Crawler\Url\NormalizerInterface;
+use LastCall\Crawler\Uri\MatcherInterface;
+use LastCall\Crawler\Uri\NormalizerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -21,11 +21,11 @@ class RedirectDiscoverer implements EventSubscriberInterface
     use RedirectDetectionTrait;
 
     /**
-     * @var \LastCall\Crawler\Url\MatcherInterface
+     * @var \LastCall\Crawler\Uri\MatcherInterface
      */
     private $matcher;
     /**
-     * @var \LastCall\Crawler\Url\NormalizerInterface
+     * @var \LastCall\Crawler\Uri\NormalizerInterface
      */
     private $normalizer;
 

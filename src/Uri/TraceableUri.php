@@ -1,6 +1,6 @@
 <?php
 
-namespace LastCall\Crawler\Url;
+namespace LastCall\Crawler\Uri;
 
 use Psr\Http\Message\UriInterface;
 

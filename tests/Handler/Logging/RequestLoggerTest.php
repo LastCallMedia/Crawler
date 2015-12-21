@@ -12,7 +12,7 @@ use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Url\TraceableUri;
+use LastCall\Crawler\Uri\TraceableUri;
 use Psr\Log\LoggerInterface;
 
 class RequestLoggerTest extends \PHPUnit_Framework_TestCase

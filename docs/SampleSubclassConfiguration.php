@@ -3,7 +3,7 @@
 namespace {
 
     use LastCall\Crawler\Configuration\Configuration;
-    use LastCall\Crawler\Url\Normalizer;
+    use LastCall\Crawler\Uri\Normalizer;
     use Psr\Log\NullLogger;
     use Symfony\Component\Console\Logger\ConsoleLogger;
     use Symfony\Component\Console\Output\OutputInterface;

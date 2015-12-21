@@ -1,7 +1,7 @@
 <?php
 
 
-namespace LastCall\Crawler\Url;
+namespace LastCall\Crawler\Uri;
 
 
 interface NormalizerInterface

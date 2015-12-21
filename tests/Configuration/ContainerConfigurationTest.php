@@ -12,7 +12,7 @@ use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Handler\Module\ModuleHandler;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Url\Normalizer;
+use LastCall\Crawler\Uri\Normalizer;
 use Psr\Log\NullLogger;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase

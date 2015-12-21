@@ -10,7 +10,7 @@ use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Discovery\DenormalizedUrlDiscoverer;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Url\TraceableUri;
+use LastCall\Crawler\Uri\TraceableUri;
 
 class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
 {

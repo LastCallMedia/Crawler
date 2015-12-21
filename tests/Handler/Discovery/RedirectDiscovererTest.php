@@ -10,8 +10,8 @@ use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Discovery\RedirectDiscoverer;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Url\Matcher;
-use LastCall\Crawler\Url\Normalizer;
+use LastCall\Crawler\Uri\Matcher;
+use LastCall\Crawler\Uri\Normalizer;
 
 class RedirectDiscovererTest extends \PHPUnit_Framework_TestCase
 {

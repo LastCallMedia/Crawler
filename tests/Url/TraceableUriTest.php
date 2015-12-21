@@ -3,7 +3,7 @@
 namespace LastCall\Crawler\Test\Url;
 
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Url\TraceableUri;
+use LastCall\Crawler\Uri\TraceableUri;
 
 class TraceableUriTest extends \PHPUnit_Framework_TestCase
 {

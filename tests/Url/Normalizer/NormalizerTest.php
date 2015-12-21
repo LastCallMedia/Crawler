@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Test\Url\Normalizer;
 
 
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Url\Normalizer;
+use LastCall\Crawler\Uri\Normalizer;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {

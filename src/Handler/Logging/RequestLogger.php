@@ -8,7 +8,7 @@ use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Url\TraceableUri;
+use LastCall\Crawler\Uri\TraceableUri;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

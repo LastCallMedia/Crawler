@@ -3,8 +3,8 @@
 namespace LastCall\Crawler\Test\Helper;
 
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Helper\InputAwareCrawlerHelper;
 use LastCall\Crawler\Reporter\ReporterInterface;

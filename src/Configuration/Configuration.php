@@ -14,8 +14,8 @@ use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Url\Matcher;
-use LastCall\Crawler\Url\Normalizer;
+use LastCall\Crawler\Uri\Matcher;
+use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 

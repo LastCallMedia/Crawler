@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Test\Url\Matcher;
 
 
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Url\Matcher;
+use LastCall\Crawler\Uri\Matcher;
 
 class MatcherTest extends \PHPUnit_Framework_TestCase
 {
