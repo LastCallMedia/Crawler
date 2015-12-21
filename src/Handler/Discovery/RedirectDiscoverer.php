@@ -20,6 +20,15 @@ class RedirectDiscoverer implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
 
+    /**
+     * @var \LastCall\Crawler\Url\MatcherInterface
+     */
+    private $matcher;
+    /**
+     * @var \LastCall\Crawler\Url\NormalizerInterface
+     */
+    private $normalizer;
+
     public static function getSubscribedEvents()
     {
         return array(
