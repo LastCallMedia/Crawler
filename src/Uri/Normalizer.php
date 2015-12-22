@@ -125,13 +125,20 @@ class Normalizer implements NormalizerInterface
         }
 
         return function (UriInterface $uri) use ($case) {
+
             switch ($case) {
                 case 'lower':
-                    return preg_match('/[A-Z]/',
-                        $uri->getPath()) ? $uri->withPath(mb_strtolower($uri->getPath())) : $uri;
+                    $ret = $uri;
+                    $ret = (empty($ret->getHost()) || ctype_lower($ret->getHost())) ? $ret : $ret->withHost(mb_strtolower($ret->getHost()));
+                    $ret = (empty($ret->getPath()) || ctype_lower($ret->getPath())) ? $ret : $ret->withPath(mb_strtolower($ret->getPath()));
+                    $ret = (empty($ret->getFragment()) || ctype_lower($ret->getFragment())) ? $ret : $ret->withFragment(mb_strtolower($ret->getFragment()));
+                    return $ret;
                 case 'upper':
-                    return preg_match('/[a-z]/',
-                        $uri->getPath()) ? $uri->withPath(mb_strtoupper($uri->getPath())) : $uri;
+                    $ret = $uri;
+                    $ret = (empty($ret->getHost()) || ctype_upper($ret->getHost())) ? $ret : $ret->withHost(mb_strtoupper($ret->getHost()));
+                    $ret = (empty($ret->getPath()) || ctype_upper($ret->getPath())) ? $ret : $ret->withPath(mb_strtoupper($ret->getPath()));
+                    $ret = (empty($ret->getFragment()) || ctype_upper($ret->getFragment())) ? $ret : $ret->withFragment(mb_strtouppers($ret->getFragment()));
+                    return $ret;
             }
         };
     }

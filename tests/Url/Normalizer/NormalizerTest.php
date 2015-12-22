@@ -148,17 +148,22 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             array(
                 'http://google.com',
                 'http://google.com',
-                'http://google.com'
+                'http://GOOGLE.COM'
             ),
             array(
-                'http://google.com/FOO',
+                'http://google.com/foo_bar',
+                'http://google.com/foo_bar',
+                'http://GOOGLE.COM/FOO_BAR'
+            ),
+            array(
+                'httP://Google.com/FOo',
                 'http://google.com/foo',
-                'http://google.com/FOO'
+                'http://GOOGLE.COM/FOO'
             ),
             array(
                 'http://google.com/indEx.html',
                 'http://google.com/index.html',
-                'http://google.com/INDEX.HTML'
+                'http://GOOGLE.COM/INDEX.HTML'
             ),
         );
     }
