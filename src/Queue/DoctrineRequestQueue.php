@@ -56,6 +56,34 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         }
     }
 
+    public function pushMultiple(array $requests)
+    {
+        $return = array_fill_keys(array_keys($requests), FALSE);
+        $keys = array_unique(array_map([$this, 'getKey'], $requests));
+        $requests = array_intersect_key($requests, $keys);
+        $exists = $this->multipleExists($keys);
+        $requests = array_diff_key($requests, array_flip($exists));
+        if(count($requests)) {
+            try {
+                $params = $clauses = [];
+                $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) " .
+                    "VALUES ";
+                foreach($requests as $i => $request) {
+                    $clauses[] = "(0, ?, 1, ?)";
+                    $params[] = $keys[$i];
+                    $params[] = serialize($request);
+                    $return[$i] = TRUE;
+                }
+                $this->connection->executeUpdate($sql . implode(', ', $clauses), $params);
+            }
+            catch(UniqueConstraintViolationException $e) {
+                return $return;
+            }
+        }
+
+        return $return;
+    }
+
     public function pop($leaseTime = 30)
     {
         $conn = $this->connection;
@@ -157,6 +185,12 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
             array(
                 $identifier
             ))->fetchColumn();
+    }
+
+    private function multipleExists(array $identifiers) {
+        return $this->connection->executeQuery("SELECT identifier FROM {$this->table} WHERE identifier IN(?)", [
+          $identifiers
+        ], [Connection::PARAM_INT_ARRAY])->fetchAll();
     }
 
     private function updateIfExistsAndIsPending(

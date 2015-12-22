@@ -25,6 +25,14 @@ interface RequestQueueInterface
     public function push(RequestInterface $request);
 
     /**
+     * Adds multiple requests to the queue.
+     *
+     * @param \Psr\Http\Message\RequestInterface[] $requests
+     * @return array
+     */
+    public function pushMultiple(array $requests);
+
+    /**
      * Retrieve the next request to be processed.
      *
      * @param int $leaseTime The amount of time to hold the request in pending

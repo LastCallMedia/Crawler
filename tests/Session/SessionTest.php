@@ -217,7 +217,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             });
 
         $queue = $this->prophesize(RequestQueueInterface::class);
-        $queue->push($newRequest)->shouldBeCalled();
+        $queue->pushMultiple([$newRequest])->shouldBeCalled();
 
         $session = new Session('https://lastcallmedia.com', $queue->reveal(),
             $dispatcher);

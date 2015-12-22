@@ -128,9 +128,7 @@ class Session implements SessionInterface
     private function dispatch($eventName, CrawlerEvent $event)
     {
         $this->dispatcher->dispatch($eventName, $event);
-        foreach ($event->getAdditionalRequests() as $request) {
-            $this->queue->push($request);
-        }
+        $this->queue->pushMultiple($event->getAdditionalRequests());
     }
 
     public function onRequestSending(RequestInterface $request)

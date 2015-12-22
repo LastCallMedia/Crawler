@@ -26,6 +26,19 @@ class ArrayRequestQueue implements RequestQueueInterface
         return false;
     }
 
+    public function pushMultiple(array $requests)
+    {
+        $return = array_fill_keys(array_keys($requests), FALSE);
+        $keys = array_unique(array_map([$this, 'getKey'], $requests));
+        foreach($keys as $i => $key) {
+            if (!isset($this->incomplete[$key]) && !isset($this->pending[$key]) && !isset($this->complete[$key])) {
+                $this->incomplete[$key] = $requests[$i];
+                $return[$i] = TRUE;
+            }
+        }
+        return $return;
+    }
+
     private function getKey(RequestInterface $request)
     {
         return $request->getMethod() . $request->getUri();

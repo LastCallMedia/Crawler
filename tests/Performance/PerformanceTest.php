@@ -126,8 +126,35 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/a/' . $i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/b/' . $i));
+        }
+        $stopwatch->stop('queue');
+        if ($queue instanceof SetupTeardownInterface) {
+            $queue->onTeardown();
+        }
+        $event = $stopwatch->getEvent('queue');
+        $this->logDataPoint($event);
+    }
+
+    /**
+     * @dataProvider getQueues
+     */
+    public function testQueuePushMultiple(RequestQueueInterface $queue) {
+        if ($queue instanceof SetupTeardownInterface) {
+            $queue->onSetup();
+        }
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('queue', get_class($queue) . '::pushMultiple()');
+        for ($i = 0; $i < 1000; $i++) {
+            $requests = array();
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/a/' . $i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/b/' . $i);
+            $queue->pushMultiple($requests);
         }
         $stopwatch->stop('queue');
         if ($queue instanceof SetupTeardownInterface) {
