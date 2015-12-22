@@ -38,7 +38,7 @@ trait QueueTestTrait
         $request = $this->getRequest();
         $request2 = $this->getRequest(1);
         $queue = $this->getQueue();
-        
+
         $assert->assertEquals([true, false, true], $queue->pushMultiple([$request, $request, $request2]));
         $assert->assertEquals([false], $queue->pushMultiple([$request]));
         $assert->assertEquals(2, $queue->count());
