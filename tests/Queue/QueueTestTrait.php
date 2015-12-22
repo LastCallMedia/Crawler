@@ -36,11 +36,14 @@ trait QueueTestTrait
     public function testPushMultiple() {
         $assert = $this->getAssert();
         $request = $this->getRequest();
-        $reqest2 = $this->getRequest(1);
+        $request2 = $this->getRequest(1);
         $queue = $this->getQueue();
-
-        $assert->assertEquals([true, false, true], $queue->pushMultiple([$request, $request, $reqest2]));
+        
+        $assert->assertEquals([true, false, true], $queue->pushMultiple([$request, $request, $request2]));
+        $assert->assertEquals([false], $queue->pushMultiple([$request]));
         $assert->assertEquals(2, $queue->count());
+        $assert->assertEquals('https://lastcallmedia.com', (string)$queue->pop()->getUri());
+        $assert->assertEquals('https://lastcallmedia.com1', (string)$queue->pop()->getUri());
     }
 
     public function testPop()

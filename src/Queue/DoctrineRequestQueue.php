@@ -62,7 +62,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $keys = array_unique(array_map([$this, 'getKey'], $requests));
         $requests = array_intersect_key($requests, $keys);
         $exists = $this->multipleExists($keys);
-        $requests = array_diff_key($requests, array_flip($exists));
+        $requests = array_diff_key($requests, $exists);
         if(count($requests)) {
             try {
                 $params = $clauses = [];
@@ -188,9 +188,14 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     }
 
     private function multipleExists(array $identifiers) {
-        return $this->connection->executeQuery("SELECT identifier FROM {$this->table} WHERE identifier IN(?)", [
-          $identifiers
-        ], [Connection::PARAM_INT_ARRAY])->fetchAll();
+        $conn = $this->connection;
+        $sql = "SELECT identifier FROM {$this->table} WHERE identifier IN(?)";
+        $existing = $conn->executeQuery($sql, [$identifiers],
+            [Connection::PARAM_STR_ARRAY])
+            ->fetchAll(\PDO::FETCH_COLUMN);
+
+        // Re-key the identifiers using the same scheme that was passed in.
+        return array_intersect($identifiers, $existing);
     }
 
     private function updateIfExistsAndIsPending(
