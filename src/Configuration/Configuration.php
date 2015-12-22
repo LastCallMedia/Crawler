@@ -57,7 +57,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return $subscribers;
         };
         $this['matcher'] = function () {
-            return new Matcher([$this['baseUrl']]);
+            return new Matcher(['^' . $this['baseUrl']]);
         };
         $this['normalizer'] = function () {
             return new Normalizer($this['normalizers']);
