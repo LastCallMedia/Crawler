@@ -1,26 +1,26 @@
 <?php
 
 
-namespace LastCall\Crawler\Module\Processor;
+namespace LastCall\Crawler\Fragment\Processor;
 
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Module\ModuleSubscription;
+use LastCall\Crawler\Fragment\FragmentSubscription;
 use LastCall\Crawler\Uri\MatcherInterface;
 use LastCall\Crawler\Uri\NormalizerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
-class LinkProcessor implements ModuleProcessorInterface
+class LinkProcessor implements FragmentProcessorInterface
 {
 
     public function getSubscribedMethods()
     {
         return [
-            new ModuleSubscription($this, 'xpath',
+            new FragmentSubscription($this, 'xpath',
                 'descendant-or-self::a[@href]', 'processLinks')
         ];
     }

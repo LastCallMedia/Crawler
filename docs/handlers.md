@@ -40,7 +40,7 @@ Logging:
 
 Modules:
 
-* [ModuleHandler](../src/Handler/Module/ModuleHandler.php)
+* [FragmentHandler](../src/Handler/Module/FragmentHandler.php)
 
 Discovery:
 
@@ -51,7 +51,7 @@ Reporting
 
 * [CrawlerStatusReporter](../src/Handler/Reporting/CrawlerStatusReporter.php)
 
-The ModuleHandler also allows for additional processing to be done on subtrees of a page.  For example, the [LinkProcessor](../src/Module/Processor/LinkProcessor.php) hooks into the ModuleHandler to parse and re-add links.
+The FragmentHandler also allows for additional processing to be done on subtrees of a page.  For example, the [LinkProcessor](../src/Module/Processor/LinkProcessor.php) hooks into the FragmentHandler to parse and re-add links.
 
 Creating Handlers
 -----------------

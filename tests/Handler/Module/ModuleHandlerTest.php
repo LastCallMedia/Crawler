@@ -8,9 +8,9 @@ use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Handler\Module\ModuleHandler;
-use LastCall\Crawler\Module\Parser\XPathParser;
-use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Fragment\Parser\XPathParser;
+use LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface;
+use LastCall\Crawler\Handler\Fragment\FragmentHandler;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Test\Resources\DummyProcessor;
 use Prophecy\Argument;
@@ -26,9 +26,9 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testChecksForValidSubscriptionArray()
     {
-        $processor = $this->prophesize(ModuleProcessorInterface::class);
+        $processor = $this->prophesize(FragmentProcessorInterface::class);
         $processor->getSubscribedMethods()->willReturn(false);
-        new \LastCall\Crawler\Handler\Module\ModuleHandler([],
+        new \LastCall\Crawler\Handler\Fragment\FragmentHandler([],
             [$processor->reveal()]);
     }
 
@@ -38,9 +38,9 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testChecksForValidSubscription()
     {
-        $processor = $this->prophesize(ModuleProcessorInterface::class);
+        $processor = $this->prophesize(FragmentProcessorInterface::class);
         $processor->getSubscribedMethods()->willReturn([false]);
-        new \LastCall\Crawler\Handler\Module\ModuleHandler([],
+        new \LastCall\Crawler\Handler\Fragment\FragmentHandler([],
             [$processor->reveal()]);
     }
 
@@ -51,7 +51,8 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     public function testChecksForSetSubscriptionParser()
     {
         $processor = new DummyProcessor(null, null);
-        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor]);
+        new \LastCall\Crawler\Handler\Fragment\FragmentHandler([],
+            [$processor]);
     }
 
     /**
@@ -61,7 +62,8 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
     public function testChecksForValidParser()
     {
         $processor = new DummyProcessor('foo', 'bar');
-        new \LastCall\Crawler\Handler\Module\ModuleHandler([], [$processor]);
+        new \LastCall\Crawler\Handler\Fragment\FragmentHandler([],
+            [$processor]);
     }
 
     public function testCallsParsersAndSubscribers()
@@ -69,7 +71,7 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
         $processor = new DummyProcessor('xpath', 'descendant-or-self::a');
         $parser = new XPathParser();
 
-        $handler = new \LastCall\Crawler\Handler\Module\ModuleHandler([$parser],
+        $handler = new \LastCall\Crawler\Handler\Fragment\FragmentHandler([$parser],
             [$processor]);
 
         $html = '<html><a>Foo</a></html>';
@@ -86,23 +88,23 @@ class ModuleHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCallsSetup()
     {
-        $processor = $this->prophesize(ModuleProcessorInterface::class);
+        $processor = $this->prophesize(FragmentProcessorInterface::class);
         $processor->willImplement(SetupTeardownInterface::class);
         $processor->getSubscribedMethods()->willReturn([]);
         $processor->onSetup()->shouldBeCalled();
 
-        $handler = new ModuleHandler([], [$processor->reveal()]);
+        $handler = new FragmentHandler([], [$processor->reveal()]);
         $handler->onSetup();
     }
 
     public function testCallsTeardown()
     {
-        $processor = $this->prophesize(ModuleProcessorInterface::class);
+        $processor = $this->prophesize(FragmentProcessorInterface::class);
         $processor->willImplement(SetupTeardownInterface::class);
         $processor->getSubscribedMethods()->willReturn([]);
         $processor->onTeardown()->shouldBeCalled();
 
-        $handler = new ModuleHandler([], [$processor->reveal()]);
+        $handler = new FragmentHandler([], [$processor->reveal()]);
         $handler->onTeardown();
     }
 }

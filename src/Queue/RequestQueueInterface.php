@@ -28,6 +28,7 @@ interface RequestQueueInterface
      * Adds multiple requests to the queue.
      *
      * @param \Psr\Http\Message\RequestInterface[] $requests
+     *
      * @return array
      */
     public function pushMultiple(array $requests);

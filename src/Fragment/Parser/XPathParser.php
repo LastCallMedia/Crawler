@@ -1,24 +1,24 @@
 <?php
 
 
-namespace LastCall\Crawler\Module\Parser;
+namespace LastCall\Crawler\Fragment\Parser;
 
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
-class XPathParser implements ModuleParserInterface
+class XPathParser implements FragmentParserInterface
 {
     public function getId()
     {
         return 'xpath';
     }
 
-    public function parseResponse(ResponseInterface $response)
+    public function prepareResponse(ResponseInterface $response)
     {
         return new DomCrawler((string)$response->getBody());
     }
 
-    public function parseNodes($node, $selector)
+    public function parseFragments($node, $selector)
     {
         return $node->filterXPath($selector);
     }

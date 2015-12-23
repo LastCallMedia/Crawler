@@ -58,25 +58,24 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
 
     public function pushMultiple(array $requests)
     {
-        $return = array_fill_keys(array_keys($requests), FALSE);
+        $return = array_fill_keys(array_keys($requests), false);
         $keys = array_unique(array_map([$this, 'getKey'], $requests));
         $requests = array_intersect_key($requests, $keys);
         $exists = $this->multipleExists($keys);
         $requests = array_diff_key($requests, $exists);
-        if(count($requests)) {
+        if (count($requests)) {
             try {
                 $params = $clauses = [];
-                $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) " .
-                    "VALUES ";
-                foreach($requests as $i => $request) {
+                $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) " . "VALUES ";
+                foreach ($requests as $i => $request) {
                     $clauses[] = "(0, ?, 1, ?)";
                     $params[] = $keys[$i];
                     $params[] = serialize($request);
-                    $return[$i] = TRUE;
+                    $return[$i] = true;
                 }
-                $this->connection->executeUpdate($sql . implode(', ', $clauses), $params);
-            }
-            catch(UniqueConstraintViolationException $e) {
+                $this->connection->executeUpdate($sql . implode(', ', $clauses),
+                    $params);
+            } catch (UniqueConstraintViolationException $e) {
                 return $return;
             }
         }
@@ -187,12 +186,12 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
             ))->fetchColumn();
     }
 
-    private function multipleExists(array $identifiers) {
+    private function multipleExists(array $identifiers)
+    {
         $conn = $this->connection;
         $sql = "SELECT identifier FROM {$this->table} WHERE identifier IN(?)";
         $existing = $conn->executeQuery($sql, [$identifiers],
-            [Connection::PARAM_STR_ARRAY])
-            ->fetchAll(\PDO::FETCH_COLUMN);
+            [Connection::PARAM_STR_ARRAY])->fetchAll(\PDO::FETCH_COLUMN);
 
         // Re-key the identifiers using the same scheme that was passed in.
         return array_intersect($identifiers, $existing);

@@ -4,10 +4,10 @@
 namespace LastCall\Crawler\Test\Resources;
 
 
-use LastCall\Crawler\Module\ModuleSubscription;
-use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Fragment\FragmentSubscription;
+use LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface;
 
-class DummyProcessor implements ModuleProcessorInterface
+class DummyProcessor implements FragmentProcessorInterface
 {
     private $subscriptions = [];
 
@@ -15,7 +15,7 @@ class DummyProcessor implements ModuleProcessorInterface
 
     public function __construct($parserId, $selector)
     {
-        $this->subscriptions[] = new ModuleSubscription($this, $parserId,
+        $this->subscriptions[] = new FragmentSubscription($this, $parserId,
             $selector, 'dummyMethod');
     }
 

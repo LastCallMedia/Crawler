@@ -14,10 +14,14 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
 {
-    public function getNormalizerPasses() {
+    public function getNormalizerPasses()
+    {
         return [
             [Normalizer::normalizeCase(), 'Normalizer::normalizeCase()'],
-            [Normalizer::preferredDomainMap(['lastcallmedia.com' => 'foo.com']), 'Normalizer::preferredDomainMap()'],
+            [
+                Normalizer::preferredDomainMap(['lastcallmedia.com' => 'foo.com']),
+                'Normalizer::preferredDomainMap()'
+            ],
             [Normalizer::stripFragment(), 'Normalizer::stripFragment()']
         ];
     }
@@ -25,7 +29,8 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getNormalizerPasses
      */
-    public function testNormalization(callable $fn, $name) {
+    public function testNormalization(callable $fn, $name)
+    {
         $uris = [
             new Uri('https://lastcallmedia.com/index.html'),
             new Uri('https://LastCallMedia.com/foo'),
@@ -33,8 +38,8 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
         ];
         $stopwatch = new Stopwatch();
         $stopwatch->start('normalizer', $name);
-        for($i = 0; $i < 5000; $i++) {
-            foreach($uris as $uri) {
+        for ($i = 0; $i < 5000; $i++) {
+            foreach ($uris as $uri) {
                 $fn($uri);
             }
         }

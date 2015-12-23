@@ -10,7 +10,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
@@ -22,7 +21,6 @@ use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
-use LastCall\Crawler\Uri\Normalizer;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -128,8 +126,10 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
             $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/a/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/b/' . $i));
+            $queue->push(new Request('GET',
+                'https://lastcallmedia.com/a/' . $i));
+            $queue->push(new Request('GET',
+                'https://lastcallmedia.com/b/' . $i));
         }
         $stopwatch->stop('queue');
         if ($queue instanceof SetupTeardownInterface) {
@@ -142,7 +142,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getQueues
      */
-    public function testQueuePushMultiple(RequestQueueInterface $queue) {
+    public function testQueuePushMultiple(RequestQueueInterface $queue)
+    {
         if ($queue instanceof SetupTeardownInterface) {
             $queue->onSetup();
         }
@@ -154,8 +155,10 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
             $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
             $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/a/' . $i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/b/' . $i);
+            $requests[] = new Request('GET',
+                'https://lastcallmedia.com/a/' . $i);
+            $requests[] = new Request('GET',
+                'https://lastcallmedia.com/b/' . $i);
             $queue->pushMultiple($requests);
         }
         $stopwatch->stop('queue');

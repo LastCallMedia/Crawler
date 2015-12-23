@@ -7,9 +7,9 @@ namespace LastCall\Crawler\Test\Configuration;
 use Doctrine\DBAL\DriverManager;
 use GuzzleHttp\ClientInterface;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Handler\Fragment\FragmentHandler;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
-use LastCall\Crawler\Handler\Module\ModuleHandler;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Uri\Normalizer;
@@ -87,7 +87,7 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $subscribers = $config->getSubscribers();
         $this->assertCount(1, $subscribers);
-        $this->assertInstanceOf(ModuleHandler::class,
+        $this->assertInstanceOf(FragmentHandler::class,
             $subscribers['moduleHandler']);
     }
 

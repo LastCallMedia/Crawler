@@ -1,22 +1,22 @@
 <?php
 
 
-namespace LastCall\Crawler\Handler\Module;
+namespace LastCall\Crawler\Handler\Fragment;
 
 
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Module\ModuleSubscription;
-use LastCall\Crawler\Module\Parser\ModuleParserInterface;
-use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Fragment\FragmentSubscription;
+use LastCall\Crawler\Fragment\Parser\FragmentParserInterface;
+use LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Delegates parsing and processing of subsections (modules)
  * of the response.
  */
-class ModuleHandler implements EventSubscriberInterface
+class FragmentHandler implements EventSubscriberInterface
 {
 
     /**
@@ -32,23 +32,23 @@ class ModuleHandler implements EventSubscriberInterface
     }
 
     /**
-     * @var \LastCall\Crawler\Module\Parser\ModuleParserInterface[]
+     * @var \LastCall\Crawler\Fragment\Parser\FragmentParserInterface[]
      */
     private $parsers = [];
 
     /**
-     * @var \LastCall\Crawler\Module\Processor\ModuleProcessorInterface[]
+     * @var \LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface[]
      */
     private $processors = [];
 
     /**
-     * @var \LastCall\Crawler\Module\ModuleSubscription[]
+     * @var \LastCall\Crawler\Fragment\FragmentSubscription[]
      */
     private $subscribed = [];
 
 
     /**
-     * ModuleHandler constructor.
+     * FragmentHandler constructor.
      *
      * @param array $parsers
      * @param array $processors
@@ -66,9 +66,9 @@ class ModuleHandler implements EventSubscriberInterface
     /**
      * Add a parser to the handler.
      *
-     * @param \LastCall\Crawler\Module\Parser\ModuleParserInterface $parser
+     * @param \LastCall\Crawler\Fragment\Parser\FragmentParserInterface $parser
      */
-    public function addParser(ModuleParserInterface $parser)
+    public function addParser(FragmentParserInterface $parser)
     {
         $this->parsers[$parser->getId()] = $parser;
     }
@@ -76,9 +76,9 @@ class ModuleHandler implements EventSubscriberInterface
     /**
      * Add a processor to the handler.
      *
-     * @param \LastCall\Crawler\Module\Processor\ModuleProcessorInterface $processor
+     * @param \LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface $processor
      */
-    public function addProcessor(ModuleProcessorInterface $processor)
+    public function addProcessor(FragmentProcessorInterface $processor)
     {
         $this->processors[] = $processor;
         $this->subscribed = array_merge($this->subscribed,
@@ -86,11 +86,11 @@ class ModuleHandler implements EventSubscriberInterface
     }
 
     /**
-     * @param \LastCall\Crawler\Module\Processor\ModuleProcessorInterface $processor
+     * @param \LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface $processor
      *
-     * @return \LastCall\Crawler\Module\ModuleSubscription[]
+     * @return \LastCall\Crawler\Fragment\FragmentSubscription[]
      */
-    private function getSubscribedMethods(ModuleProcessorInterface $processor)
+    private function getSubscribedMethods(FragmentProcessorInterface $processor)
     {
         $methods = $processor->getSubscribedMethods();
         if (!is_array($methods)) {
@@ -98,7 +98,7 @@ class ModuleHandler implements EventSubscriberInterface
                 get_class($processor)));
         }
         foreach ($methods as $method) {
-            if (!$method instanceof ModuleSubscription) {
+            if (!$method instanceof FragmentSubscription) {
                 throw new \InvalidArgumentException('Invalid module subscription');
             }
             if (!$method->getParserId()) {
@@ -127,7 +127,7 @@ class ModuleHandler implements EventSubscriberInterface
     /**
      * @param $parserId
      *
-     * @return \LastCall\Crawler\Module\Parser\ModuleParserInterface
+     * @return \LastCall\Crawler\Fragment\Parser\FragmentParserInterface
      */
     private function getParser($parserId)
     {
@@ -161,9 +161,9 @@ class ModuleHandler implements EventSubscriberInterface
 
         foreach ($this->getSubscribersGrouped() as $parserId => $parserSubscriptions) {
             $parser = $this->getParser($parserId);
-            $node = $parser->parseResponse($event->getResponse());
+            $node = $parser->prepareResponse($event->getResponse());
             foreach ($parserSubscriptions as $selector => $subscriptions) {
-                $fragments = $parser->parseNodes($node, $selector);
+                $fragments = $parser->parseFragments($node, $selector);
                 foreach ($subscriptions as $subscription) {
                     $callable = $subscription->getCallable();
                     $callable($event, $fragments);

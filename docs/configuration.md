@@ -16,16 +16,16 @@ use LastCall\Crawler\Configuration\Configuration;
 $config = new Configuration();
 ```
 
-If you're crawling an HTML site, you'll need to add a Processor to collect links and add them back into the queue.  This snippet creates a new `ModuleHandler`, and adds a `Parser` and a `Processor`.  Modules are just units of content that are broken out of the original response.  Here, the `LinkProcessor` uses the `XPathParser` to break link tags out of the content.  The `LinkProcessor` knows how to add the discovered URLs back into the queue for processing.
+If you're crawling an HTML site, you'll need to add a Processor to collect links and add them back into the queue.  This snippet creates a new `FragmentHandler`, and adds a `Parser` and a `Processor`.  Modules are just units of content that are broken out of the original response.  Here, the `LinkProcessor` uses the `XPathParser` to break link tags out of the content.  The `LinkProcessor` knows how to add the discovered URLs back into the queue for processing.
 
 ```php
-use LastCall\Crawler\Handler\Module\ModuleHandler;
+use LastCall\Crawler\Handler\Module\FragmentHandler;
 use LastCall\Crawler\Module\Parser\XPathParser;
 use LastCall\Crawler\Module\Processor\LinkProcessor;
 
 include_once __DIR__ .'/vendor/autoload.php';
 
-$moduleHandler = new ModuleHandler();
+$moduleHandler = new FragmentHandler();
 $moduleHandler->addParser(new XPathParser());
 $moduleHandler->addProcessor(new LinkProcessor());
 

@@ -6,12 +6,12 @@ namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
 use LastCall\Crawler\Common\OutputAwareInterface;
+use LastCall\Crawler\Fragment\Parser\CSSSelectorParser;
+use LastCall\Crawler\Fragment\Parser\XPathParser;
+use LastCall\Crawler\Fragment\Processor\LinkProcessor;
+use LastCall\Crawler\Handler\Fragment\FragmentHandler;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
-use LastCall\Crawler\Handler\Module\ModuleHandler;
-use LastCall\Crawler\Module\Parser\CSSSelectorParser;
-use LastCall\Crawler\Module\Parser\XPathParser;
-use LastCall\Crawler\Module\Processor\LinkProcessor;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Uri\Matcher;
@@ -45,7 +45,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         };
         $this['subscribers'] = function () {
             $subscribers = [
-                'moduleHandler' => new ModuleHandler($this['parsers'],
+                'moduleHandler' => new FragmentHandler($this['parsers'],
                     $this['processors'])
             ];
 

@@ -1,16 +1,16 @@
 <?php
 
 
-namespace LastCall\Crawler\Module;
+namespace LastCall\Crawler\Fragment;
 
 
-use LastCall\Crawler\Module\Processor\ModuleProcessorInterface;
+use LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface;
 
 /**
- * ModuleSubscription registers a callback when a named parser
+ * FragmentSubscription registers a callback when a named parser
  * encounters a given selector.
  */
-class ModuleSubscription
+class FragmentSubscription
 {
     private $processor;
     private $parserId;
@@ -18,7 +18,7 @@ class ModuleSubscription
     private $callback;
 
     public function __construct(
-        ModuleProcessorInterface $processor,
+        FragmentProcessorInterface $processor,
         $parserId,
         $selector,
         $callback
