@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Discovery;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
@@ -23,10 +21,10 @@ class DenormalizedUrlDiscoverer implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             CrawlerEvents::SUCCESS => 'onSuccess',
             CrawlerEvents::FAILURE => 'onFailure',
-        );
+        ];
     }
 
     /**
@@ -58,11 +56,11 @@ class DenormalizedUrlDiscoverer implements EventSubscriberInterface
             $location = $response->getHeaderLine('Location');
 
             $request = $event->getRequest();
-            $location = (string)Uri::resolve($request->getUri(), $location);
+            $location = (string) Uri::resolve($request->getUri(), $location);
 
             $uri = $event->getRequest()->getUri();
             while ($uri = $uri->getPrevious()) {
-                if ($location === (string)$uri) {
+                if ($location === (string) $uri) {
                     $newRequest = new Request('GET', $uri);
                     $event->addAdditionalRequest($newRequest);
                 }
@@ -83,5 +81,4 @@ class DenormalizedUrlDiscoverer implements EventSubscriberInterface
             $event->addAdditionalRequest($newRequest);
         }
     }
-
 }

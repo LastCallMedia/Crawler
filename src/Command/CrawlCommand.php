@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Command;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Reporter\ConsoleOutputReporter;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,7 +13,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CrawlCommand extends Command
 {
-
     public function configure()
     {
         if (!$this->getName()) {

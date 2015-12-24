@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Reporter;
-
 
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,11 +26,10 @@ class ConsoleOutputReporter implements ReporterInterface
             $this->indicator->start('Starting');
         }
         $this->indicator->advance();
-        $message = strtr("Crawling {{sent}} sent - {{remaining}} left", [
+        $message = strtr('Crawling {{sent}} sent - {{remaining}} left', [
             '{{sent}}' => $stats['sent'],
-            '{{remaining}}' => $stats['remaining']
+            '{{remaining}}' => $stats['remaining'],
         ]);
         $this->indicator->setMessage($message);
     }
-
 }

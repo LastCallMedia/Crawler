@@ -10,7 +10,6 @@ use Psr\Http\Message\UriInterface;
  */
 class TraceableUri implements UriInterface
 {
-
     protected $inner;
 
     /**
@@ -54,7 +53,7 @@ class TraceableUri implements UriInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getScheme()
     {

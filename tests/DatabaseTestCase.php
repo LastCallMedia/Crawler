@@ -12,7 +12,6 @@ use Pimple\Container;
 
 abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @return \Doctrine\ORM\EntityManager
      */
@@ -29,12 +28,12 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
     protected function getConfiguration()
     {
         $config = new Configuration();
-        $config->setProxyDir(sys_get_temp_dir() . '/phpunit-proxies');
+        $config->setProxyDir(sys_get_temp_dir().'/phpunit-proxies');
         $config->setProxyNamespace('DoctrineProxy');
 
-        $driver = $config->newDefaultAnnotationDriver(array(
-            __DIR__ . '/../../../../src/LastCall/Crawler/RequestQueue',
-        ), false);
+        $driver = $config->newDefaultAnnotationDriver([
+            __DIR__.'/../../../../src/LastCall/Crawler/RequestQueue',
+        ], false);
         $config->setMetadataDriverImpl($driver);
 
         return $config;
@@ -42,10 +41,10 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
 
     protected function getConnection()
     {
-        $connectionParams = array(
+        $connectionParams = [
             'driver' => 'pdo_sqlite',
             'memory' => true,
-        );
+        ];
 
         return DriverManager::getConnection($connectionParams);
     }
@@ -85,7 +84,7 @@ abstract class DatabaseTestCase extends \PHPUnit_Framework_TestCase
         };
 
         return new PimpleManagerRegistry($pimple,
-            array('connection' => 'connection'), array('manager' => 'manager'),
+            ['connection' => 'connection'], ['manager' => 'manager'],
             'connection', 'manager');
     }
 }

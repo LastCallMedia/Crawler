@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Reporting;
-
 
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\CrawlerEvents;
@@ -29,15 +27,15 @@ class CrawlerStatusReporterTest extends \PHPUnit_Framework_TestCase
             [[CrawlerEvents::SENDING, CrawlerEvents::SENDING], ['sent' => 2]],
             [
                 [CrawlerEvents::SENDING, CrawlerEvents::SUCCESS],
-                ['sent' => 1, 'success' => 1]
+                ['sent' => 1, 'success' => 1],
             ],
             [
                 [CrawlerEvents::SENDING, CrawlerEvents::FAILURE],
-                ['sent' => 1, 'failure' => 1]
+                ['sent' => 1, 'failure' => 1],
             ],
             [
                 [CrawlerEvents::SENDING, CrawlerEvents::EXCEPTION],
-                ['sent' => 1, 'exception' => 1]
+                ['sent' => 1, 'exception' => 1],
             ],
         ];
     }
@@ -54,14 +52,13 @@ class CrawlerStatusReporterTest extends \PHPUnit_Framework_TestCase
         foreach ($invocations as $invocation) {
             $this->invokeEvent($handler, $invocation, $event);
         }
-        $stats += array(
+        $stats += [
             'sent' => 0,
             'success' => 0,
             'failure' => 0,
             'exception' => 0,
             'remaining' => 0,
-        );
+        ];
         $target->report($stats)->shouldHaveBeenCalled();
     }
-
 }

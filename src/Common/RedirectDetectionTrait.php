@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Common;
-
 
 use Psr\Http\Message\ResponseInterface;
 
@@ -12,7 +10,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 trait RedirectDetectionTrait
 {
-
     /**
      * Check whether the given response indicates a redirect.
      *
@@ -27,5 +24,4 @@ trait RedirectDetectionTrait
         return in_array($response->getStatusCode(),
             $codes) && $response->hasHeader('Location');
     }
-
 }

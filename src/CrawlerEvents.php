@@ -7,7 +7,6 @@ namespace LastCall\Crawler;
  */
 class CrawlerEvents
 {
-
     /**
      * Request is sending.
      *
@@ -55,5 +54,4 @@ class CrawlerEvents
      * @Event
      */
     const TEARDOWN = 'crawler.teardown';
-
 }

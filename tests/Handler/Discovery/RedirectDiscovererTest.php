@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Discovery;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -33,5 +31,4 @@ class RedirectDiscovererTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $added);
         $this->assertEquals('http://google.com/foo', $added[0]->getUri());
     }
-
 }

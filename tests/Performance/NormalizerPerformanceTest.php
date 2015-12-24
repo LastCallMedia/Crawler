@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Performance;
-
 
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Uri\Normalizer;
@@ -20,9 +18,9 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
             [Normalizer::normalizeCase(), 'Normalizer::normalizeCase()'],
             [
                 Normalizer::preferredDomainMap(['lastcallmedia.com' => 'foo.com']),
-                'Normalizer::preferredDomainMap()'
+                'Normalizer::preferredDomainMap()',
             ],
-            [Normalizer::stripFragment(), 'Normalizer::stripFragment()']
+            [Normalizer::stripFragment(), 'Normalizer::stripFragment()'],
         ];
     }
 
@@ -34,11 +32,11 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
         $uris = [
             new Uri('https://lastcallmedia.com/index.html'),
             new Uri('https://LastCallMedia.com/foo'),
-            new Uri('https://lastcallmedia.com/bar#baz')
+            new Uri('https://lastcallmedia.com/bar#baz'),
         ];
         $stopwatch = new Stopwatch();
         $stopwatch->start('normalizer', $name);
-        for ($i = 0; $i < 5000; $i++) {
+        for ($i = 0; $i < 5000; ++$i) {
             foreach ($uris as $uri) {
                 $fn($uri);
             }
@@ -48,9 +46,8 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
         $this->logDataPoint($event);
     }
 
-
     private function logDataPoint(StopwatchEvent $event)
     {
-        print $event . PHP_EOL;
+        echo $event.PHP_EOL;
     }
 }

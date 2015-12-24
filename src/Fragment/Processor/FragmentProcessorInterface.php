@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LastCall\Crawler\Fragment\Processor;
 
 /**
@@ -8,13 +7,10 @@ namespace LastCall\Crawler\Fragment\Processor;
  */
 interface FragmentProcessorInterface
 {
-
     /**
      * Get a list of the "modules" that this processor subscribes to.
      *
      * @return \LastCall\Crawler\Fragment\FragmentSubscription[]
      */
     public function getSubscribedMethods();
-
-
 }

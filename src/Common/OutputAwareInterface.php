@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Common;
-
 
 use Symfony\Component\Console\Output\OutputInterface;
 

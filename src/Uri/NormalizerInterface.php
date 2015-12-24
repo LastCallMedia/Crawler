@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Uri;
-
 
 interface NormalizerInterface
 {

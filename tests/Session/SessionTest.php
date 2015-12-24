@@ -20,10 +20,8 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCreateFromConfig()
     {
         $subscriber = new RequestLogger(new NullLogger());
@@ -36,7 +34,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $config['queue'] = $queue;
         $config['subscribers'] = [$subscriber];
         $config->addListener(CrawlerEvents::SUCCESS, $listener);
-
 
         $session = Session::createFromConfig($config, $dispatcher);
         $listeners = $dispatcher->getListeners(CrawlerEvents::SUCCESS);
@@ -65,7 +62,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [true, 0],
-            [false, 1]
+            [false, 1],
         ];
     }
 
@@ -97,7 +94,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $queue->push(Argument::that(function (RequestInterface $request) use (
             $expectedadd
         ) {
-            return (string)$request->getUri() === $expectedadd;
+            return (string) $request->getUri() === $expectedadd;
         }))->shouldBeCalled();
         $session = new Session('https://lastcallmedia.com', $queue->reveal());
         $session->init($baseUrl);

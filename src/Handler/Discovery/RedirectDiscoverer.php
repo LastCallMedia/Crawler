@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Discovery;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
@@ -31,9 +29,9 @@ class RedirectDiscoverer implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             CrawlerEvents::SUCCESS => 'onResponse',
-        );
+        ];
     }
 
     public function __construct(
@@ -60,5 +58,4 @@ class RedirectDiscoverer implements EventSubscriberInterface
             }
         }
     }
-
 }

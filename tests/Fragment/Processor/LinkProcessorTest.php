@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Fragment\Processor;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -33,20 +31,19 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function getInputs()
     {
-        $inputs = array(
-            array(
+        $inputs = [
+            [
                 '<html><a href="/foo"></a></html>',
-                ['https://lastcallmedia.com/foo']
-            ),
-            array(
+                ['https://lastcallmedia.com/foo'],
+            ],
+            [
                 '<html><a href="https://lastcallmedia.com/bar">Test</a></html>',
-                ['https://lastcallmedia.com/bar']
-            )
-        );
+                ['https://lastcallmedia.com/bar'],
+            ],
+        ];
 
         return $inputs;
     }
-
 
     /**
      * @dataProvider getInputs
@@ -66,9 +63,8 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 
         $added = [];
         foreach ($event->getAdditionalRequests() as $addedRequest) {
-            $added[] = (string)$addedRequest->getUri();
+            $added[] = (string) $addedRequest->getUri();
         }
         $this->assertEquals($expected, $added);
     }
-
 }

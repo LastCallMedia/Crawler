@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Session;
 
-
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
@@ -19,11 +18,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Concrete implementation of the session.
+ *
  * @see SessionInterface
  */
 class Session implements SessionInterface
 {
-
     /**
      * @var string
      */
@@ -161,6 +160,4 @@ class Session implements SessionInterface
         $event = new CrawlerExceptionEvent($request, $response, $exception);
         $this->dispatch(CrawlerEvents::EXCEPTION, $event);
     }
-
-
 }

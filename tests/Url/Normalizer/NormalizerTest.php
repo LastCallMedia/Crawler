@@ -1,21 +1,18 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Url\Normalizer;
-
 
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Uri\Normalizer;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
-
     public function getTrailingSlashTests()
     {
-        return array(
-            array('http://google.com', 'http://google.com'),
-            array('http://google.com/', 'http://google.com')
-        );
+        return [
+            ['http://google.com', 'http://google.com'],
+            ['http://google.com/', 'http://google.com'],
+        ];
     }
 
     public function testNormalizeReturnsUriObject()
@@ -31,7 +28,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer = new Normalizer([
             function () use (&$success) {
                 $success = true;
-            }
+            },
         ]);
 
         $normalizer->normalize('http://foo.com');
@@ -49,16 +46,16 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function getStripFragmentTests()
     {
-        return array(
-            array(
+        return [
+            [
                 'http://google.com/index.html',
-                'http://google.com/index.html'
-            ),
-            array(
+                'http://google.com/index.html',
+            ],
+            [
                 'http://google.com/index.html#foo',
-                'http://google.com/index.html'
-            ),
-        );
+                'http://google.com/index.html',
+            ],
+        ];
     }
 
     /**
@@ -72,10 +69,10 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function getStripSSLTests()
     {
-        return array(
-            array('http://google.com', 'http://google.com'),
-            array('https://google.com', 'http://google.com'),
-        );
+        return [
+            ['http://google.com', 'http://google.com'],
+            ['https://google.com', 'http://google.com'],
+        ];
     }
 
     /**
@@ -89,11 +86,11 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function getStripIndexTests()
     {
-        return array(
-            array('http://google.com/index.html', 'http://google.com/'),
-            array('http://google.com/', 'http://google.com/'),
-            array('http://google.com/foo', 'http://google.com/foo'),
-        );
+        return [
+            ['http://google.com/index.html', 'http://google.com/'],
+            ['http://google.com/', 'http://google.com/'],
+            ['http://google.com/foo', 'http://google.com/foo'],
+        ];
     }
 
     /**
@@ -107,23 +104,23 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function getPreferredDomainTests()
     {
-        return array(
-            array(
+        return [
+            [
                 'http://google.com',
                 'http://www.google.com',
-                array('google.com' => 'www.google.com')
-            ),
-            array(
+                ['google.com' => 'www.google.com'],
+            ],
+            [
                 'http://www.google.com',
                 'http://www.google.com',
-                array('google.com' => 'www.google.com')
-            ),
-            array(
+                ['google.com' => 'www.google.com'],
+            ],
+            [
                 'http://alta-vista.com',
                 'http://alta-vista.com',
-                array('google.com' => 'www.google.com')
-            ),
-        );
+                ['google.com' => 'www.google.com'],
+            ],
+        ];
     }
 
     /**
@@ -144,28 +141,28 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function getNormalizeCaseTests()
     {
-        return array(
-            array(
+        return [
+            [
                 'http://google.com',
                 'http://google.com',
-                'http://GOOGLE.COM'
-            ),
-            array(
+                'http://GOOGLE.COM',
+            ],
+            [
                 'http://google.com/foo_bar',
                 'http://google.com/foo_bar',
-                'http://GOOGLE.COM/FOO_BAR'
-            ),
-            array(
+                'http://GOOGLE.COM/FOO_BAR',
+            ],
+            [
                 'httP://Google.com/FOo',
                 'http://google.com/foo',
-                'http://GOOGLE.COM/FOO'
-            ),
-            array(
+                'http://GOOGLE.COM/FOO',
+            ],
+            [
                 'http://google.com/indEx.html',
                 'http://google.com/index.html',
-                'http://GOOGLE.COM/INDEX.HTML'
-            ),
-        );
+                'http://GOOGLE.COM/INDEX.HTML',
+            ],
+        ];
     }
 
     /**
@@ -192,7 +189,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     protected function assertUrlEquals($expected, $url)
     {
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
-        $this->assertEquals($expected, (string)$url);
+        $this->assertEquals($expected, (string) $url);
     }
-
 }

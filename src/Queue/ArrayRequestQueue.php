@@ -1,14 +1,11 @@
 <?php
 
-
 namespace LastCall\Crawler\Queue;
-
 
 use Psr\Http\Message\RequestInterface;
 
 class ArrayRequestQueue implements RequestQueueInterface
 {
-
     private $incomplete = [];
     private $pending = [];
     private $complete = [];
@@ -28,7 +25,7 @@ class ArrayRequestQueue implements RequestQueueInterface
 
     private function getKey(RequestInterface $request)
     {
-        return $request->getMethod() . $request->getUri();
+        return $request->getMethod().$request->getUri();
     }
 
     public function pushMultiple(array $requests)
@@ -56,7 +53,7 @@ class ArrayRequestQueue implements RequestQueueInterface
             return $this->pending[$key] = $request;
         }
 
-        return null;
+        return;
     }
 
     private function expire()
@@ -114,7 +111,6 @@ class ArrayRequestQueue implements RequestQueueInterface
                 return count($this->complete);
         }
         throw new \RuntimeException(sprintf('Unexpected status %s',
-            (string)$status));
+            (string) $status));
     }
-
 }

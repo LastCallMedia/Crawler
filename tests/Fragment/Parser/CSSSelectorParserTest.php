@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Fragment\Parser;
-
 
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Fragment\Parser\CSSSelectorParser;
@@ -31,5 +29,4 @@ class CSSSelectorParserTest extends \PHPUnit_Framework_TestCase
         $a = $parser->parseFragments(new DomCrawler($html), 'a');
         $this->assertEquals('Foo', $a->text());
     }
-
 }

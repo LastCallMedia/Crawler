@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Module;
 
 use GuzzleHttp\Psr7\Request;
@@ -13,7 +12,6 @@ use LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface;
 use LastCall\Crawler\Handler\Fragment\FragmentHandler;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use LastCall\Crawler\Test\Resources\DummyProcessor;
-use Prophecy\Argument;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class ModuleHandlerTest extends \PHPUnit_Framework_TestCase

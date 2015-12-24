@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Reporter;
-
 
 interface ReporterInterface
 {
@@ -14,8 +12,6 @@ interface ReporterInterface
      *                     - exception: # of requests that generated an
      *                     exception
      *                     - remaining: # of requests left in the queue
-     *
-     * @return void
      */
     public function report(array $stats);
 }

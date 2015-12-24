@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Uri;
-
 
 interface MatcherInterface
 {
@@ -11,5 +9,4 @@ interface MatcherInterface
     public function matchesFile($uri);
 
     public function matchesHtml($uri);
-
 }

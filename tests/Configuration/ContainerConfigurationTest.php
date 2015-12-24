@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Configuration;
-
 
 use Doctrine\DBAL\DriverManager;
 use GuzzleHttp\ClientInterface;
@@ -17,7 +15,6 @@ use Psr\Log\NullLogger;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
 {
-
     public function getBaseContainer()
     {
         return [[new Configuration('https://lastcallmedia.com')]];
@@ -45,7 +42,6 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
 
         return [[$config]];
     }
-
 
     /**
      * @dataProvider getBaseContainer

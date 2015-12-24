@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Command;
-
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -68,5 +66,4 @@ class SetupTeardownCommand extends Command
             $io->success('Setup complete.');
         }
     }
-
 }

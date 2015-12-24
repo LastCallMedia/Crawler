@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Fragment;
-
 
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
@@ -18,7 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FragmentHandler implements EventSubscriberInterface
 {
-
     /**
      * {@inheritdoc}
      */
@@ -45,7 +42,6 @@ class FragmentHandler implements EventSubscriberInterface
      * @var \LastCall\Crawler\Fragment\FragmentSubscription[]
      */
     private $subscribed = [];
-
 
     /**
      * FragmentHandler constructor.

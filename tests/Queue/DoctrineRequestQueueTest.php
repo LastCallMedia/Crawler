@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Queue;
-
 
 use Doctrine\DBAL\DriverManager;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
@@ -27,6 +25,4 @@ class DoctrineRequestQueueTest extends \PHPUnit_Framework_TestCase
     {
         return $this;
     }
-
-
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Discovery;
 
 use GuzzleHttp\Psr7\Request;
@@ -36,23 +35,23 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
 
     public function getRetryTests()
     {
-        $tests = array();
+        $tests = [];
 
-        $tests[] = array(
+        $tests[] = [
             (new TraceableUri(new Uri('https://lastcallmedia.com/index.html')))->withPath(''),
             'https://lastcallmedia.com/index.html',
-            'https://lastcallmedia.com/index.html'
-        );
-        $tests[] = array(
+            'https://lastcallmedia.com/index.html',
+        ];
+        $tests[] = [
             (new TraceableUri(new Uri('https://lastcallmedia.com/index.html')))->withPath(''),
             'https://lastcallmedia.com/some/other.html',
-            false
-        );
-        $tests[] = array(
+            false,
+        ];
+        $tests[] = [
             (new TraceableUri(new Uri('https://lastcallmedia.com/index.html')))->withPath(''),
             '/index.html',
             'https://lastcallmedia.com/index.html',
-        );
+        ];
 
         return $tests;
     }
@@ -72,10 +71,9 @@ class DenormalizedUrlDiscovererTest extends \PHPUnit_Framework_TestCase
         $added = $event->getAdditionalRequests();
         if ($expected) {
             $this->assertCount(1, $added);
-            $this->assertEquals($expected, (string)$added[0]->getUri());
+            $this->assertEquals($expected, (string) $added[0]->getUri());
         } else {
             $this->assertCount(0, $added);
         }
-
     }
 }

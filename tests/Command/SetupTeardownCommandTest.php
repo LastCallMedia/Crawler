@@ -1,17 +1,12 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Command;
-
 
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Helper\PreloadedCrawlerHelper;
-use Prophecy\Argument;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -57,7 +52,7 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
 
         $command->setHelperSet(new HelperSet([
-            new PreloadedCrawlerHelper($config)
+            new PreloadedCrawlerHelper($config),
         ]));
 
         $tester = new CommandTester($command);
@@ -73,6 +68,4 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
             $this->assertContains('Setup complete', $tester->getDisplay());
         }
     }
-
-
 }

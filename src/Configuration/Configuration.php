@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Configuration;
-
 
 use GuzzleHttp\Client;
 use LastCall\Crawler\Common\OutputAwareInterface;
@@ -27,7 +25,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
     public function __construct($baseUrl = null)
     {
         parent::__construct([
-            'normalizers' => []
+            'normalizers' => [],
         ]);
         $this['baseUrl'] = $baseUrl;
         $this['queue'] = function () {
@@ -46,7 +44,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['subscribers'] = function () {
             $subscribers = [
                 'moduleHandler' => new FragmentHandler($this['parsers'],
-                    $this['processors'])
+                    $this['processors']),
             ];
 
             if (isset($this['logger'])) {
@@ -57,7 +55,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return $subscribers;
         };
         $this['matcher'] = function () {
-            return new Matcher(['^' . $this['baseUrl']]);
+            return new Matcher(['^'.$this['baseUrl']]);
         };
         $this['normalizer'] = function () {
             return new Normalizer($this['normalizers']);
@@ -65,7 +63,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['normalizers'] = [];
         $this['parsers'] = function () {
             $parsers = [
-                'xpath' => new XPathParser()
+                'xpath' => new XPathParser(),
             ];
             if (class_exists('Symfony\Component\CssSelector\CssSelectorConverter')) {
                 $parsers['css'] = new CSSSelectorParser();
@@ -76,7 +74,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['processors'] = function () {
             return [
                 'link' => new LinkProcessor($this['matcher'],
-                    $this['normalizer'])
+                    $this['normalizer']),
             ];
         };
     }

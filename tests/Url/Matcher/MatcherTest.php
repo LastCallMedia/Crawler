@@ -1,15 +1,12 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Url\Matcher;
-
 
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Uri\Matcher;
 
 class MatcherTest extends \PHPUnit_Framework_TestCase
 {
-
     public function getMatchTests()
     {
         return [
@@ -27,7 +24,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = new Matcher([
             'http://google.com',
-            'https://lastcallmedia.com/include'
+            'https://lastcallmedia.com/include',
         ], ['http://google.com/exclude']);
         $this->assertEquals($expected, $matcher->matches($url));
         $this->assertEquals($expected, $matcher->matches(new Uri($url)));
@@ -35,7 +32,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
 
     public function getFileTests()
     {
-        $exts = array(
+        $exts = [
             'pdf',
             'xml',
             'png',
@@ -46,8 +43,8 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
             'jpeg',
             'doc',
             'docx',
-            'txt'
-        );
+            'txt',
+        ];
 
         $tests = [
             ['http://foo.com/test.png?foo=bar', true],
@@ -93,5 +90,4 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $matcher->matchesHTML($uri));
         $this->assertEquals($expected, $matcher->matchesHTML(new Uri($uri)));
     }
-
 }

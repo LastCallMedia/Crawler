@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Fragment\Parser;
-
 
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Fragment\Parser\XPathParser;
@@ -10,7 +8,6 @@ use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class XpathSelectorTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testName()
     {
         $this->assertEquals('xpath', (new XPathParser())->getId());
@@ -33,5 +30,4 @@ class XpathSelectorTest extends \PHPUnit_Framework_TestCase
             'descendant-or-self::a');
         $this->assertEquals('Foo', $a->text());
     }
-
 }

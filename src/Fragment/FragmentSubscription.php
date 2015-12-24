@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Fragment;
-
 
 use LastCall\Crawler\Fragment\Processor\FragmentProcessorInterface;
 

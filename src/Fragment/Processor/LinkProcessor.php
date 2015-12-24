@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Fragment\Processor;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
@@ -16,12 +14,11 @@ use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements FragmentProcessorInterface
 {
-
     public function getSubscribedMethods()
     {
         return [
             new FragmentSubscription($this, 'xpath',
-                'descendant-or-self::a[@href]', 'processLinks')
+                'descendant-or-self::a[@href]', 'processLinks'),
         ];
     }
 

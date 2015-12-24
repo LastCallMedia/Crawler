@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Queue;
-
 
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Queue\RequestQueueInterface;
@@ -21,7 +19,7 @@ trait QueueTestTrait
 
     private function getRequest($suffix = '')
     {
-        return new Request('GET', 'https://lastcallmedia.com' . $suffix);
+        return new Request('GET', 'https://lastcallmedia.com'.$suffix);
     }
 
     public function testPush()
@@ -45,9 +43,9 @@ trait QueueTestTrait
         $assert->assertEquals([false], $queue->pushMultiple([$request]));
         $assert->assertEquals(2, $queue->count());
         $assert->assertEquals('https://lastcallmedia.com',
-            (string)$queue->pop()->getUri());
+            (string) $queue->pop()->getUri());
         $assert->assertEquals('https://lastcallmedia.com1',
-            (string)$queue->pop()->getUri());
+            (string) $queue->pop()->getUri());
     }
 
     public function testPop()
@@ -137,5 +135,4 @@ trait QueueTestTrait
         $queue = $this->getQueue();
         $queue->release(new Request('GET', 'foo'));
     }
-
 }

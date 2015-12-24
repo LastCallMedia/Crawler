@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LastCall\Crawler\Fragment\Parser;
 
 use Psr\Http\Message\ResponseInterface;
@@ -15,7 +14,7 @@ class XPathParser implements FragmentParserInterface
 
     public function prepareResponse(ResponseInterface $response)
     {
-        return new DomCrawler((string)$response->getBody());
+        return new DomCrawler((string) $response->getBody());
     }
 
     public function parseFragments($node, $selector)

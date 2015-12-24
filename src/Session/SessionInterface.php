@@ -11,7 +11,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 interface SessionInterface
 {
-
     /**
      * Prepare the session for crawling.
      *
@@ -36,8 +35,6 @@ interface SessionInterface
      * Add a request to the current session.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     *
-     * @return void
      */
     public function addRequest(RequestInterface $request);
 
@@ -62,8 +59,6 @@ interface SessionInterface
      * Dispatch a request sending event.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     *
-     * @return void
      */
     public function onRequestSending(RequestInterface $request);
 
@@ -72,8 +67,6 @@ interface SessionInterface
      *
      * @param \Psr\Http\Message\RequestInterface  $request
      * @param \Psr\Http\Message\ResponseInterface $response
-     *
-     * @return void
      */
     public function onRequestSuccess(
         RequestInterface $request,
@@ -85,8 +78,6 @@ interface SessionInterface
      *
      * @param \Psr\Http\Message\RequestInterface  $request
      * @param \Psr\Http\Message\ResponseInterface $response
-     *
-     * @return void
      */
     public function onRequestFailure(
         RequestInterface $request,

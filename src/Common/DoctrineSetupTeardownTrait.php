@@ -10,7 +10,6 @@ use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
  */
 trait DoctrineSetupTeardownTrait
 {
-
     public function onSetup()
     {
         $connection = $this->getConnection();
@@ -36,5 +35,4 @@ trait DoctrineSetupTeardownTrait
         $synchronizer = new SingleDatabaseSynchronizer($connection);
         $synchronizer->dropSchema($this->getSchema());
     }
-
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Helper;
-
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
@@ -15,7 +13,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class AbstractCrawlerHelper extends Helper implements CrawlerHelperInterface
 {
-
     public function getName()
     {
         return 'crawler';
@@ -41,5 +38,4 @@ abstract class AbstractCrawlerHelper extends Helper implements CrawlerHelperInte
     ) {
         return new Crawler($session, $config->getClient());
     }
-
 }

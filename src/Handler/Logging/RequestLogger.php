@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Logging;
-
 
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
@@ -41,7 +39,7 @@ class RequestLogger implements EventSubscriberInterface
 
     private function getStatus(CrawlerResponseEvent $event)
     {
-        return (int)$event->getResponse()->getStatusCode();
+        return (int) $event->getResponse()->getStatusCode();
     }
 
     private function getRedirectUri(CrawlerResponseEvent $event)
@@ -56,12 +54,12 @@ class RequestLogger implements EventSubscriberInterface
         if ($uri instanceof TraceableUri && $uri->getNext()) {
             $this->logger->debug(sprintf('Sending %s as a retry for %s', $uri,
                 $uri->getNext()), [
-                'url' => (string)$uri,
-                'retry' => (string)$uri->getNext()
+                'url' => (string) $uri,
+                'retry' => (string) $uri->getNext(),
             ]);
         } else {
             $this->logger->debug(sprintf('Sending %s', $uri), [
-                'url' => (string)$uri
+                'url' => (string) $uri,
             ]);
         }
     }
@@ -75,13 +73,13 @@ class RequestLogger implements EventSubscriberInterface
             $redirectUri = $this->getRedirectUri($event);
             $this->logger->info(sprintf('Received %s redirecting to %s', $uri,
                 $redirectUri), [
-                'url' => (string)$uri,
+                'url' => (string) $uri,
                 'status' => $status,
-                'redirect' => (string)$redirectUri,
+                'redirect' => (string) $redirectUri,
             ]);
         } else {
             $this->logger->debug(sprintf('Received %s', $uri), [
-                'url' => (string)$uri,
+                'url' => (string) $uri,
                 'status' => $status,
             ]);
         }
@@ -92,7 +90,7 @@ class RequestLogger implements EventSubscriberInterface
         $uri = $this->getUri($event);
         $status = $this->getStatus($event);
         $this->logger->warning(sprintf('Failure %s', $uri), [
-            'url' => (string)$uri,
+            'url' => (string) $uri,
             'status' => $status,
         ]);
     }

@@ -2,14 +2,11 @@
 
 namespace LastCall\Crawler\Configuration;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 /**
  * A single crawler configuration.
  */
 interface ConfigurationInterface
 {
-
     /**
      * Get the HTTP client to be used for this configuration.
      *

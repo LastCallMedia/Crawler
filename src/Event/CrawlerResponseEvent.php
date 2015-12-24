@@ -10,7 +10,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class CrawlerResponseEvent extends CrawlerEvent
 {
-
     private $response;
 
     public function __construct(
@@ -25,5 +24,4 @@ class CrawlerResponseEvent extends CrawlerEvent
     {
         return $this->response;
     }
-
 }

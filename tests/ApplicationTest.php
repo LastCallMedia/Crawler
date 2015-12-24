@@ -2,14 +2,12 @@
 
 namespace LastCall\Crawler\Test;
 
-
 use LastCall\Crawler\Application;
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Helper\CrawlerHelperInterface;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testDefaultCommands()
     {
         $application = new Application();

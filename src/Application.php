@@ -11,7 +11,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Crawler application
+ * Crawler application.
  */
 class Application extends BaseApplication
 {
@@ -52,12 +52,11 @@ class Application extends BaseApplication
      */
     public function getDefaultCommands()
     {
-        return array_merge(parent::getDefaultCommands(), array(
+        return array_merge(parent::getDefaultCommands(), [
             new CrawlCommand(),
             SetupTeardownCommand::setup(),
             SetupTeardownCommand::teardown(),
             SetupTeardownCommand::reset(),
-        ));
+        ]);
     }
-
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Reporting;
-
 
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Queue\RequestQueueInterface;
@@ -11,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CrawlerStatusReporter implements EventSubscriberInterface
 {
-
     private $stats = [
         'sent' => 0,
         'success' => 0,
@@ -43,7 +40,7 @@ class CrawlerStatusReporter implements EventSubscriberInterface
      */
     public function __construct(
         RequestQueueInterface $queue,
-        array $targets = array()
+        array $targets = []
     ) {
         $this->queue = $queue;
         foreach ($targets as $target) {
@@ -58,36 +55,35 @@ class CrawlerStatusReporter implements EventSubscriberInterface
 
     public function onSending()
     {
-        $this->stats['sent']++;
+        ++$this->stats['sent'];
         $this->report();
     }
 
     public function onSuccess()
     {
-        $this->stats['success']++;
+        ++$this->stats['success'];
         $this->report();
     }
 
     public function onFailure()
     {
-        $this->stats['failure']++;
+        ++$this->stats['failure'];
         $this->report();
     }
 
     public function onException()
     {
-        $this->stats['exception']++;
+        ++$this->stats['exception'];
         $this->report();
     }
 
     private function report()
     {
         $stats = $this->stats + [
-                'remaining' => $this->queue->count(RequestQueueInterface::FREE)
+                'remaining' => $this->queue->count(RequestQueueInterface::FREE),
             ];
         foreach ($this->targets as $target) {
             $target->report($stats);
         }
     }
-
 }

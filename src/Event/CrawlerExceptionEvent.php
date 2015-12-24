@@ -10,7 +10,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class CrawlerExceptionEvent extends CrawlerEvent
 {
-
     private $exception;
 
     private $response;

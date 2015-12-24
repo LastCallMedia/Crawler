@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Queue;
-
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -32,7 +30,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
 
     private function getKey(RequestInterface $request)
     {
-        return $request->getMethod() . $request->getUri();
+        return $request->getMethod().$request->getUri();
     }
 
     public function push(RequestInterface $request)
@@ -66,14 +64,14 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         if (count($requests)) {
             try {
                 $params = $clauses = [];
-                $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) " . "VALUES ";
+                $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) VALUES ";
                 foreach ($requests as $i => $request) {
-                    $clauses[] = "(0, ?, 1, ?)";
+                    $clauses[] = '(0, ?, 1, ?)';
                     $params[] = $keys[$i];
                     $params[] = serialize($request);
                     $return[$i] = true;
                 }
-                $this->connection->executeUpdate($sql . implode(', ', $clauses),
+                $this->connection->executeUpdate($sql.implode(', ', $clauses),
                     $params);
             } catch (UniqueConstraintViolationException $e) {
                 return $return;
@@ -86,9 +84,9 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     public function pop($leaseTime = 30)
     {
         $conn = $this->connection;
-        $sql = "SELECT * FROM " . $conn->getDatabasePlatform()
+        $sql = 'SELECT * FROM '.$conn->getDatabasePlatform()
                 ->appendLockHint($this->table,
-                    LockMode::PESSIMISTIC_READ) . " WHERE status = ? AND expire <= ? LIMIT 1";
+                    LockMode::PESSIMISTIC_READ).' WHERE status = ? AND expire <= ? LIMIT 1';
 
         $return = null;
 
@@ -103,9 +101,9 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
             ) {
                 $expire = time() + $leaseTime;
                 $conn->update($this->table, [
-                    'expire' => $expire
+                    'expire' => $expire,
                 ], [
-                    'identifier' => $res['identifier']
+                    'identifier' => $res['identifier'],
                 ]);
                 $return = unserialize($res['data']);
             }
@@ -139,25 +137,25 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $table = $this->table;
         switch ($status) {
             case self::FREE:
-                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire <= ?",
-                    array(
+                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire <= ?",
+                    [
                         self::FREE,
-                        time()
-                    ))->fetchColumn();
+                        time(),
+                    ])->fetchColumn();
             case self::PENDING:
-                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire > ?",
-                    array(
+                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire > ?",
+                    [
                         self::FREE,
-                        time()
-                    ))->fetchColumn();
+                        time(),
+                    ])->fetchColumn();
             case self::COMPLETE:
-                return (int)$this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ?",
-                    array(
-                        self::COMPLETE
-                    ))->fetchColumn();
+                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ?",
+                    [
+                        self::COMPLETE,
+                    ])->fetchColumn();
         }
         throw new \RuntimeException(sprintf('Unexpected status %s',
-            (string)$status));
+            (string) $status));
     }
 
     protected function getConnection()
@@ -181,9 +179,9 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     private function exists($identifier)
     {
         return $this->connection->executeQuery("SELECT 1 FROM {$this->table} WHERE identifier = ?",
-            array(
-                $identifier
-            ))->fetchColumn();
+            [
+                $identifier,
+            ])->fetchColumn();
     }
 
     private function multipleExists(array $identifiers)
@@ -209,5 +207,4 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         }
         throw new \RuntimeException('This request is not managed by this queue.');
     }
-
 }

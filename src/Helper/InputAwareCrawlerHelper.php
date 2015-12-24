@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Helper;
 
-
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -10,10 +9,9 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputAwareInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Console helper for instantiating crawlers and configurations
+ * Console helper for instantiating crawlers and configurations.
  */
 class InputAwareCrawlerHelper extends AbstractCrawlerHelper implements InputAwareInterface
 {

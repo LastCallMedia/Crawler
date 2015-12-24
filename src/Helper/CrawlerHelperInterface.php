@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Helper;
-
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Reporter\ReporterInterface;
@@ -10,7 +8,6 @@ use LastCall\Crawler\Session\SessionInterface;
 
 interface CrawlerHelperInterface
 {
-
     /**
      * Get the configuration.
      *
@@ -43,5 +40,4 @@ interface CrawlerHelperInterface
         ConfigurationInterface $config,
         SessionInterface $session
     );
-
 }

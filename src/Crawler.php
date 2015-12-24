@@ -14,7 +14,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Crawler
 {
-
     /**
      * @var \LastCall\Crawler\Session\SessionInterface
      */
@@ -59,7 +58,7 @@ class Crawler
         $gen = function () use ($chunk) {
             while (!$this->session->isFinished()) {
                 $inner = new EachPromise($this->getRequestWorkerFn(), [
-                    'concurrency' => $chunk
+                    'concurrency' => $chunk,
                 ]);
                 yield $inner->promise();
             }

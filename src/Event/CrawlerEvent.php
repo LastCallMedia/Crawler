@@ -5,10 +5,8 @@ namespace LastCall\Crawler\Event;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\EventDispatcher\Event;
 
-
 class CrawlerEvent extends Event
 {
-
     /**
      * @var \Psr\Http\Message\RequestInterface
      */

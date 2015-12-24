@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Queue;
 
-
 use Psr\Http\Message\RequestInterface;
 
 /**

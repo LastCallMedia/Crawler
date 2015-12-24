@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LastCall\Crawler\Fragment\Parser;
 
 use Psr\Http\Message\ResponseInterface;

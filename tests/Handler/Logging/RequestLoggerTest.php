@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Logging;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -74,7 +72,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
             [
                 'url' => 'https://lastcallmedia.com',
                 'status' => 301,
-                'redirect' => '/foo'
+                'redirect' => '/foo',
             ])->shouldHaveBeenCalled();
     }
 

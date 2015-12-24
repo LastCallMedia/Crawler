@@ -7,7 +7,6 @@ namespace LastCall\Crawler\Configuration;
  */
 abstract class AbstractConfiguration implements ConfigurationInterface
 {
-
     /**
      * @var string
      */
@@ -23,10 +22,9 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     protected $queue;
 
-    protected $subscribers = array();
+    protected $subscribers = [];
 
-    protected $listeners = array();
-
+    protected $listeners = [];
 
     public function getClient()
     {

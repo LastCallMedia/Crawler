@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Performance;
-
 
 use Doctrine\DBAL\DriverManager;
 use GuzzleHttp\Client;
@@ -18,7 +16,6 @@ use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Queue\RequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use Psr\Log\NullLogger;
@@ -31,7 +28,6 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class PerformanceTest extends \PHPUnit_Framework_TestCase
 {
-
     private function getClient()
     {
         $handler = $this->handler();
@@ -48,7 +44,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $headers = [];
 
             $path = $request->getUri()->getPath();
-            $file = __DIR__ . '/../Resources/html' . $path;
+            $file = __DIR__.'/../Resources/html'.$path;
             if (file_exists($file)) {
                 $status = 200;
                 $handle = fopen($file, 'r');
@@ -71,7 +67,6 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         return $queue;
     }
 
-
     public function testLogging()
     {
         $configuration = new Configuration('http://example.com/index.html');
@@ -80,7 +75,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $configuration['subscribers'] = function () {
             return [
                 new RequestLogger(new NullLogger()),
-                new ExceptionLogger(new NullLogger())
+                new ExceptionLogger(new NullLogger()),
             ];
         };
         $event = $this->runConfiguration($configuration, 'Logging');
@@ -107,7 +102,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
 
         return [
             [new ArrayRequestQueue(), 240],
-            [new DoctrineRequestQueue($conn, 'new'), 600]
+            [new DoctrineRequestQueue($conn, 'new'), 600],
         ];
     }
 
@@ -120,16 +115,16 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $queue->onSetup();
         }
         $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue) . '::push()');
-        for ($i = 0; $i < 1000; $i++) {
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+        $stopwatch->start('queue', get_class($queue).'::push()');
+        for ($i = 0; $i < 1000; ++$i) {
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
             $queue->push(new Request('GET',
-                'https://lastcallmedia.com/a/' . $i));
+                'https://lastcallmedia.com/a/'.$i));
             $queue->push(new Request('GET',
-                'https://lastcallmedia.com/b/' . $i));
+                'https://lastcallmedia.com/b/'.$i));
         }
         $stopwatch->stop('queue');
         if ($queue instanceof SetupTeardownInterface) {
@@ -148,17 +143,17 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $queue->onSetup();
         }
         $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue) . '::pushMultiple()');
-        for ($i = 0; $i < 1000; $i++) {
-            $requests = array();
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/' . $i);
+        $stopwatch->start('queue', get_class($queue).'::pushMultiple()');
+        for ($i = 0; $i < 1000; ++$i) {
+            $requests = [];
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
             $requests[] = new Request('GET',
-                'https://lastcallmedia.com/a/' . $i);
+                'https://lastcallmedia.com/a/'.$i);
             $requests[] = new Request('GET',
-                'https://lastcallmedia.com/b/' . $i);
+                'https://lastcallmedia.com/b/'.$i);
             $queue->pushMultiple($requests);
         }
         $stopwatch->stop('queue');
@@ -177,8 +172,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         if ($queue instanceof SetupTeardownInterface) {
             $queue->onSetup();
         }
-        for ($i = 0; $i < 1000; $i++) {
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+        for ($i = 0; $i < 1000; ++$i) {
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
             if ($i % 3) {
                 $queue->complete($queue->pop());
             }
@@ -187,8 +182,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             }
         }
         $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue) . '::count()');
-        for ($i = 0; $i < 1000; $i++) {
+        $stopwatch->start('queue', get_class($queue).'::count()');
+        for ($i = 0; $i < 1000; ++$i) {
             $queue->count($queue::FREE);
             $queue->count($queue::COMPLETE);
             $queue->count($queue::PENDING);
@@ -210,9 +205,9 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $queue->onSetup();
         }
         $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue) . '::complete()');
-        for ($i = 0; $i < 1000; $i++) {
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/' . $i));
+        $stopwatch->start('queue', get_class($queue).'::complete()');
+        for ($i = 0; $i < 1000; ++$i) {
+            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
             $job = $queue->pop();
             $queue->complete($job);
         }
@@ -242,6 +237,6 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
 
     private function logDataPoint(StopwatchEvent $event)
     {
-        print $event . PHP_EOL;
+        echo $event.PHP_EOL;
     }
 }

@@ -17,8 +17,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
 {
-
-
     protected function mockClient(array $requests)
     {
         $handler = new MockHandler($requests);
@@ -144,7 +142,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
-
     public function testExceptionEventIsFiredOnSendingException()
     {
         $queue = new ArrayRequestQueue();
@@ -176,8 +173,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->onRequestSending(Argument::type(RequestInterface::class))
             ->shouldBeCalled();
         $session->onRequestSuccess(Argument::type(RequestInterface::class),
-            Argument::type(ResponseInterface::class))->will(function ($args) use
-        (
+            Argument::type(ResponseInterface::class))->will(function ($args) use (
             &$queue,
             &$count
         ) {
@@ -185,7 +181,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             if ($request->getUri() == 'https://lastcallmedia.com/1') {
                 $queue->push(new Request('GET', 'http://google.com/2'));
             }
-            $count++;
+            ++$count;
         });
 
         $crawler = new Crawler($session->reveal(), $client);

@@ -9,22 +9,18 @@ use LastCall\Crawler\Crawler;
 use LastCall\Crawler\Helper\InputAwareCrawlerHelper;
 use LastCall\Crawler\Reporter\ReporterInterface;
 use Prophecy\Argument;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class InputAwareCrawlerHelperTest extends \PHPUnit_Framework_TestCase
 {
-
     private function getInput($filename)
     {
         $definition = new InputDefinition([
             new InputOption('config', 'c', InputOption::VALUE_REQUIRED,
-                'config.php')
+                'config.php'),
         ]);
 
         return new ArrayInput(['--config' => $filename], $definition);

@@ -11,5 +11,4 @@ interface SetupTeardownInterface
     public function onSetup();
 
     public function onTeardown();
-
 }

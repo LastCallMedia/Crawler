@@ -6,9 +6,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use LastCall\Crawler\Command\CrawlCommand;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Helper\ConfigurationHelper;
 use LastCall\Crawler\Session\SessionInterface;
-use LastCall\Crawler\Test\Command\CommandTest;
 use LastCall\Crawler\Test\Resources\DummyCrawlerHelper;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -16,7 +14,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class WorkCommandTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testRunsCrawler()
     {
         $configuration = new Configuration('https://lastcallmedia.com');
@@ -27,7 +24,6 @@ class WorkCommandTest extends \PHPUnit_Framework_TestCase
 
         $helper = new DummyCrawlerHelper($configuration, null,
             $crawler->reveal());
-
 
         $command = new CrawlCommand();
         $command->setHelperSet(new HelperSet([$helper]));

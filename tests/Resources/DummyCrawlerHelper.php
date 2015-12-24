@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Resources;
-
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Crawler;
@@ -38,5 +36,4 @@ class DummyCrawlerHelper extends PreloadedCrawlerHelper
     ) {
         return $this->crawler ?: parent::getCrawler($config, $session);
     }
-
 }

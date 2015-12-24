@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Logging;
 
 use GuzzleHttp\Psr7\Request;
@@ -9,7 +8,6 @@ use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
 use Psr\Log\LoggerInterface;
-
 
 class ExceptionLoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,5 +29,4 @@ class ExceptionLoggerTest extends \PHPUnit_Framework_TestCase
             'url' => 'bar',
         ])->shouldHaveBeenCalled();
     }
-
 }

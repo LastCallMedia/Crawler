@@ -1,12 +1,10 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Common;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
-
 
 class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,7 +46,7 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ]);
-        $connection->exec("CREATE TABLE foo(id INTEGER)");
+        $connection->exec('CREATE TABLE foo(id INTEGER)');
         $mock = $this->getTraitMock($schema, $connection);
         $mock->onTeardown();
         $this->assertFalse($connection->getSchemaManager()
@@ -65,7 +63,7 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
             'driver' => 'pdo_sqlite',
             'memory' => true,
         ]);
-        $connection->exec("CREATE TABLE foo(id INTEGER, key INTEGER)");
+        $connection->exec('CREATE TABLE foo(id INTEGER, key INTEGER)');
         $mock = $this->getTraitMock($schema, $connection);
         $mock->onSetup();
         $this->assertTrue($connection->getSchemaManager()
@@ -87,5 +85,4 @@ class DoctrineSetupTeardownTraitTest extends \PHPUnit_Framework_TestCase
         $mock = $this->getTraitMock($schema, $connection);
         $mock->onTeardown();
     }
-
 }

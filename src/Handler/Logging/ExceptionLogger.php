@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Logging;
-
 
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
@@ -14,7 +12,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ExceptionLogger implements EventSubscriberInterface
 {
-
     /**
      * @var \Psr\Log\LoggerInterface
      */

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Setup;
-
 
 use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -12,10 +10,10 @@ class LogSetup implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             CrawlerEvents::SETUP => 'onSetup',
             CrawlerEvents::TEARDOWN => 'onTeardown',
-        );
+        ];
     }
 
     private $dir;
@@ -32,7 +30,6 @@ class LogSetup implements EventSubscriberInterface
 
     public function onTeardown()
     {
-        (new Filesystem())->remove(glob($this->dir . '/*.log'));
+        (new Filesystem())->remove(glob($this->dir.'/*.log'));
     }
-
 }

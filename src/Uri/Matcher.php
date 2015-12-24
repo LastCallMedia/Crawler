@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Uri;
-
 
 class Matcher implements MatcherInterface
 {
@@ -22,8 +20,8 @@ class Matcher implements MatcherInterface
             'doc',
             'docx',
             'zip',
-            'txt'
-        ]
+            'txt',
+        ],
     ];
 
     private $compiled = [];
@@ -47,7 +45,7 @@ class Matcher implements MatcherInterface
     public function matches($uri)
     {
         // Cast to a string here so we don't have to do it 2x.
-        $uri = (string)$uri;
+        $uri = (string) $uri;
 
         return $this->matchesPattern('include', $uri,
             true) && !$this->matchesPattern('exclude', $uri, false);
@@ -56,7 +54,7 @@ class Matcher implements MatcherInterface
     private function matchesPattern($type, $value, $default)
     {
         if ($pattern = $this->compilePattern($type)) {
-            return (bool)preg_match($pattern, $value);
+            return (bool) preg_match($pattern, $value);
         }
 
         return $default;
@@ -68,12 +66,12 @@ class Matcher implements MatcherInterface
             switch ($type) {
                 case 'file':
                 case 'html':
-                    $this->compiled[$type] = $this->patterns[$type] ? '@(^' . implode('$|^',
-                            $this->patterns[$type]) . '$)@S' : false;
+                    $this->compiled[$type] = $this->patterns[$type] ? '@(^'.implode('$|^',
+                            $this->patterns[$type]).'$)@S' : false;
                     break;
                 default:
-                    $this->compiled[$type] = $this->patterns[$type] ? '@(' . implode('|',
-                            $this->patterns[$type]) . ')@S' : false;
+                    $this->compiled[$type] = $this->patterns[$type] ? '@('.implode('|',
+                            $this->patterns[$type]).')@S' : false;
             }
         }
 
@@ -100,5 +98,4 @@ class Matcher implements MatcherInterface
     {
         return $this->extensionMatchesPattern('html', $uri, true);
     }
-
 }

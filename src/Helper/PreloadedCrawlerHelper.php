@@ -1,11 +1,8 @@
 <?php
 
-
 namespace LastCall\Crawler\Helper;
 
-
 use LastCall\Crawler\Configuration\ConfigurationInterface;
-use Symfony\Component\Console\Helper\Helper;
 
 class PreloadedCrawlerHelper extends AbstractCrawlerHelper
 {

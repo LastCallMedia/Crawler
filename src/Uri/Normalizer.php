@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Uri;
-
 
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
@@ -11,7 +9,7 @@ class Normalizer implements NormalizerInterface
 {
     private $handlers = [];
 
-    public function __construct(array $handlers = array())
+    public function __construct(array $handlers = [])
     {
         $this->handlers = $handlers;
     }
@@ -39,7 +37,6 @@ class Normalizer implements NormalizerInterface
         return $uri;
     }
 
-
     /**
      * Give a list of preferred domains that will be used.  An example of this
      * would be preferring the www. form of the domain.
@@ -56,7 +53,7 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
-     * Strip off the URL fragment (#fragment)
+     * Strip off the URL fragment (#fragment).
      *
      * @return \Closure
      */
@@ -94,7 +91,7 @@ class Normalizer implements NormalizerInterface
     }
 
     /**
-     * Strip off an index page (index.html, index.php, etc)
+     * Strip off an index page (index.html, index.php, etc).
      *
      * @param string $indexRegex
      *
@@ -119,9 +116,9 @@ class Normalizer implements NormalizerInterface
      */
     public static function normalizeCase($case = 'lower')
     {
-        if (!in_array($case, array('upper', 'lower'))) {
+        if (!in_array($case, ['upper', 'lower'])) {
             throw new \InvalidArgumentException(sprintf('Invalid case \'%s\'',
-                (string)$case));
+                (string) $case));
         }
 
         return function (UriInterface $uri) use ($case) {
@@ -144,5 +141,4 @@ class Normalizer implements NormalizerInterface
             }
         };
     }
-
 }
