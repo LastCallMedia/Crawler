@@ -4,11 +4,11 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\Common\HasResolvingNormalizer;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Uri\MatcherInterface;
-use LastCall\Crawler\Uri\NormalizerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -17,13 +17,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RedirectDiscoverer implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
+    use HasResolvingNormalizer;
 
     /**
      * @var \LastCall\Crawler\Uri\MatcherInterface
      */
     private $matcher;
     /**
-     * @var \LastCall\Crawler\Uri\NormalizerInterface
+     * @var callable
      */
     private $normalizer;
 
@@ -36,7 +37,7 @@ class RedirectDiscoverer implements EventSubscriberInterface
 
     public function __construct(
         MatcherInterface $matcher,
-        NormalizerInterface $normalizer
+        callable $normalizer
     ) {
         $this->matcher = $matcher;
         $this->normalizer = $normalizer;
@@ -47,13 +48,13 @@ class RedirectDiscoverer implements EventSubscriberInterface
         $response = $event->getResponse();
         if ($this->isRedirectResponse($response)) {
             $request = $event->getRequest();
+            $normalizer = $this->getResolvingNormalizer($request->getUri(), $this->normalizer);
 
-            $location = $response->getHeaderLine('Location');
-            $location = Uri::resolve($request->getUri(), $location);
+            $location = new Uri($response->getHeaderLine('Location'));
+            $location = $normalizer($location);
 
             if ($this->matcher->matches($location) && $this->matcher->matchesHtml($location)) {
-                $normalUrl = $this->normalizer->normalize($location);
-                $request = new Request('GET', $normalUrl);
+                $request = new Request('GET', $location);
                 $event->addAdditionalRequest($request);
             }
         }

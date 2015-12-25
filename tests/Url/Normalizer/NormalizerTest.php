@@ -15,11 +15,12 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testNormalizeReturnsUriObject()
+    public function testReturnsUriObject()
     {
         $normalizer = new Normalizer();
-        $normal = $normalizer->normalize('http://foo.com');
+        $normal = $normalizer(new Uri('http://foo.com'));
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $normal);
+        $this->assertEquals('http://foo.com', (string) $normal);
     }
 
     public function testCallsNormalizers()
@@ -31,7 +32,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             },
         ]);
 
-        $normalizer->normalize('http://foo.com');
+        $normalizer(new Uri('http://foo.com'));
         $this->assertTrue($success);
     }
 
@@ -130,13 +131,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $pass = Normalizer::preferredDomainMap($map);
         $this->assertUrlEquals($expected, $pass(new Uri($url)));
-    }
-
-    public function testPassUri()
-    {
-        $pass = new Normalizer();
-        $this->assertUrlEquals('http://google.com',
-            $pass->normalize(new Uri('http://google.com')));
     }
 
     public function getNormalizeCaseTests()

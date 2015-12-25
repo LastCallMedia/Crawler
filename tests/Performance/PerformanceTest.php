@@ -86,7 +86,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
     public function testLinkDiscovery()
     {
         $configuration = new Configuration('http://example.com/index.html');
-        $configuration['queue'] = $this->getQueue();
+        $queue = $this->getQueue();
+        $configuration['queue'] = $queue;
         $configuration['client'] = $this->getClient();
         $event = $this->runConfiguration($configuration, 'Link Discovery');
 

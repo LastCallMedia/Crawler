@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Uri;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
-class Normalizer implements NormalizerInterface
+class Normalizer
 {
     private $handlers = [];
 
@@ -14,10 +14,8 @@ class Normalizer implements NormalizerInterface
         $this->handlers = $handlers;
     }
 
-    public function normalize($url)
+    public function __invoke(UriInterface $uri)
     {
-        $uri = $this->createUri($url);
-
         foreach ($this->handlers as $handler) {
             $uri = $handler($uri);
         }
@@ -35,6 +33,13 @@ class Normalizer implements NormalizerInterface
         }
 
         return $uri;
+    }
+
+    public static function resolve(UriInterface $base)
+    {
+        return function (UriInterface $relative) use ($base) {
+            return Uri::resolve($base, $relative);
+        };
     }
 
     /**
