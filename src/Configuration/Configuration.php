@@ -68,7 +68,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return $matcher;
         };
         $this['normalizer'] = function () {
-            return new Normalizer($this['normalizers']);
+            return new Normalizer($this['normalizers'], true);
         };
         $this['normalizers'] = [];
         $this['parsers'] = function () {

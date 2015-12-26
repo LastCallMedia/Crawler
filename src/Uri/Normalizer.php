@@ -86,13 +86,17 @@ class Normalizer
 
     private $handlers = [];
 
-    public function __construct(array $handlers = [])
+    public function __construct(array $handlers = [], $traceable = false)
     {
         $this->handlers = $handlers;
+        $this->traceable = $traceable;
     }
 
     public function __invoke(UriInterface $uri)
     {
+        if($this->traceable && !$uri instanceof TraceableUri) {
+            $uri = new TraceableUri($uri);
+        }
         foreach ($this->handlers as $handler) {
             $uri = $handler($uri);
         }
