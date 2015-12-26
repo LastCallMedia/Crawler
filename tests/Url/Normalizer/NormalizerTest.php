@@ -180,7 +180,8 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         Normalizer::normalizeCase('foo');
     }
 
-    public function lowercaseSchemeAndHostTests() {
+    public function lowercaseSchemeAndHostTests()
+    {
         return [
             ['HTTP://GOOGLE.COM/FOO', 'http://google.com/FOO'],
             // @todo: UTF-8 hostnames are broken in Guzzle.
@@ -192,29 +193,32 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider lowercaseSchemeAndHostTests
      */
-    public function testLowercaseSchemeAndHost($uriString, $expected) {
+    public function testLowercaseSchemeAndHost($uriString, $expected)
+    {
         $uri = new Uri($uriString);
         $normalizer = Normalizer::lowercaseSchemeAndHost();
         $this->assertEquals($expected, (string) $normalizer($uri));
     }
 
-    public function capitalizeEscapedTests() {
+    public function capitalizeEscapedTests()
+    {
         return [
             ['http://foo%3a.com/%3a?bar%3a', 'http://foo%3A.com/%3A?bar%3A'],
         ];
     }
 
-
     /**
      * @dataProvider capitalizeEscapedTests
      */
-    public function testCapitalizeEscaped($uriString, $expected) {
+    public function testCapitalizeEscaped($uriString, $expected)
+    {
         $uri = new Uri($uriString);
         $normalizer = Normalizer::capitalizeEscaped();
         $this->assertEquals($expected, (string) $normalizer($uri));
     }
 
-    public function decodeUnreservedTests() {
+    public function decodeUnreservedTests()
+    {
         return [
             ['http://foo%2Dbar.com/bar%2Dbaz?baz%5Fbar#%31', 'http://foo-bar.com/bar-baz?baz_bar#1'],
         ];
@@ -223,7 +227,8 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider decodeUnreservedTests
      */
-    public function testDecodeUnreserved($uriString, $expected) {
+    public function testDecodeUnreserved($uriString, $expected)
+    {
         $uri = new Uri($uriString);
         $normalizer = Normalizer::decodeUnreserved();
         $this->assertEquals($expected, (string) $normalizer($uri));

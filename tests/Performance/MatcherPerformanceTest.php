@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Performance;
-
 
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Uri\MatcherAssert;
@@ -12,7 +10,8 @@ use LastCall\Crawler\Uri\MatcherAssert;
  */
 class MatcherPerformanceTest extends \PHPUnit_Framework_TestCase
 {
-    public function getMatcherPasses() {
+    public function getMatcherPasses()
+    {
         return [
             [MatcherAssert::schemeIs('http'), 'MatcherAssert::schemeIs(single)'],
             [MatcherAssert::schemeIs(['http', 'https']), 'MatcherAssert::schemeIs(multiple)'],
@@ -44,19 +43,20 @@ class MatcherPerformanceTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getMatcherPasses
      */
-    public function testMatcherPass(callable $pass, $name) {
+    public function testMatcherPass(callable $pass, $name)
+    {
         $uri = new Uri('https://lastcallmedia.com:8081/foo.html?bar#baz');
-        $time = microtime(TRUE);
-        for($i = 0; $i < 5000; $i++) {
+        $time = microtime(true);
+        for ($i = 0; $i < 5000; ++$i) {
             $pass($uri);
         }
 
-        $duration = microtime(TRUE) - $time;
-        print sprintf('%s: %dms', $name, $this->formatMs($duration)) . PHP_EOL;
+        $duration = microtime(true) - $time;
+        echo sprintf('%s: %dms', $name, $this->formatMs($duration)).PHP_EOL;
     }
 
-    public function formatMs($time) {
+    public function formatMs($time)
+    {
         return round($time * 1000);
     }
-
 }

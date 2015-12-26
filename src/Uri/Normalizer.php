@@ -12,12 +12,12 @@ use Psr\Http\Message\UriInterface;
  */
 class Normalizer
 {
-
     /**
      * Characters that do not need to be encoded in URLs, and could be unescaped.
+     *
      * @var array
      */
-    private static $unreservedChars = array (
+    private static $unreservedChars = array(
         '%30' => '0',
         '%31' => '1',
         '%32' => '2',
@@ -94,7 +94,7 @@ class Normalizer
 
     public function __invoke(UriInterface $uri)
     {
-        if($this->traceable && !$uri instanceof TraceableUri) {
+        if ($this->traceable && !$uri instanceof TraceableUri) {
             $uri = new TraceableUri($uri);
         }
         foreach ($this->handlers as $handler) {
@@ -135,6 +135,7 @@ class Normalizer
     {
         return function (UriInterface $uri) use ($map) {
             $host = $uri->getHost();
+
             return isset($map[$host]) ? $uri->withHost($map[$host]) : $uri;
         };
     }
@@ -236,23 +237,25 @@ class Normalizer
      *
      * @return \Closure
      */
-    public static function lowercaseSchemeAndHost() {
-        return function(UriInterface $uri) {
+    public static function lowercaseSchemeAndHost()
+    {
+        return function (UriInterface $uri) {
             $scheme = $uri->getScheme();
-            if(!ctype_lower($scheme)) {
+            if (!ctype_lower($scheme)) {
                 $uri = $uri->withScheme(strtolower($scheme));
             }
             $host = $uri->getHost();
 
-            if(!ctype_lower($host)) {
+            if (!ctype_lower($host)) {
                 // Only convert ASCII A-Z to lowercase.
-                $lower = preg_replace_callback('/[A-Z]+/', function($matches) {
+                $lower = preg_replace_callback('/[A-Z]+/', function ($matches) {
                     return strtolower($matches[0]);
                 }, $host);
-                if($lower !== $host) {
+                if ($lower !== $host) {
                     $uri = $uri->withHost($lower);
                 }
             }
+
             return $uri;
         };
     }
@@ -264,12 +267,13 @@ class Normalizer
      *
      * @return \Closure
      */
-    public static function capitalizeEscaped() {
-        return function(UriInterface $uri) {
-            foreach(['Host', 'Path', 'Query', 'Fragment'] as $partName) {
+    public static function capitalizeEscaped()
+    {
+        return function (UriInterface $uri) {
+            foreach (['Host', 'Path', 'Query', 'Fragment'] as $partName) {
                 $part = $uri->{"get$partName"}();
-                if(preg_match('/%[0-9a-f]{2}/', $part)) {
-                    $upper = preg_replace_callback('/%[0-9a-f]{2}+/', function($matches) {
+                if (preg_match('/%[0-9a-f]{2}/', $part)) {
+                    $upper = preg_replace_callback('/%[0-9a-f]{2}+/', function ($matches) {
                         return strtoupper($matches[0]);
                     }, $part);
                     $uri = $uri->{"with$partName"}($upper);
@@ -287,20 +291,22 @@ class Normalizer
      *
      * @return \Closure
      */
-    public static function decodeUnreserved() {
-        $regex = '/('. implode('|', array_keys(self::$unreservedChars)) . ')+/';
-        return function(UriInterface $uri) use ($regex) {
-            foreach(['Host', 'Path', 'Query', 'Fragment'] as $partName) {
+    public static function decodeUnreserved()
+    {
+        $regex = '/('.implode('|', array_keys(self::$unreservedChars)).')+/';
+
+        return function (UriInterface $uri) use ($regex) {
+            foreach (['Host', 'Path', 'Query', 'Fragment'] as $partName) {
                 $part = $uri->{"get$partName"}();
-                if(preg_match($regex, $part)) {
-                    $fixed = preg_replace_callback($regex, function($matches) {
+                if (preg_match($regex, $part)) {
+                    $fixed = preg_replace_callback($regex, function ($matches) {
                         return rawurldecode($matches[0]);
                     }, $part);
                     $uri = $uri->{"with$partName"}($fixed);
                 }
             }
+
             return $uri;
         };
     }
-
 }

@@ -157,7 +157,8 @@ class MatcherAssertTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $m($uri));
     }
 
-    public function pathMatchesTests() {
+    public function pathMatchesTests()
+    {
         return [
             ['//', 'http://test.com', true],
             ['/foo/', 'foo', true],
@@ -172,7 +173,8 @@ class MatcherAssertTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider pathMatchesTests
      */
-    public function testPathMatches($patterns, $uri, $expected) {
+    public function testPathMatches($patterns, $uri, $expected)
+    {
         $uri = new Uri($uri);
         $m = MatcherAssert::pathMatches($patterns);
         $this->assertEquals($expected, $m($uri));

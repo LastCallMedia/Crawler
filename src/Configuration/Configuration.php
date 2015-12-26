@@ -60,11 +60,13 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             $matcher = Matcher::create();
             $matcher->schemeIs($baseUri->getScheme());
             $matcher->hostIs($baseUri->getHost());
+
             return $matcher;
         };
-        $this['html_matcher'] = function() {
+        $this['html_matcher'] = function () {
             $matcher = clone $this['matcher'];
             $matcher->pathExtensionIs($this['html_extensions']);
+
             return $matcher;
         };
         $this['normalizer'] = function () {
