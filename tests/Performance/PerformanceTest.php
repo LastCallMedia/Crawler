@@ -241,7 +241,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $stopwatch = new Stopwatch();
         $stopwatch->start('matcher', 'Matcher');
 
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; $i < 5000; ++$i) {
             $matcher($uri);
         }
         $stopwatch->stop('matcher');

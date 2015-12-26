@@ -43,91 +43,213 @@ class Matcher
         }
     }
 
+    /**
+     * Return a new condition set that requires all conditions to be fulfilled.
+     *
+     * @return $this
+     */
     public function all()
     {
         return $this->handlers[] = new self(self::ALL);
     }
 
+    /**
+     * Return a new condition set that requires any condition to be fulfilled.
+     *
+     * @return $this
+     */
     public function any()
     {
         return $this->handlers[] = new self(self::ANY);
     }
 
+    /**
+     * Add a condition that will always be true.
+     *
+     * @return $this
+     */
     public function always()
     {
         return $this->add(MatcherAssert::always());
     }
 
+    /**
+     * Add a condition that will never be true.
+     *
+     * @return $this
+     */
     public function never()
     {
         return $this->add(MatcherAssert::never());
     }
 
+    /**
+     * Add a condition that the scheme matches exactly.
+     *
+     * @param string|string[] $schemes
+     *
+     * @return $this
+     */
     public function schemeIs($schemes)
     {
         return $this->add(MatcherAssert::schemeIs($schemes));
     }
 
+    /**
+     * Add a condition that the scheme matches a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return $this
+     */
     public function schemeMatches($patterns)
     {
         return $this->add(MatcherAssert::schemeMatches($patterns));
     }
 
+    /**
+     * Add a condition that the host matches exactly.
+     *
+     * @param string|string[] $hosts
+     *
+     * @return $this
+     */
     public function hostIs($hosts)
     {
         return $this->add(MatcherAssert::hostIs($hosts));
     }
 
+    /**
+     * Add a condition that the host matches a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return $this
+     */
     public function hostMatches($patterns)
     {
         return $this->add(MatcherAssert::hostMatches($patterns));
     }
 
+    /**
+     * Add a condition that the port matches exactly.
+     *
+     * @param int|int[]|null $ports
+     *
+     * @return $this
+     */
     public function portIs($ports)
     {
         return $this->add(MatcherAssert::portIs($ports));
     }
 
+    /**
+     * Add a condition that the port is inside a range.
+     *
+     * @param int $min
+     * @param int $max
+     *
+     * @return $this
+     */
     public function portIn($min, $max)
     {
         return $this->add(MatcherAssert::portIn($min, $max));
     }
 
+    /**
+     * Add a condition that the path matches exactly.
+     *
+     * @param string|string[] $paths
+     *
+     * @return $this
+     */
     public function pathIs($paths)
     {
         return $this->add(MatcherAssert::pathIs($paths));
     }
 
+    /**
+     * Add a condition that the path ends in a certain extension.
+     *
+     * @param string|string[] $exts
+     *
+     * @return $this
+     */
     public function pathExtensionIs($exts)
     {
         return $this->add(MatcherAssert::pathExtensionIs($exts));
     }
 
+    /**
+     * Add a condition that the path matches a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return $this
+     */
     public function pathMatches($patterns)
     {
         return $this->add(MatcherAssert::pathMatches($patterns));
     }
 
+    /**
+     * Add a condition that the query string matches exactly.
+     *
+     * @param string|string[] $queries
+     *
+     * @return $this
+     */
     public function queryIs($queries)
     {
         return $this->add(MatcherAssert::queryIs($queries));
     }
 
+    /**
+     * Add a condition that the query string matches a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return $this
+     */
     public function queryMatches($patterns)
     {
         return $this->add(MatcherAssert::queryMatches($patterns));
     }
 
+    /**
+     * Add a condition that the fragment matches exactly.
+     *
+     * @param string|string[] $fragments
+     *
+     * @return $this
+     */
     public function fragmentIs($fragments)
     {
         return $this->add(MatcherAssert::fragmentIs($fragments));
     }
 
+    /**
+     * Add a condition that the fragment matches a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return $this
+     */
     public function fragmentMatches($patterns)
     {
         return $this->add(MatcherAssert::fragmentMatches($patterns));
     }
 
+    /**
+     * Add an arbitrary callback function to the matcher.
+     *
+     * The callback must accept a `UriInterface` object as a parameter,
+     * and return a boolean value indicating whether the URI matches.
+     *
+     * @param callable $handler
+     *
+     * @return $this
+     */
     public function add(callable $handler)
     {
         $this->handlers[] = $handler;
