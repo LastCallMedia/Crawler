@@ -14,7 +14,6 @@ use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Uri\Matcher;
-use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
