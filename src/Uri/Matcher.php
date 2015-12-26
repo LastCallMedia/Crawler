@@ -4,6 +4,9 @@ namespace LastCall\Crawler\Uri;
 
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Matches URLs against a predefined set of conditions.
+ */
 class Matcher
 {
     const ALL = 'all';
@@ -12,16 +15,37 @@ class Matcher
     private $mode;
     private $handlers = [];
 
+    /**
+     * Create a new matcher instance.
+     *
+     * The root matcher requires that all conditions be fulfilled.
+     * If you want to add optional conditions, you can use the `any`
+     * method to return an OR branch.
+     *
+     * @return \LastCall\Crawler\Uri\Matcher
+     */
     public static function create()
     {
         return new self(self::ALL);
     }
 
+    /**
+     * Matcher constructor.
+     *
+     * @param $mode
+     */
     private function __construct($mode)
     {
         $this->mode = $mode;
     }
 
+    /**
+     * Determine whether a given URL matches the conditions.
+     *
+     * @param \Psr\Http\Message\UriInterface $uri
+     *
+     * @return bool
+     */
     public function __invoke(UriInterface $uri)
     {
         if (self::ALL === $this->mode) {
