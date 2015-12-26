@@ -16,6 +16,9 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [Normalizer::normalizeCase(), 'Normalizer::normalizeCase()'],
+            [Normalizer::lowercaseSchemeAndHost(), 'Normalizer::lowercaseSchemeAndHost()'],
+            [Normalizer::capitalizeEscaped(), 'Normalizer::capitalizeEscaped()'],
+            [Normalizer::decodeUnreserved(), 'Normalizer::decodeUnreserved()'],
             [
                 Normalizer::preferredDomainMap(['lastcallmedia.com' => 'foo.com']),
                 'Normalizer::preferredDomainMap()',
@@ -30,7 +33,7 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
     public function testNormalization(callable $fn, $name)
     {
         $uris = [
-            new Uri('https://lastcallmedia.com/index.html'),
+            new Uri('https://lastcallmedia.com/index%3a.html'),
             new Uri('https://LastCallMedia.com/foo'),
             new Uri('https://lastcallmedia.com/bar#baz'),
         ];

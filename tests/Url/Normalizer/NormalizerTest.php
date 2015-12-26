@@ -180,6 +180,55 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         Normalizer::normalizeCase('foo');
     }
 
+    public function lowercaseSchemeAndHostTests() {
+        return [
+            ['HTTP://GOOGLE.COM/FOO', 'http://google.com/FOO'],
+            // @todo: UTF-8 hostnames are broken in Guzzle.
+            // Fix there first.
+            //['http://مثال.إختبار', 'http://مثال.إختبار'],
+        ];
+    }
+
+    /**
+     * @dataProvider lowercaseSchemeAndHostTests
+     */
+    public function testLowercaseSchemeAndHost($uriString, $expected) {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::lowercaseSchemeAndHost();
+        $this->assertEquals($expected, (string) $normalizer($uri));
+    }
+
+    public function capitalizeEscapedTests() {
+        return [
+            ['http://foo%3a.com/%3a?bar%3a', 'http://foo%3A.com/%3A?bar%3A'],
+        ];
+    }
+
+
+    /**
+     * @dataProvider capitalizeEscapedTests
+     */
+    public function testCapitalizeEscaped($uriString, $expected) {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::capitalizeEscaped();
+        $this->assertEquals($expected, (string) $normalizer($uri));
+    }
+
+    public function decodeUnreservedTests() {
+        return [
+            ['http://foo%2Dbar.com/bar%2Dbaz?baz%5Fbar#%31', 'http://foo-bar.com/bar-baz?baz_bar#1'],
+        ];
+    }
+
+    /**
+     * @dataProvider decodeUnreservedTests
+     */
+    public function testDecodeUnreserved($uriString, $expected) {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::decodeUnreserved();
+        $this->assertEquals($expected, (string) $normalizer($uri));
+    }
+
     protected function assertUrlEquals($expected, $url)
     {
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);

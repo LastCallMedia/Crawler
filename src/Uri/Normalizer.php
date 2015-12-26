@@ -5,8 +5,85 @@ namespace LastCall\Crawler\Uri;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Normalize URLs to a consistent state.
+ *
+ * @see https://tools.ietf.org/html/rfc3986
+ */
 class Normalizer
 {
+
+    /**
+     * Characters that do not need to be encoded in URLs, and could be unescaped.
+     * @var array
+     */
+    private static $unreservedChars = array (
+        '%30' => '0',
+        '%31' => '1',
+        '%32' => '2',
+        '%33' => '3',
+        '%34' => '4',
+        '%35' => '5',
+        '%36' => '6',
+        '%37' => '7',
+        '%38' => '8',
+        '%39' => '9',
+        '%61' => 'a',
+        '%62' => 'b',
+        '%63' => 'c',
+        '%64' => 'd',
+        '%65' => 'e',
+        '%66' => 'f',
+        '%67' => 'g',
+        '%68' => 'h',
+        '%69' => 'i',
+        '%6a' => 'j',
+        '%6b' => 'k',
+        '%6c' => 'l',
+        '%6d' => 'm',
+        '%6e' => 'n',
+        '%6f' => 'o',
+        '%70' => 'p',
+        '%71' => 'q',
+        '%72' => 'r',
+        '%73' => 's',
+        '%74' => 't',
+        '%75' => 'u',
+        '%76' => 'v',
+        '%77' => 'w',
+        '%78' => 'x',
+        '%79' => 'y',
+        '%7a' => 'z',
+        '%41' => 'A',
+        '%42' => 'B',
+        '%43' => 'C',
+        '%44' => 'D',
+        '%45' => 'E',
+        '%46' => 'F',
+        '%47' => 'G',
+        '%48' => 'H',
+        '%49' => 'I',
+        '%4a' => 'J',
+        '%4b' => 'K',
+        '%4c' => 'L',
+        '%4d' => 'M',
+        '%4e' => 'N',
+        '%4f' => 'O',
+        '%50' => 'P',
+        '%51' => 'Q',
+        '%52' => 'R',
+        '%53' => 'S',
+        '%54' => 'T',
+        '%55' => 'U',
+        '%56' => 'V',
+        '%57' => 'W',
+        '%58' => 'X',
+        '%59' => 'Y',
+        '%5a' => 'Z',
+        '%2D' => '-',
+        '%5F' => '_',
+    );
+
     private $handlers = [];
 
     public function __construct(array $handlers = [])
@@ -53,7 +130,8 @@ class Normalizer
     public static function preferredDomainMap(array $map)
     {
         return function (UriInterface $uri) use ($map) {
-            return isset($map[$uri->getHost()]) ? $uri->withHost($map[$uri->getHost()]) : $uri;
+            $host = $uri->getHost();
+            return isset($map[$host]) ? $uri->withHost($map[$host]) : $uri;
         };
     }
 
@@ -146,4 +224,79 @@ class Normalizer
             }
         };
     }
+
+    /**
+     * Lowercase the scheme and host segments of the URL.
+     *
+     * This is considered a "safe" normalization as per RFC 3986
+     *
+     * @return \Closure
+     */
+    public static function lowercaseSchemeAndHost() {
+        return function(UriInterface $uri) {
+            $scheme = $uri->getScheme();
+            if(!ctype_lower($scheme)) {
+                $uri = $uri->withScheme(strtolower($scheme));
+            }
+            $host = $uri->getHost();
+
+            if(!ctype_lower($host)) {
+                // Only convert ASCII A-Z to lowercase.
+                $lower = preg_replace_callback('/[A-Z]+/', function($matches) {
+                    return strtolower($matches[0]);
+                }, $host);
+                if($lower !== $host) {
+                    $uri = $uri->withHost($lower);
+                }
+            }
+            return $uri;
+        };
+    }
+
+    /**
+     * Convert all hex encoded URL characters to use uppercase hex.
+     *
+     * This is considered a "safe" normalization as per RFC 3986
+     *
+     * @return \Closure
+     */
+    public static function capitalizeEscaped() {
+        return function(UriInterface $uri) {
+            foreach(['Host', 'Path', 'Query', 'Fragment'] as $partName) {
+                $part = $uri->{"get$partName"}();
+                if(preg_match('/%[0-9a-f]{2}/', $part)) {
+                    $upper = preg_replace_callback('/%[0-9a-f]{2}+/', function($matches) {
+                        return strtoupper($matches[0]);
+                    }, $part);
+                    $uri = $uri->{"with$partName"}($upper);
+                }
+            }
+
+            return $uri;
+        };
+    }
+
+    /**
+     * Decode hex-encoded characters that do not need to be encoded.
+     *
+     * This is considered a "safe" normalization as per RFC 3986
+     *
+     * @return \Closure
+     */
+    public static function decodeUnreserved() {
+        $regex = '/('. implode('|', array_keys(self::$unreservedChars)) . ')+/';
+        return function(UriInterface $uri) use ($regex) {
+            foreach(['Host', 'Path', 'Query', 'Fragment'] as $partName) {
+                $part = $uri->{"get$partName"}();
+                if(preg_match($regex, $part)) {
+                    $fixed = preg_replace_callback($regex, function($matches) {
+                        return rawurldecode($matches[0]);
+                    }, $part);
+                    $uri = $uri->{"with$partName"}($fixed);
+                }
+            }
+            return $uri;
+        };
+    }
+
 }
