@@ -60,10 +60,11 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             $matcher = Matcher::create();
             $matcher->schemeIs($baseUri->getScheme());
             $matcher->hostIs($baseUri->getHost());
-
-            // Default HTML file extensions.
+            return $matcher;
+        };
+        $this['html_matcher'] = function() {
+            $matcher = clone $this['matcher'];
             $matcher->pathExtensionIs($this['html_extensions']);
-
             return $matcher;
         };
         $this['normalizer'] = function () {
@@ -82,7 +83,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         };
         $this['processors'] = function () {
             return [
-                'link' => new LinkProcessor($this['matcher'],
+                'link' => new LinkProcessor($this['html_matcher'],
                     $this['normalizer']),
             ];
         };
