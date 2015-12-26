@@ -2,100 +2,136 @@
 
 namespace LastCall\Crawler\Uri;
 
-class Matcher implements MatcherInterface
+use Psr\Http\Message\UriInterface;
+
+class Matcher
 {
-    private $patterns = [
-        'include' => [],
-        'exclude' => [],
-        'html' => ['html', 'htm', 'php', 'asp', 'aspx', 'cfm'],
-        'file' => [
-            'gif',
-            'png',
-            'jpg',
-            'jpeg',
-            'svg',
-            'psd',
-            'pdf',
-            'xml',
-            'doc',
-            'docx',
-            'zip',
-            'txt',
-        ],
-    ];
+    const ALL = 'all';
+    const ANY = 'any';
 
-    private $compiled = [];
+    private $mode;
+    private $handlers = [];
 
-    public function __construct(
-        array $includePatterns = [],
-        array $excludePatterns = [],
-        array $htmlPatterns = null,
-        array $filePatterns = null
-    ) {
-        $this->patterns['include'] = $includePatterns;
-        $this->patterns['exclude'] = $excludePatterns;
-        if (isset($filePatterns)) {
-            $this->patterns['file'] = $filePatterns;
-        }
-        if (isset($htmlPatterns)) {
-            $this->patterns['html'] = $htmlPatterns;
-        }
+    public static function create()
+    {
+        return new self(self::ALL);
     }
 
-    public function matches($uri)
+    private function __construct($mode)
     {
-        // Cast to a string here so we don't have to do it 2x.
-        $uri = (string) $uri;
-
-        return $this->matchesPattern('include', $uri,
-            true) && !$this->matchesPattern('exclude', $uri, false);
+        $this->mode = $mode;
     }
 
-    private function matchesPattern($type, $value, $default)
+    public function __invoke(UriInterface $uri)
     {
-        if ($pattern = $this->compilePattern($type)) {
-            return (bool) preg_match($pattern, $value);
-        }
-
-        return $default;
-    }
-
-    private function compilePattern($type)
-    {
-        if (!isset($this->compiled[$type])) {
-            switch ($type) {
-                case 'file':
-                case 'html':
-                    $this->compiled[$type] = $this->patterns[$type] ? '@(^'.implode('$|^',
-                            $this->patterns[$type]).'$)@S' : false;
-                    break;
-                default:
-                    $this->compiled[$type] = $this->patterns[$type] ? '@('.implode('|',
-                            $this->patterns[$type]).')@S' : false;
+        if (self::ALL === $this->mode) {
+            foreach ($this->handlers as $handler) {
+                if (true !== $handler($uri)) {
+                    return false;
+                }
             }
-        }
 
-        return $this->compiled[$type];
-    }
-
-    public function matchesFile($uri)
-    {
-        return $this->extensionMatchesPattern('file', $uri, false);
-    }
-
-    private function extensionMatchesPattern($type, $url, $default)
-    {
-        if ($path = parse_url($url, PHP_URL_PATH)) {
-            if ($ext = pathinfo($path, PATHINFO_EXTENSION)) {
-                return $this->matchesPattern($type, $ext, $default);
+            return true;
+        } elseif (self::ANY === $this->mode) {
+            foreach ($this->handlers as $handler) {
+                if (false !== $handler($uri)) {
+                    return true;
+                }
             }
-        }
 
-        return $default;
+            return false;
+        }
     }
 
-    public function matchesHtml($uri)
+    public function all()
     {
-        return $this->extensionMatchesPattern('html', $uri, true);
+        return $this->handlers[] = new self(self::ALL);
+    }
+
+    public function any()
+    {
+        return $this->handlers[] = new self(self::ANY);
+    }
+
+    public function always()
+    {
+        return $this->add(MatcherAssert::always());
+    }
+
+    public function never()
+    {
+        return $this->add(MatcherAssert::never());
+    }
+
+    public function schemeIs($schemes)
+    {
+        return $this->add(MatcherAssert::schemeIs($schemes));
+    }
+
+    public function schemeMatches($patterns)
+    {
+        return $this->add(MatcherAssert::schemeMatches($patterns));
+    }
+
+    public function hostIs($hosts)
+    {
+        return $this->add(MatcherAssert::hostIs($hosts));
+    }
+
+    public function hostMatches($patterns)
+    {
+        return $this->add(MatcherAssert::hostMatches($patterns));
+    }
+
+    public function portIs($ports)
+    {
+        return $this->add(MatcherAssert::portIs($ports));
+    }
+
+    public function portIn($min, $max)
+    {
+        return $this->add(MatcherAssert::portIn($min, $max));
+    }
+
+    public function pathIs($paths)
+    {
+        return $this->add(MatcherAssert::pathIs($paths));
+    }
+
+    public function pathExtensionIs($exts)
+    {
+        return $this->add(MatcherAssert::pathExtensionIs($exts));
+    }
+
+    public function pathMatches($patterns)
+    {
+        return $this->add(MatcherAssert::pathMatches($patterns));
+    }
+
+    public function queryIs($queries)
+    {
+        return $this->add(MatcherAssert::queryIs($queries));
+    }
+
+    public function queryMatches($patterns)
+    {
+        return $this->add(MatcherAssert::queryMatches($patterns));
+    }
+
+    public function fragmentIs($fragments)
+    {
+        return $this->add(MatcherAssert::fragmentIs($fragments));
+    }
+
+    public function fragmentMatches($patterns)
+    {
+        return $this->add(MatcherAssert::fragmentMatches($patterns));
+    }
+
+    public function add(callable $handler)
+    {
+        $this->handlers[] = $handler;
+
+        return $this;
     }
 }

@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Fragment\Parser\CSSSelectorParser;
 use LastCall\Crawler\Fragment\Parser\XPathParser;
@@ -12,6 +13,7 @@ use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
+use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
@@ -55,7 +57,15 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return $subscribers;
         };
         $this['matcher'] = function () {
-            return new Matcher(['^'.$this['baseUrl']]);
+            $baseUri = new Uri($this['baseUrl']);
+            $matcher = Matcher::create();
+            $matcher->schemeIs($baseUri->getScheme());
+            $matcher->hostIs($baseUri->getHost());
+
+            // Default HTML file extensions.
+            $matcher->pathExtensionIs($this['html_extensions']);
+
+            return $matcher;
         };
         $this['normalizer'] = function () {
             return new Normalizer($this['normalizers']);
@@ -77,6 +87,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
                     $this['normalizer']),
             ];
         };
+        $this['html_extensions'] = ['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm'];
     }
 
     public function setOutput(OutputInterface $output)

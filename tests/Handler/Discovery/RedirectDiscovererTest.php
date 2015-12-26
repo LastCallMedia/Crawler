@@ -17,7 +17,7 @@ class RedirectDiscovererTest extends \PHPUnit_Framework_TestCase
 
     public function testAddsRedirectsToSession()
     {
-        $matcher = new Matcher();
+        $matcher = Matcher::create()->always();
         $normalizer = new Normalizer();
 
         $request = new Request('GET', 'http://google.com');

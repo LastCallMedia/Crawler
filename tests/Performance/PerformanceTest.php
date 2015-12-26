@@ -8,6 +8,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
@@ -18,6 +19,7 @@ use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
+use LastCall\Crawler\Uri\Matcher;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -67,156 +69,176 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         return $queue;
     }
 
-    public function testLogging()
+//    public function testLogging()
+//    {
+//        $configuration = new Configuration('http://example.com/index.html');
+//        $configuration['queue'] = $this->getQueue();
+//        $configuration['client'] = $this->getClient();
+//        $configuration['subscribers'] = function () {
+//            return [
+//                new RequestLogger(new NullLogger()),
+//                new ExceptionLogger(new NullLogger()),
+//            ];
+//        };
+//        $event = $this->runConfiguration($configuration, 'Logging');
+//
+//        $this->logDataPoint($event);
+//    }
+//
+//    public function testLinkDiscovery()
+//    {
+//        $configuration = new Configuration('http://example.com/index.html');
+//        $queue = $this->getQueue();
+//        $configuration['queue'] = $queue;
+//        $configuration['client'] = $this->getClient();
+//        $event = $this->runConfiguration($configuration, 'Link Discovery');
+//
+//        $this->logDataPoint($event);
+//    }
+//
+//    public function getQueues()
+//    {
+//        $conn = DriverManager::getConnection([
+//            'driver' => 'pdo_sqlite',
+//            'memory' => true,
+//        ]);
+//
+//        return [
+//            [new ArrayRequestQueue(), 240],
+//            [new DoctrineRequestQueue($conn, 'new'), 600],
+//        ];
+//    }
+//
+//    /**
+//     * @dataProvider getQueues
+//     */
+//    public function testQueuePush(RequestQueueInterface $queue, $expectedTime)
+//    {
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onSetup();
+//        }
+//        $stopwatch = new Stopwatch();
+//        $stopwatch->start('queue', get_class($queue).'::push()');
+//        for ($i = 0; $i < 1000; ++$i) {
+//            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+//            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+//            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+//            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+//            $queue->push(new Request('GET',
+//                'https://lastcallmedia.com/a/'.$i));
+//            $queue->push(new Request('GET',
+//                'https://lastcallmedia.com/b/'.$i));
+//        }
+//        $stopwatch->stop('queue');
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onTeardown();
+//        }
+//        $event = $stopwatch->getEvent('queue');
+//        $this->logDataPoint($event);
+//    }
+//
+//    /**
+//     * @dataProvider getQueues
+//     */
+//    public function testQueuePushMultiple(RequestQueueInterface $queue)
+//    {
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onSetup();
+//        }
+//        $stopwatch = new Stopwatch();
+//        $stopwatch->start('queue', get_class($queue).'::pushMultiple()');
+//        for ($i = 0; $i < 1000; ++$i) {
+//            $requests = [];
+//            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+//            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+//            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+//            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
+//            $requests[] = new Request('GET',
+//                'https://lastcallmedia.com/a/'.$i);
+//            $requests[] = new Request('GET',
+//                'https://lastcallmedia.com/b/'.$i);
+//            $queue->pushMultiple($requests);
+//        }
+//        $stopwatch->stop('queue');
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onTeardown();
+//        }
+//        $event = $stopwatch->getEvent('queue');
+//        $this->logDataPoint($event);
+//    }
+//
+//    /**
+//     * @dataProvider getQueues
+//     */
+//    public function testQueueCount(RequestQueueInterface $queue)
+//    {
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onSetup();
+//        }
+//        for ($i = 0; $i < 1000; ++$i) {
+//            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+//            if ($i % 3) {
+//                $queue->complete($queue->pop());
+//            }
+//            if ($i % 5) {
+//                $queue->pop();
+//            }
+//        }
+//        $stopwatch = new Stopwatch();
+//        $stopwatch->start('queue', get_class($queue).'::count()');
+//        for ($i = 0; $i < 1000; ++$i) {
+//            $queue->count($queue::FREE);
+//            $queue->count($queue::COMPLETE);
+//            $queue->count($queue::PENDING);
+//        }
+//        $stopwatch->stop('queue');
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onTeardown();
+//        }
+//        $event = $stopwatch->getEvent('queue');
+//        $this->logDataPoint($event);
+//    }
+//
+//    /**
+//     * @dataProvider getQueues
+//     */
+//    public function testQueueComplete(RequestQueueInterface $queue)
+//    {
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onSetup();
+//        }
+//        $stopwatch = new Stopwatch();
+//        $stopwatch->start('queue', get_class($queue).'::complete()');
+//        for ($i = 0; $i < 1000; ++$i) {
+//            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
+//            $job = $queue->pop();
+//            $queue->complete($job);
+//        }
+//        $stopwatch->stop('queue');
+//        if ($queue instanceof SetupTeardownInterface) {
+//            $queue->onTeardown();
+//        }
+//        $event = $stopwatch->getEvent('queue');
+//        $this->logDataPoint($event);
+//    }
+
+    public function testMatcher()
     {
-        $configuration = new Configuration('http://example.com/index.html');
-        $configuration['queue'] = $this->getQueue();
-        $configuration['client'] = $this->getClient();
-        $configuration['subscribers'] = function () {
-            return [
-                new RequestLogger(new NullLogger()),
-                new ExceptionLogger(new NullLogger()),
-            ];
-        };
-        $event = $this->runConfiguration($configuration, 'Logging');
+        $matcher = Matcher::create();
+        $matcher->schemeIs('http');
+        $matcher->hostIs('lastcallmedia.com');
+        $matcher->schemeMatches('/foo/');
 
-        $this->logDataPoint($event);
-    }
+        $uri = new Uri('https://lastcallmedia.com');
 
-    public function testLinkDiscovery()
-    {
-        $configuration = new Configuration('http://example.com/index.html');
-        $queue = $this->getQueue();
-        $configuration['queue'] = $queue;
-        $configuration['client'] = $this->getClient();
-        $event = $this->runConfiguration($configuration, 'Link Discovery');
-
-        $this->logDataPoint($event);
-    }
-
-    public function getQueues()
-    {
-        $conn = DriverManager::getConnection([
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        ]);
-
-        return [
-            [new ArrayRequestQueue(), 240],
-            [new DoctrineRequestQueue($conn, 'new'), 600],
-        ];
-    }
-
-    /**
-     * @dataProvider getQueues
-     */
-    public function testQueuePush(RequestQueueInterface $queue, $expectedTime)
-    {
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onSetup();
-        }
         $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue).'::push()');
-        for ($i = 0; $i < 1000; ++$i) {
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
-            $queue->push(new Request('GET',
-                'https://lastcallmedia.com/a/'.$i));
-            $queue->push(new Request('GET',
-                'https://lastcallmedia.com/b/'.$i));
-        }
-        $stopwatch->stop('queue');
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onTeardown();
-        }
-        $event = $stopwatch->getEvent('queue');
-        $this->logDataPoint($event);
-    }
+        $stopwatch->start('matcher', 'Matcher');
 
-    /**
-     * @dataProvider getQueues
-     */
-    public function testQueuePushMultiple(RequestQueueInterface $queue)
-    {
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onSetup();
-        }
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue).'::pushMultiple()');
         for ($i = 0; $i < 1000; ++$i) {
-            $requests = [];
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
-            $requests[] = new Request('GET', 'https://lastcallmedia.com/'.$i);
-            $requests[] = new Request('GET',
-                'https://lastcallmedia.com/a/'.$i);
-            $requests[] = new Request('GET',
-                'https://lastcallmedia.com/b/'.$i);
-            $queue->pushMultiple($requests);
+            $matcher($uri);
         }
-        $stopwatch->stop('queue');
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onTeardown();
-        }
-        $event = $stopwatch->getEvent('queue');
-        $this->logDataPoint($event);
-    }
-
-    /**
-     * @dataProvider getQueues
-     */
-    public function testQueueCount(RequestQueueInterface $queue)
-    {
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onSetup();
-        }
-        for ($i = 0; $i < 1000; ++$i) {
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
-            if ($i % 3) {
-                $queue->complete($queue->pop());
-            }
-            if ($i % 5) {
-                $queue->pop();
-            }
-        }
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue).'::count()');
-        for ($i = 0; $i < 1000; ++$i) {
-            $queue->count($queue::FREE);
-            $queue->count($queue::COMPLETE);
-            $queue->count($queue::PENDING);
-        }
-        $stopwatch->stop('queue');
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onTeardown();
-        }
-        $event = $stopwatch->getEvent('queue');
-        $this->logDataPoint($event);
-    }
-
-    /**
-     * @dataProvider getQueues
-     */
-    public function testQueueComplete(RequestQueueInterface $queue)
-    {
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onSetup();
-        }
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('queue', get_class($queue).'::complete()');
-        for ($i = 0; $i < 1000; ++$i) {
-            $queue->push(new Request('GET', 'https://lastcallmedia.com/'.$i));
-            $job = $queue->pop();
-            $queue->complete($job);
-        }
-        $stopwatch->stop('queue');
-        if ($queue instanceof SetupTeardownInterface) {
-            $queue->onTeardown();
-        }
-        $event = $stopwatch->getEvent('queue');
+        $stopwatch->stop('matcher');
+        $event = $stopwatch->getEvent('matcher');
         $this->logDataPoint($event);
     }
 

@@ -14,7 +14,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testSubscribesToRightMethod()
     {
-        $matcher = new Matcher();
+        $matcher = Matcher::create()->always();
         $normalizer = new Normalizer();
 
         $processor = new LinkProcessor($matcher, $normalizer);
@@ -56,7 +56,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 
         $links = (new DomCrawler($html))->filterXPath('descendant-or-self::a[@href]');
 
-        $matcher = new Matcher();
+        $matcher = Matcher::create()->always();
         $normalizer = new Normalizer();
         $processor = new LinkProcessor($matcher, $normalizer);
         $processor->processLinks($event, $links);

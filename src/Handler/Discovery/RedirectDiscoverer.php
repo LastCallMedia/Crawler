@@ -8,7 +8,6 @@ use LastCall\Crawler\Common\HasResolvingNormalizer;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Uri\MatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -20,7 +19,7 @@ class RedirectDiscoverer implements EventSubscriberInterface
     use HasResolvingNormalizer;
 
     /**
-     * @var \LastCall\Crawler\Uri\MatcherInterface
+     * @var callable
      */
     private $matcher;
     /**
@@ -36,7 +35,7 @@ class RedirectDiscoverer implements EventSubscriberInterface
     }
 
     public function __construct(
-        MatcherInterface $matcher,
+        callable $matcher,
         callable $normalizer
     ) {
         $this->matcher = $matcher;
@@ -49,11 +48,12 @@ class RedirectDiscoverer implements EventSubscriberInterface
         if ($this->isRedirectResponse($response)) {
             $request = $event->getRequest();
             $normalizer = $this->getResolvingNormalizer($request->getUri(), $this->normalizer);
+            $matcher = $this->matcher;
 
             $location = new Uri($response->getHeaderLine('Location'));
             $location = $normalizer($location);
 
-            if ($this->matcher->matches($location) && $this->matcher->matchesHtml($location)) {
+            if ($matcher($location)) {
                 $request = new Request('GET', $location);
                 $event->addAdditionalRequest($request);
             }
