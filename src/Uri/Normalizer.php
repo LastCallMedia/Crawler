@@ -14,16 +14,19 @@ class Normalizer
 {
     private $handlers = [];
 
-    public function __construct(array $handlers = [], $traceable = false)
+    public function __construct(array $handlers = [], callable $matcher = null)
     {
         $this->handlers = $handlers;
-        $this->traceable = $traceable;
+        $this->matcher = $matcher;
     }
 
     public function __invoke(UriInterface $uri)
     {
-        if ($this->traceable && !$uri instanceof TraceableUri) {
-            $uri = new TraceableUri($uri);
+        if($this->matcher) {
+            $matcher = $this->matcher;
+            if(!$matcher($uri)) {
+                return $uri;
+            }
         }
 
         do {

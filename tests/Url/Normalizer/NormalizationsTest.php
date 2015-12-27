@@ -7,6 +7,10 @@ use GuzzleHttp\Psr7\Uri;
 
 class NormalizationsTest extends \PHPUnit_Framework_TestCase
 {
+    private function uri($uriString) {
+        return new Uri($uriString);
+    }
+
     protected function assertUrlEquals($expected, $url)
     {
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
@@ -24,10 +28,11 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTrailingSlashTests
      */
-    public function testStripTrailingSlash($url, $expected)
+    public function testStripTrailingSlash($uriString, $expected)
     {
+        $uri = $this->uri($uriString);
         $handler = Normalizations::stripTrailingSlash();
-        $this->assertUrlEquals($expected, $handler(new Uri($url)));
+        $this->assertUrlEquals($expected, $handler($uri));
     }
 
     public function lowercaseSchemeAndHostTests()
@@ -45,8 +50,8 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testLowercaseSchemeAndHost($uriString, $expected)
     {
-        $uri = new Uri($uriString);
-        $normalizer = Normalizations::lowercaseSchemeAndHost();
+        $uri = $this->uri($uriString);
+        $normalizer = Normalizations::lowercaseHostname();
         $this->assertEquals($expected, (string) $normalizer($uri));
     }
 
@@ -62,7 +67,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testCapitalizeEscaped($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::capitalizeEscaped();
         $this->assertEquals($expected, (string) $normalizer($uri));
     }
@@ -79,7 +84,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecodeUnreserved($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::decodeUnreserved();
         $this->assertEquals($expected, (string) $normalizer($uri));
     }
@@ -97,7 +102,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddTrailingSlash($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::addTrailingSlash();
         $this->assertUrlEquals($expected, $normalizer($uri));
     }
@@ -118,7 +123,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testDropIndex($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::dropIndex();
         $this->assertUrlEquals($expected, $normalizer($uri));
     }
@@ -142,7 +147,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testDropFragment($urlString, $expected)
     {
-        $uri = new Uri($urlString);
+        $uri = $this->uri($urlString);
         $handler = Normalizations::dropFragment();
         $this->assertUrlEquals($expected, $handler($uri));
     }
@@ -161,7 +166,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testRewriteScheme($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::rewriteScheme(['http' => 'https']);
         $this->assertUrlEquals($expected, $normalizer($uri));
     }
@@ -180,7 +185,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testrewriteHost($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::rewriteHost([
             'foo.com' => 'www.foo.com',
         ]);
@@ -201,7 +206,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
      */
     public function testSortQuery($uriString, $expected)
     {
-        $uri = new Uri($uriString);
+        $uri = $this->uri($uriString);
         $normalizer = Normalizations::sortQuery();
         $this->assertUrlEquals($expected, $normalizer($uri));
     }

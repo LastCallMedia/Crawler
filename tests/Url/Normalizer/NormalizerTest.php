@@ -5,6 +5,7 @@ namespace LastCall\Crawler\Test\Url\Normalizer;
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\Normalizer;
+use Psr\Http\Message\UriInterface;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,5 +54,30 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $uri = new Uri('http://foo.com');
         $this->assertUrlEquals('http://www2.foo.com', $normalizer($uri));
         $this->assertEquals(3, $calls);
+    }
+
+    public function testDoesNotNormalizeUnmatchedUrls() {
+        $matcher = function() { return false; };
+        $normalizer = new Normalizer([
+            function(UriInterface $uri) {
+                $this->fail('Normalizers were called when the matcher returned false.');
+            }
+        ], $matcher);
+        $uri = new Uri('http://foo.com');
+        $normalizer($uri);
+    }
+
+    public function testNormalizesMatchedUrls() {
+        $calls = 0;
+        $matcher = function() { return true; };
+        $normalizer = new Normalizer([
+           function(UriInterface $uri) use (&$calls) {
+               ++$calls;
+               return $uri;
+           }
+        ], $matcher);
+        $uri = new Uri('http://foo.com');
+        $normalizer($uri);
+        $this->assertEquals(1, $calls);
     }
 }
