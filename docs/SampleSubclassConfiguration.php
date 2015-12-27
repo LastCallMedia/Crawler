@@ -19,7 +19,7 @@ namespace {
 
             // Add some normalizers to clean up URLs.
             $this['normalizers'] = [
-                Normalizations::lowercaseSchemeAndHost(),
+                Normalizations::lowercaseHostname(),
                 Normalizations::dropFragment(),
             ];
 

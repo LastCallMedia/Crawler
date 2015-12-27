@@ -4,7 +4,6 @@ namespace LastCall\Crawler\Test\Performance;
 
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Uri\Normalizations;
-use LastCall\Crawler\Uri\Normalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
@@ -16,7 +15,7 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
     public function getNormalizations()
     {
         return [
-            [Normalizations::lowercaseSchemeAndHost(), 'Normalizer::lowercaseSchemeAndHost()'],
+            [Normalizations::lowercaseHostname(), 'Normalizer::lowercaseSchemeAndHost()'],
             [Normalizations::capitalizeEscaped(), 'Normalizer::capitalizeEscaped()'],
             [Normalizations::decodeUnreserved(), 'Normalizer::decodeUnreserved()'],
             [Normalizations::addTrailingSlash(), 'Normalizer::addTrailingSlash()'],

@@ -107,13 +107,9 @@ class Normalizations
      *
      * @return \Closure
      */
-    public static function lowercaseSchemeAndHost()
+    public static function lowercaseHostname()
     {
         return function (UriInterface $uri) {
-            $scheme = $uri->getScheme();
-            if (!ctype_lower($scheme)) {
-                $uri = $uri->withScheme(strtolower($scheme));
-            }
             $host = $uri->getHost();
 
             $lower = mb_strtolower($host);
