@@ -70,7 +70,7 @@ class Matcher
     /**
      * Return a new condition set that requires all conditions to be fulfilled.
      *
-     * @return $this
+     * @return self
      */
     public function all()
     {
@@ -80,7 +80,7 @@ class Matcher
     /**
      * Return a new condition set that requires any condition to be fulfilled.
      *
-     * @return $this
+     * @return self
      */
     public function any()
     {
@@ -90,7 +90,7 @@ class Matcher
     /**
      * Add a condition that will always be true.
      *
-     * @return $this
+     * @return self
      */
     public function always()
     {
@@ -100,7 +100,7 @@ class Matcher
     /**
      * Add a condition that will never be true.
      *
-     * @return $this
+     * @return self
      */
     public function never()
     {
@@ -112,7 +112,7 @@ class Matcher
      *
      * @param string|string[] $schemes
      *
-     * @return $this
+     * @return self
      */
     public function schemeIs($schemes)
     {
@@ -124,7 +124,7 @@ class Matcher
      *
      * @param string|string[] $patterns
      *
-     * @return $this
+     * @return self
      */
     public function schemeMatches($patterns)
     {
@@ -136,7 +136,7 @@ class Matcher
      *
      * @param string|string[] $hosts
      *
-     * @return $this
+     * @return self
      */
     public function hostIs($hosts)
     {
@@ -148,7 +148,7 @@ class Matcher
      *
      * @param string|string[] $patterns
      *
-     * @return $this
+     * @return self
      */
     public function hostMatches($patterns)
     {
@@ -160,7 +160,7 @@ class Matcher
      *
      * @param int|int[]|null $ports
      *
-     * @return $this
+     * @return self
      */
     public function portIs($ports)
     {
@@ -173,7 +173,7 @@ class Matcher
      * @param int $min
      * @param int $max
      *
-     * @return $this
+     * @return self
      */
     public function portIn($min, $max)
     {
@@ -185,7 +185,7 @@ class Matcher
      *
      * @param string|string[] $paths
      *
-     * @return $this
+     * @return self
      */
     public function pathIs($paths)
     {
@@ -197,7 +197,7 @@ class Matcher
      *
      * @param string|string[] $exts
      *
-     * @return $this
+     * @return self
      */
     public function pathExtensionIs($exts)
     {
@@ -209,7 +209,7 @@ class Matcher
      *
      * @param string|string[] $patterns
      *
-     * @return $this
+     * @return self
      */
     public function pathMatches($patterns)
     {
@@ -221,7 +221,7 @@ class Matcher
      *
      * @param string|string[] $queries
      *
-     * @return $this
+     * @return self
      */
     public function queryIs($queries)
     {
@@ -233,7 +233,7 @@ class Matcher
      *
      * @param string|string[] $patterns
      *
-     * @return $this
+     * @return self
      */
     public function queryMatches($patterns)
     {
@@ -245,7 +245,7 @@ class Matcher
      *
      * @param string|string[] $fragments
      *
-     * @return $this
+     * @return self
      */
     public function fragmentIs($fragments)
     {
@@ -257,7 +257,7 @@ class Matcher
      *
      * @param string|string[] $patterns
      *
-     * @return $this
+     * @return self
      */
     public function fragmentMatches($patterns)
     {
@@ -272,7 +272,7 @@ class Matcher
      *
      * @param callable $handler
      *
-     * @return $this
+     * @return self
      */
     public function add(callable $handler)
     {
