@@ -309,4 +309,26 @@ class Normalizer
             return $uri;
         };
     }
+
+    /**
+     * Add a trailing slash to any paths that don't have an extension.
+     *
+     * This is usually a safe normalization.
+     *
+     * @return \Closure
+     */
+    public static function addTrailingSlash()
+    {
+        return function (UriInterface $uri) {
+            $path = $uri->getPath();
+            if (substr($path, -1) !== '/') {
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                if (!$ext) {
+                    $uri = $uri->withPath($uri->getPath().'/');
+                }
+            }
+
+            return $uri;
+        };
+    }
 }

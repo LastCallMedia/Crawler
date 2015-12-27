@@ -234,6 +234,24 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, (string) $normalizer($uri));
     }
 
+    public function addTrailingSlashTests()
+    {
+        return [
+            ['/', '/'],
+            ['/foo', '/foo/'],
+        ];
+    }
+
+    /**
+     * @dataProvider addTrailingSlashTests
+     */
+    public function testAddTrailingSlash($uriString, $expected)
+    {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::addTrailingSlash();
+        $this->assertUrlEquals($expected, $normalizer($uri));
+    }
+
     protected function assertUrlEquals($expected, $url)
     {
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
