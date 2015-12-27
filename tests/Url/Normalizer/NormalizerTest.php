@@ -50,53 +50,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertUrlEquals($expected, $handler(new Uri($url)));
     }
 
-    public function getNormalizeCaseTests()
-    {
-        return [
-            [
-                'http://google.com',
-                'http://google.com',
-                'http://GOOGLE.COM',
-            ],
-            [
-                'http://google.com/foo_bar',
-                'http://google.com/foo_bar',
-                'http://GOOGLE.COM/FOO_BAR',
-            ],
-            [
-                'httP://Google.com/FOo',
-                'http://google.com/foo',
-                'http://GOOGLE.COM/FOO',
-            ],
-            [
-                'http://google.com/indEx.html',
-                'http://google.com/index.html',
-                'http://GOOGLE.COM/INDEX.HTML',
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider getNormalizeCaseTests
-     */
-    public function testNormalizeCase($url, $expectedLower, $expectedUpper)
-    {
-        $lower = Normalizer::normalizeCase('lower');
-        $upper = Normalizer::normalizeCase('upper');
-        $url = new Uri($url);
-        $this->assertUrlEquals($expectedLower, $lower($url));
-        $this->assertUrlEquals($expectedUpper, $upper($url));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid case 'foo'
-     */
-    public function testNormalizeCaseInvalid()
-    {
-        Normalizer::normalizeCase('foo');
-    }
-
     public function lowercaseSchemeAndHostTests()
     {
         return [

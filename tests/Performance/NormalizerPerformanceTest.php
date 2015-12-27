@@ -15,7 +15,6 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
     public function getNormalizerPasses()
     {
         return [
-            [Normalizer::normalizeCase(), 'Normalizer::normalizeCase()'],
             [Normalizer::lowercaseSchemeAndHost(), 'Normalizer::lowercaseSchemeAndHost()'],
             [Normalizer::capitalizeEscaped(), 'Normalizer::capitalizeEscaped()'],
             [Normalizer::decodeUnreserved(), 'Normalizer::decodeUnreserved()'],

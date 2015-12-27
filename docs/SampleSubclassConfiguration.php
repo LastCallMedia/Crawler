@@ -18,8 +18,8 @@ namespace {
 
             // Add some normalizers to clean up URLs.
             $this['normalizers'] = [
-                Normalizer::normalizeCase(),
-                Normalizer::dropFragment()
+                Normalizer::lowercaseSchemeAndHost(),
+                Normalizer::dropFragment(),
             ];
 
             // Add a logger.  Normally, we'd use something like Monolog.

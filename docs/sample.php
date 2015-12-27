@@ -14,7 +14,7 @@ $config = new Configuration('https://lastcallmedia.com');
 
 // Add some normalizers to clean up URLs.
 $config['normalizers'] = [
-    Normalizer::normalizeCase(),
+    Normalizer::lowercaseSchemeAndHost(),
     Normalizer::dropFragment()
 ];
 

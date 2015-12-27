@@ -138,41 +138,6 @@ class Normalizer
     }
 
     /**
-     * Convert the casing of the URL to all upper or lower case.
-     *
-     * @param string $case
-     *
-     * @return \Closure
-     */
-    public static function normalizeCase($case = 'lower')
-    {
-        if (!in_array($case, ['upper', 'lower'])) {
-            throw new \InvalidArgumentException(sprintf('Invalid case \'%s\'',
-                (string) $case));
-        }
-
-        return function (UriInterface $uri) use ($case) {
-
-            switch ($case) {
-                case 'lower':
-                    $ret = $uri;
-                    $ret = (empty($ret->getHost()) || ctype_lower($ret->getHost())) ? $ret : $ret->withHost(mb_strtolower($ret->getHost()));
-                    $ret = (empty($ret->getPath()) || ctype_lower($ret->getPath())) ? $ret : $ret->withPath(mb_strtolower($ret->getPath()));
-                    $ret = (empty($ret->getFragment()) || ctype_lower($ret->getFragment())) ? $ret : $ret->withFragment(mb_strtolower($ret->getFragment()));
-
-                    return $ret;
-                case 'upper':
-                    $ret = $uri;
-                    $ret = (empty($ret->getHost()) || ctype_upper($ret->getHost())) ? $ret : $ret->withHost(mb_strtoupper($ret->getHost()));
-                    $ret = (empty($ret->getPath()) || ctype_upper($ret->getPath())) ? $ret : $ret->withPath(mb_strtoupper($ret->getPath()));
-                    $ret = (empty($ret->getFragment()) || ctype_upper($ret->getFragment())) ? $ret : $ret->withFragment(mb_strtouppers($ret->getFragment()));
-
-                    return $ret;
-            }
-        };
-    }
-
-    /**
      * Lowercase the scheme and host segments of the URL.
      *
      * This is considered a "safe" normalization as per RFC 3986
