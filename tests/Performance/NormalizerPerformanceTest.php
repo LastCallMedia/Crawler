@@ -3,6 +3,7 @@
 namespace LastCall\Crawler\Test\Performance;
 
 use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\Normalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
@@ -12,27 +13,27 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
 {
-    public function getNormalizerPasses()
+    public function getNormalizations()
     {
         return [
-            [Normalizer::lowercaseSchemeAndHost(), 'Normalizer::lowercaseSchemeAndHost()'],
-            [Normalizer::capitalizeEscaped(), 'Normalizer::capitalizeEscaped()'],
-            [Normalizer::decodeUnreserved(), 'Normalizer::decodeUnreserved()'],
-            [Normalizer::addTrailingSlash(), 'Normalizer::addTrailingSlash()'],
-            [Normalizer::dropIndex(), 'Normalizer::dropIndex()'],
-            [Normalizer::dropFragment(), 'Normalizer::dropFragment()'],
-            [Normalizer::rewriteHost([
+            [Normalizations::lowercaseSchemeAndHost(), 'Normalizer::lowercaseSchemeAndHost()'],
+            [Normalizations::capitalizeEscaped(), 'Normalizer::capitalizeEscaped()'],
+            [Normalizations::decodeUnreserved(), 'Normalizer::decodeUnreserved()'],
+            [Normalizations::addTrailingSlash(), 'Normalizer::addTrailingSlash()'],
+            [Normalizations::dropIndex(), 'Normalizer::dropIndex()'],
+            [Normalizations::dropFragment(), 'Normalizer::dropFragment()'],
+            [Normalizations::rewriteHost([
                 'lastcallmedia.com' => 'www.lastcallmedia.com',
             ]), 'Normalizer::rewriteHost()'],
-            [Normalizer::rewriteScheme([
+            [Normalizations::rewriteScheme([
                 'https' => 'http',
             ]), 'Normalizer::rewriteScheme()'],
-            [Normalizer::sortQuery(), 'Normalizer::sortQuery()'],
+            [Normalizations::sortQuery(), 'Normalizer::sortQuery()'],
         ];
     }
 
     /**
-     * @dataProvider getNormalizerPasses
+     * @dataProvider getNormalizations
      */
     public function testNormalization(callable $fn, $name)
     {

@@ -3,6 +3,7 @@
 namespace {
 
     use LastCall\Crawler\Configuration\Configuration;
+    use LastCall\Crawler\Uri\Normalizations;
     use LastCall\Crawler\Uri\Normalizer;
     use Psr\Log\NullLogger;
     use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -18,8 +19,8 @@ namespace {
 
             // Add some normalizers to clean up URLs.
             $this['normalizers'] = [
-                Normalizer::lowercaseSchemeAndHost(),
-                Normalizer::dropFragment(),
+                Normalizations::lowercaseSchemeAndHost(),
+                Normalizations::dropFragment(),
             ];
 
             // Add a logger.  Normally, we'd use something like Monolog.

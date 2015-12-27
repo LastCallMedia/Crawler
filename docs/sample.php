@@ -2,6 +2,7 @@
 
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Uri\Normalizer;
+use LastCall\Crawler\Uri\Normalizations;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,8 +15,8 @@ $config = new Configuration('https://lastcallmedia.com');
 
 // Add some normalizers to clean up URLs.
 $config['normalizers'] = [
-    Normalizer::lowercaseSchemeAndHost(),
-    Normalizer::dropFragment()
+    Normalizations::lowercaseSchemeAndHost(),
+    Normalizations::dropFragment()
 ];
 
 // Add a logger.  Normally, we'd use something like Monolog.
