@@ -179,23 +179,6 @@ class Normalizer
     }
 
     /**
-     * Strip off an index page (index.html, index.php, etc).
-     *
-     * @param string $indexRegex
-     *
-     * @return \Closure
-     */
-    public static function stripIndex(
-        $indexRegex = '@/index.(html|htm|php|asp|aspx|cfm)$@'
-    ) {
-        return function (UriInterface $uri) use ($indexRegex) {
-            return preg_match($indexRegex,
-                $uri->getPath()) ? $uri->withPath(preg_replace($indexRegex, '/',
-                $uri->getPath())) : $uri;
-        };
-    }
-
-    /**
      * Convert the casing of the URL to all upper or lower case.
      *
      * @param string $case
@@ -326,6 +309,26 @@ class Normalizer
                 if (!$ext) {
                     $uri = $uri->withPath($uri->getPath().'/');
                 }
+            }
+
+            return $uri;
+        };
+    }
+
+    /**
+     * Strip off an index page (index.html, index.php, etc).
+     *
+     * @param string $indexRegex
+     *
+     * @return \Closure
+     */
+    public static function dropIndex(
+        $indexRegex = '@(?<=^|/)(index|default)\.[a-z]{2,4}$@'
+    ) {
+        return function (UriInterface $uri) use ($indexRegex) {
+            $path = $uri->getPath();
+            if (preg_match($indexRegex, $path)) {
+                $uri = $uri->withPath(preg_replace($indexRegex, '', $path));
             }
 
             return $uri;

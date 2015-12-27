@@ -85,24 +85,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertUrlEquals($expected, $handler(new Uri($url)));
     }
 
-    public function getStripIndexTests()
-    {
-        return [
-            ['http://google.com/index.html', 'http://google.com/'],
-            ['http://google.com/', 'http://google.com/'],
-            ['http://google.com/foo', 'http://google.com/foo'],
-        ];
-    }
-
-    /**
-     * @dataProvider getStripIndexTests
-     */
-    public function testStripIndex($url, $expected)
-    {
-        $handler = Normalizer::stripIndex();
-        $this->assertUrlEquals($expected, $handler(new Uri($url)));
-    }
-
     public function getPreferredDomainTests()
     {
         return [
@@ -249,6 +231,27 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $uri = new Uri($uriString);
         $normalizer = Normalizer::addTrailingSlash();
+        $this->assertUrlEquals($expected, $normalizer($uri));
+    }
+
+    public function dropIndexTests()
+    {
+        return [
+            ['/', '/'],
+            ['/index.html', '/'],
+            ['index.html', ''],
+            ['index.cfm', ''],
+            ['default.html', ''],
+        ];
+    }
+
+    /**
+     * @dataProvider dropIndexTests
+     */
+    public function testDropIndex($uriString, $expected)
+    {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::dropIndex();
         $this->assertUrlEquals($expected, $normalizer($uri));
     }
 
