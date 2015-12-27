@@ -196,7 +196,7 @@ class Normalizations
             if (substr($path, -1) !== '/') {
                 $ext = pathinfo($path, PATHINFO_EXTENSION);
                 if (!$ext) {
-                    $uri = $uri->withPath($uri->getPath().'/');
+                    $uri = $uri->withPath($path.'/');
                 }
             }
 
