@@ -38,16 +38,4 @@ class Normalizer
 
         return $uri;
     }
-
-    protected function createUri($uri)
-    {
-        if (!$uri instanceof UriInterface) {
-            $uri = new Uri($uri);
-        }
-        if (!$uri instanceof TraceableUri) {
-            $uri = new TraceableUri($uri);
-        }
-
-        return $uri;
-    }
 }
