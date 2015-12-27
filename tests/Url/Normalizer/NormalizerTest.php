@@ -56,25 +56,28 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $calls);
     }
 
-    public function testDoesNotNormalizeUnmatchedUrls() {
-        $matcher = function() { return false; };
+    public function testDoesNotNormalizeUnmatchedUrls()
+    {
+        $matcher = function () { return false; };
         $normalizer = new Normalizer([
-            function(UriInterface $uri) {
+            function (UriInterface $uri) {
                 $this->fail('Normalizers were called when the matcher returned false.');
-            }
+            },
         ], $matcher);
         $uri = new Uri('http://foo.com');
         $normalizer($uri);
     }
 
-    public function testNormalizesMatchedUrls() {
+    public function testNormalizesMatchedUrls()
+    {
         $calls = 0;
-        $matcher = function() { return true; };
+        $matcher = function () { return true; };
         $normalizer = new Normalizer([
-           function(UriInterface $uri) use (&$calls) {
+           function (UriInterface $uri) use (&$calls) {
                ++$calls;
+
                return $uri;
-           }
+           },
         ], $matcher);
         $uri = new Uri('http://foo.com');
         $normalizer($uri);

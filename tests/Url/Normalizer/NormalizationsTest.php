@@ -7,7 +7,8 @@ use GuzzleHttp\Psr7\Uri;
 
 class NormalizationsTest extends \PHPUnit_Framework_TestCase
 {
-    private function uri($uriString) {
+    private function uri($uriString)
+    {
         return new Uri($uriString);
     }
 

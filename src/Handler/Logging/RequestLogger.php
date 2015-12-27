@@ -6,7 +6,6 @@ use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Uri\TraceableUri;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -51,17 +50,9 @@ class RequestLogger implements EventSubscriberInterface
     {
         $uri = $this->getUri($event);
 
-        if ($uri instanceof TraceableUri && $uri->getNext()) {
-            $this->logger->debug(sprintf('Sending %s as a retry for %s', $uri,
-                $uri->getNext()), [
-                'url' => (string) $uri,
-                'retry' => (string) $uri->getNext(),
-            ]);
-        } else {
-            $this->logger->debug(sprintf('Sending %s', $uri), [
-                'url' => (string) $uri,
-            ]);
-        }
+        $this->logger->debug(sprintf('Sending %s', $uri), [
+            'url' => (string) $uri,
+        ]);
     }
 
     public function onSuccess(CrawlerResponseEvent $event)

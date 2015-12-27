@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Uri;
 
-use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -22,9 +21,9 @@ class Normalizer
 
     public function __invoke(UriInterface $uri)
     {
-        if($this->matcher) {
+        if ($this->matcher) {
             $matcher = $this->matcher;
-            if(!$matcher($uri)) {
+            if (!$matcher($uri)) {
                 return $uri;
             }
         }

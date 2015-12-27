@@ -4,13 +4,11 @@ namespace LastCall\Crawler\Test\Handler\Logging;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Uri\TraceableUri;
 use Psr\Log\LoggerInterface;
 
 class RequestLoggerTest extends \PHPUnit_Framework_TestCase
@@ -27,23 +25,6 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $logger->debug('Sending https://lastcallmedia.com', [
             'url' => 'https://lastcallmedia.com',
         ])->shouldHaveBeenCalled();
-    }
-
-    public function testSendingLoggingRetry()
-    {
-        $uri = new TraceableUri(new Uri('https://lastcallmedia.com'));
-        $uri = $uri->withFragment('foo')->getPrevious();
-
-        $request = new Request('GET', $uri);
-        $logger = $this->prophesize(LoggerInterface::class);
-        $handler = new RequestLogger($logger->reveal());
-        $event = new CrawlerEvent($request);
-        $this->invokeEvent($handler, CrawlerEvents::SENDING, $event);
-        $logger->debug('Sending https://lastcallmedia.com as a retry for https://lastcallmedia.com#foo',
-            [
-                'url' => 'https://lastcallmedia.com',
-                'retry' => 'https://lastcallmedia.com#foo',
-            ])->shouldHaveBeenCalled();
     }
 
     public function testSuccessLogging()
