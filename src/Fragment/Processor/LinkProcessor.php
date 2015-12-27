@@ -7,12 +7,12 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\HasResolvingNormalizer;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\FragmentSubscription;
+use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\Normalizer;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements FragmentProcessorInterface
 {
-    use HasResolvingNormalizer;
 
     public function getSubscribedMethods()
     {
@@ -40,11 +40,13 @@ class LinkProcessor implements FragmentProcessorInterface
         $urls = array_unique($crawler->extract(['href']));
 
         $request = $event->getRequest();
-        $normalizer = $this->getResolvingNormalizer($request->getUri(), $this->normalizer);
+        $resolve = Normalizations::resolve($request->getUri());
+        $normalizer = $this->normalizer;
         $matcher = $this->matcher;
 
         foreach ($urls as $url) {
             $uri = new Uri($url);
+            $uri = $resolve($uri);
             $uri = $normalizer($uri);
 
             if ($matcher($uri)) {
