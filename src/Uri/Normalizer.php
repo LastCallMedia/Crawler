@@ -141,18 +141,6 @@ class Normalizer
     }
 
     /**
-     * Strip off the URL fragment (#fragment).
-     *
-     * @return \Closure
-     */
-    public static function stripFragment()
-    {
-        return function (UriInterface $uri) {
-            return $uri->getFragment() ? $uri->withFragment(false) : $uri;
-        };
-    }
-
-    /**
      * Use http instead of https.
      *
      * @return \Closure
@@ -318,6 +306,9 @@ class Normalizer
     /**
      * Strip off an index page (index.html, index.php, etc).
      *
+     * This is a breaking normalization.  It may or may not be safe to use,
+     * depending on the server setup.
+     *
      * @param string $indexRegex
      *
      * @return \Closure
@@ -332,6 +323,20 @@ class Normalizer
             }
 
             return $uri;
+        };
+    }
+
+    /**
+     * Strip off the URL fragment (#fragment).
+     *
+     * This is usually a safe normalization.
+     *
+     * @return \Closure
+     */
+    public static function dropFragment()
+    {
+        return function (UriInterface $uri) {
+            return $uri->getFragment() ? $uri->withFragment(false) : $uri;
         };
     }
 }

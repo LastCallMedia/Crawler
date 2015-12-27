@@ -45,29 +45,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertUrlEquals($expected, $handler(new Uri($url)));
     }
 
-    public function getStripFragmentTests()
-    {
-        return [
-            [
-                'http://google.com/index.html',
-                'http://google.com/index.html',
-            ],
-            [
-                'http://google.com/index.html#foo',
-                'http://google.com/index.html',
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider getStripFragmentTests
-     */
-    public function testStripFragment($url, $expected)
-    {
-        $handler = Normalizer::stripFragment();
-        $this->assertUrlEquals($expected, $handler(new Uri($url)));
-    }
-
     public function getStripSSLTests()
     {
         return [
@@ -259,5 +236,29 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
         $this->assertEquals($expected, (string) $url);
+    }
+
+    public function dropFragmentTests()
+    {
+        return [
+            [
+                'http://google.com/index.html',
+                'http://google.com/index.html',
+            ],
+            [
+                'http://google.com/index.html#foo',
+                'http://google.com/index.html',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dropFragmentTests
+     */
+    public function testDropFragment($urlString, $expected)
+    {
+        $uri = new Uri($urlString);
+        $handler = Normalizer::dropFragment();
+        $this->assertUrlEquals($expected, $handler($uri));
     }
 }

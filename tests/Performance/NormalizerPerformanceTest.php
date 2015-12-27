@@ -21,11 +21,11 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
             [Normalizer::decodeUnreserved(), 'Normalizer::decodeUnreserved()'],
             [Normalizer::addTrailingSlash(), 'Normalizer::addTrailingSlash()'],
             [Normalizer::dropIndex(), 'Normalizer::dropIndex()'],
+            [Normalizer::dropFragment(), 'Normalizer::dropFragment()'],
             [
                 Normalizer::preferredDomainMap(['lastcallmedia.com' => 'foo.com']),
                 'Normalizer::preferredDomainMap()',
             ],
-            [Normalizer::stripFragment(), 'Normalizer::stripFragment()'],
         ];
     }
 

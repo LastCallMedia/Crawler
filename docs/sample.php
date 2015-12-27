@@ -15,7 +15,7 @@ $config = new Configuration('https://lastcallmedia.com');
 // Add some normalizers to clean up URLs.
 $config['normalizers'] = [
     Normalizer::normalizeCase(),
-    Normalizer::stripFragment()
+    Normalizer::dropFragment()
 ];
 
 // Add a logger.  Normally, we'd use something like Monolog.
