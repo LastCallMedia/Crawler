@@ -97,9 +97,16 @@ class Normalizer
         if ($this->traceable && !$uri instanceof TraceableUri) {
             $uri = new TraceableUri($uri);
         }
-        foreach ($this->handlers as $handler) {
-            $uri = $handler($uri);
+
+        do {
+            $str = (string) $uri;
+            foreach ($this->handlers as $handler) {
+                $uri = $handler($uri);
+            }
+            $newStr = (string) $uri;
         }
+        // Normalization is achieved once running normalizers causes no changes.
+        while ($str !== $newStr);
 
         return $uri;
     }
@@ -273,7 +280,11 @@ class Normalizer
     public static function dropFragment()
     {
         return function (UriInterface $uri) {
-            return $uri->getFragment() ? $uri->withFragment(false) : $uri;
+            if ($uri->getFragment()) {
+                $uri = $uri->withFragment(false);
+            }
+
+            return $uri;
         };
     }
 
@@ -287,9 +298,13 @@ class Normalizer
     public static function rewriteScheme(array $map)
     {
         return function (UriInterface $uri) use ($map) {
-            $scheme = $uri->getScheme();
-            if (isset($map[$scheme])) {
-                $uri = $uri->withScheme($map[$scheme]);
+            $originalScheme = $scheme = $uri->getScheme();
+            while (isset($map[$scheme])) {
+                $scheme = $map[$scheme];
+            }
+
+            if ($originalScheme !== $scheme) {
+                $uri = $uri->withScheme($scheme);
             }
 
             return $uri;
@@ -306,9 +321,12 @@ class Normalizer
     public static function rewriteHost(array $map)
     {
         return function (UriInterface $uri) use ($map) {
-            $host = $uri->getHost();
-            if (isset($map[$host])) {
-                $uri = $uri->withHost($map[$host]);
+            $originalHost = $host = $uri->getHost();
+            while (isset($map[$host])) {
+                $host = $map[$host];
+            }
+            if ($host !== $originalHost) {
+                $uri = $uri->withHost($host);
             }
 
             return $uri;

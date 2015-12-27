@@ -42,6 +42,27 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Assert that the normalizer runs until a run returns the exact same url as
+     * the previous run.
+     */
+    public function testReinvokesNormalizers()
+    {
+        $calls = 0;
+        $normalizer = new Normalizer([
+            Normalizer::rewriteHost(['www.foo.com' => 'www2.foo.com']),
+            Normalizer::rewriteHost(['foo.com' => 'www.foo.com']),
+            function ($uri) use (&$calls) {
+                ++$calls;
+
+                return $uri;
+            },
+        ]);
+        $uri = new Uri('http://foo.com');
+        $this->assertUrlEquals('http://www2.foo.com', $normalizer($uri));
+        $this->assertEquals(3, $calls);
+    }
+
+    /**
      * @dataProvider getTrailingSlashTests
      */
     public function testStripTrailingSlash($url, $expected)
