@@ -116,14 +116,9 @@ class Normalizations
             }
             $host = $uri->getHost();
 
-            if (!ctype_lower($host)) {
-                // Only convert ASCII A-Z to lowercase.
-                $lower = preg_replace_callback('/[A-Z]+/', function ($matches) {
-                    return strtolower($matches[0]);
-                }, $host);
-                if ($lower !== $host) {
-                    $uri = $uri->withHost($lower);
-                }
+            $lower = mb_strtolower($host);
+            if ($lower !== $host) {
+                $uri = $uri->withHost($lower);
             }
 
             return $uri;
