@@ -27,6 +27,7 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
             [Normalizer::rewriteScheme([
                 'https' => 'http',
             ]), 'Normalizer::rewriteScheme()'],
+            [Normalizer::sortQuery(), 'Normalizer::sortQuery()'],
         ];
     }
 
@@ -37,8 +38,8 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
     {
         $uris = [
             new Uri('https://lastcallmedia.com/index%3a.html'),
-            new Uri('https://LastCallMedia.com/foo'),
-            new Uri('https://lastcallmedia.com/bar#baz'),
+            new Uri('https://LastCallMedia.com/foo?bar'),
+            new Uri('https://lastcallmedia.com/bar?foo&bar#baz'),
         ];
         $stopwatch = new Stopwatch();
         $stopwatch->start('normalizer', $name);

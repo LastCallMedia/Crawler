@@ -179,11 +179,13 @@ class Normalizer
         return function (UriInterface $uri) {
             foreach (['Host', 'Path', 'Query', 'Fragment'] as $partName) {
                 $part = $uri->{"get$partName"}();
-                if (preg_match('/%[0-9a-f]{2}/', $part)) {
+                if (!empty($part) && strpos($part, '%') !== false) {
                     $upper = preg_replace_callback('/%[0-9a-f]{2}+/', function ($matches) {
                         return strtoupper($matches[0]);
                     }, $part);
-                    $uri = $uri->{"with$partName"}($upper);
+                    if ($upper !== $part) {
+                        $uri = $uri->{"with$partName"}($upper);
+                    }
                 }
             }
 
@@ -205,7 +207,7 @@ class Normalizer
         return function (UriInterface $uri) use ($regex) {
             foreach (['Host', 'Path', 'Query', 'Fragment'] as $partName) {
                 $part = $uri->{"get$partName"}();
-                if (preg_match($regex, $part)) {
+                if (!empty($part) && strpos($part, '%') !== false && preg_match($regex, $part)) {
                     $fixed = preg_replace_callback($regex, function ($matches) {
                         return rawurldecode($matches[0]);
                     }, $part);
@@ -249,13 +251,12 @@ class Normalizer
      *
      * @return \Closure
      */
-    public static function dropIndex(
-        $indexRegex = '@(?<=^|/)(index|default)\.[a-z]{2,4}$@'
-    ) {
-        return function (UriInterface $uri) use ($indexRegex) {
+    public static function dropIndex()
+    {
+        return function (UriInterface $uri) {
             $path = $uri->getPath();
-            if (preg_match($indexRegex, $path)) {
-                $uri = $uri->withPath(preg_replace($indexRegex, '', $path));
+            if (preg_match('@(?<=^|/)(index|default)\.[a-z]{2,4}$@', $path)) {
+                $uri = $uri->withPath(preg_replace('@(?<=^|/)(index|default)\.[a-z]{2,4}$@', '', $path));
             }
 
             return $uri;
@@ -308,6 +309,28 @@ class Normalizer
             $host = $uri->getHost();
             if (isset($map[$host])) {
                 $uri = $uri->withHost($map[$host]);
+            }
+
+            return $uri;
+        };
+    }
+
+    /**
+     * Sort query parameters alphabetically.
+     *
+     * @return \Closure
+     */
+    public static function sortQuery()
+    {
+        return function (UriInterface $uri) {
+            $query = $uri->getQuery();
+            if (!empty($query) && strpos($query, '&') !== false) {
+                $params = \GuzzleHttp\Psr7\parse_query($query);
+                ksort($params);
+                $newQuery = \GuzzleHttp\Psr7\build_query($params);
+                if ($newQuery !== $query) {
+                    $uri = $uri->withQuery($newQuery);
+                }
             }
 
             return $uri;

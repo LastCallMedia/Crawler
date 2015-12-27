@@ -206,4 +206,23 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->assertUrlEquals($expected, $normalizer($uri));
     }
+
+    public function sortQueryTests()
+    {
+        return [
+            ['', ''],
+            ['foo?bar', 'foo?bar'],
+            ['foo?baz&bar', 'foo?bar&baz'],
+        ];
+    }
+
+    /**
+     * @dataProvider sortQueryTests
+     */
+    public function testSortQuery($uriString, $expected)
+    {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::sortQuery();
+        $this->assertUrlEquals($expected, $normalizer($uri));
+    }
 }
