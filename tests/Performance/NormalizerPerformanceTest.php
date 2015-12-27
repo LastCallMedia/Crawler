@@ -22,10 +22,12 @@ class NormalizerPerformanceTest extends \PHPUnit_Framework_TestCase
             [Normalizer::addTrailingSlash(), 'Normalizer::addTrailingSlash()'],
             [Normalizer::dropIndex(), 'Normalizer::dropIndex()'],
             [Normalizer::dropFragment(), 'Normalizer::dropFragment()'],
-            [
-                Normalizer::preferredDomainMap(['lastcallmedia.com' => 'foo.com']),
-                'Normalizer::preferredDomainMap()',
-            ],
+            [Normalizer::rewriteHost([
+                'lastcallmedia.com' => 'www.lastcallmedia.com',
+            ]), 'Normalizer::rewriteHost()'],
+            [Normalizer::rewriteScheme([
+                'https' => 'http',
+            ]), 'Normalizer::rewriteScheme()'],
         ];
     }
 

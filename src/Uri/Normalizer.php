@@ -124,35 +124,6 @@ class Normalizer
     }
 
     /**
-     * Give a list of preferred domains that will be used.  An example of this
-     * would be preferring the www. form of the domain.
-     *
-     * @param array $map
-     *
-     * @return \Closure
-     */
-    public static function preferredDomainMap(array $map)
-    {
-        return function (UriInterface $uri) use ($map) {
-            $host = $uri->getHost();
-
-            return isset($map[$host]) ? $uri->withHost($map[$host]) : $uri;
-        };
-    }
-
-    /**
-     * Use http instead of https.
-     *
-     * @return \Closure
-     */
-    public static function stripSSL()
-    {
-        return function (UriInterface $uri) {
-            return $uri->getScheme() == 'https' ? $uri->withScheme('http') : $uri;
-        };
-    }
-
-    /**
      * Strip a trailing slash off of the url path.
      *
      * @return \Closure
@@ -337,6 +308,44 @@ class Normalizer
     {
         return function (UriInterface $uri) {
             return $uri->getFragment() ? $uri->withFragment(false) : $uri;
+        };
+    }
+
+    /**
+     * Change the scheme according to a map.
+     *
+     * @param array $map
+     *
+     * @return \Closure
+     */
+    public static function rewriteScheme(array $map)
+    {
+        return function (UriInterface $uri) use ($map) {
+            $scheme = $uri->getScheme();
+            if (isset($map[$scheme])) {
+                $uri = $uri->withScheme($map[$scheme]);
+            }
+
+            return $uri;
+        };
+    }
+
+    /**
+     * Change the hostname according to a map.
+     *
+     * @param array $map
+     *
+     * @return \Closure
+     */
+    public static function rewriteHost(array $map)
+    {
+        return function (UriInterface $uri) use ($map) {
+            $host = $uri->getHost();
+            if (isset($map[$host])) {
+                $uri = $uri->withHost($map[$host]);
+            }
+
+            return $uri;
         };
     }
 }

@@ -7,6 +7,12 @@ use LastCall\Crawler\Uri\Normalizer;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    protected function assertUrlEquals($expected, $url)
+    {
+        $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
+        $this->assertEquals($expected, (string) $url);
+    }
+
     public function getTrailingSlashTests()
     {
         return [
@@ -17,10 +23,9 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testReturnsUriObject()
     {
+        $uri = new Uri('http://foo.com');
         $normalizer = new Normalizer();
-        $normal = $normalizer(new Uri('http://foo.com'));
-        $this->assertInstanceOf('Psr\Http\Message\UriInterface', $normal);
-        $this->assertEquals('http://foo.com', (string) $normal);
+        $this->assertUrlEquals('http://foo.com', $normalizer($uri));
     }
 
     public function testCallsNormalizers()
@@ -43,53 +48,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = Normalizer::stripTrailingSlash();
         $this->assertUrlEquals($expected, $handler(new Uri($url)));
-    }
-
-    public function getStripSSLTests()
-    {
-        return [
-            ['http://google.com', 'http://google.com'],
-            ['https://google.com', 'http://google.com'],
-        ];
-    }
-
-    /**
-     * @dataProvider getStripSSLTests
-     */
-    public function testStripSSL($url, $expected)
-    {
-        $handler = Normalizer::stripSSL();
-        $this->assertUrlEquals($expected, $handler(new Uri($url)));
-    }
-
-    public function getPreferredDomainTests()
-    {
-        return [
-            [
-                'http://google.com',
-                'http://www.google.com',
-                ['google.com' => 'www.google.com'],
-            ],
-            [
-                'http://www.google.com',
-                'http://www.google.com',
-                ['google.com' => 'www.google.com'],
-            ],
-            [
-                'http://alta-vista.com',
-                'http://alta-vista.com',
-                ['google.com' => 'www.google.com'],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider getPreferredDomainTests
-     */
-    public function testPreferredDomainMap($url, $expected, $map)
-    {
-        $pass = Normalizer::preferredDomainMap($map);
-        $this->assertUrlEquals($expected, $pass(new Uri($url)));
     }
 
     public function getNormalizeCaseTests()
@@ -232,12 +190,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertUrlEquals($expected, $normalizer($uri));
     }
 
-    protected function assertUrlEquals($expected, $url)
-    {
-        $this->assertInstanceOf('Psr\Http\Message\UriInterface', $url);
-        $this->assertEquals($expected, (string) $url);
-    }
-
     public function dropFragmentTests()
     {
         return [
@@ -260,5 +212,45 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $uri = new Uri($urlString);
         $handler = Normalizer::dropFragment();
         $this->assertUrlEquals($expected, $handler($uri));
+    }
+
+    public function rewriteSchemeTests()
+    {
+        return [
+            ['', ''],
+            ['http://foo', 'https://foo'],
+            ['https://foo', 'https://foo'],
+        ];
+    }
+
+    /**
+     * @dataProvider rewriteSchemeTests
+     */
+    public function testRewriteScheme($uriString, $expected)
+    {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::rewriteScheme(['http' => 'https']);
+        $this->assertUrlEquals($expected, $normalizer($uri));
+    }
+
+    public function rewriteHostTests()
+    {
+        return [
+            ['', ''],
+            ['http://foo.com', 'http://www.foo.com'],
+            ['http://www.foo.com', 'http://www.foo.com'],
+        ];
+    }
+
+    /**
+     * @dataProvider rewriteHostTests
+     */
+    public function testrewriteHost($uriString, $expected)
+    {
+        $uri = new Uri($uriString);
+        $normalizer = Normalizer::rewriteHost([
+            'foo.com' => 'www.foo.com',
+        ]);
+        $this->assertUrlEquals($expected, $normalizer($uri));
     }
 }
