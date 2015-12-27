@@ -56,7 +56,7 @@ class Matcher
             }
 
             return true;
-        } elseif (self::ANY === $this->mode) {
+        } else {
             foreach ($this->handlers as $handler) {
                 if (false !== $handler($uri)) {
                     return true;
