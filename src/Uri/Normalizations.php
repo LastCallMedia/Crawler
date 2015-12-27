@@ -237,7 +237,7 @@ class Normalizations
     {
         return function (UriInterface $uri) {
             if ($uri->getFragment()) {
-                $uri = $uri->withFragment(false);
+                $uri = $uri->withFragment('');
             }
 
             return $uri;
