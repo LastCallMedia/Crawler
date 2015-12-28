@@ -50,25 +50,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         return $session;
     }
 
-    public function testTeardownEventIsDispatched()
-    {
-        $session = $this->getMockSession();
-        $session->onTeardown()->shouldBeCalledTimes(1);
-        $client = $this->prophesize(ClientInterface::class);
-
-        $crawler = new Crawler($session->reveal(), $client->reveal());
-        $crawler->teardown();
-    }
-
-    public function testSetupEventIsDispatched()
-    {
-        $session = $this->getMockSession();
-        $session->onSetup()->shouldBeCalledTimes(1);
-        $client = $this->prophesize(ClientInterface::class);
-        $crawler = new Crawler($session->reveal(), $client->reveal());
-        $crawler->setUp();
-    }
-
     public function testItemIsCompletedOnSuccess()
     {
         $queue = new ArrayRequestQueue();

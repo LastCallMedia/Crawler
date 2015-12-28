@@ -122,20 +122,4 @@ class Crawler
             return \GuzzleHttp\Promise\rejection_for($reason);
         };
     }
-
-    /**
-     * Execute setup tasks.
-     */
-    public function setUp()
-    {
-        $this->session->onSetup();
-    }
-
-    /**
-     * Execute teardown tasks.
-     */
-    public function teardown()
-    {
-        $this->session->onTeardown();
-    }
 }
