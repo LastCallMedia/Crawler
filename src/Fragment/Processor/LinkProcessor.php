@@ -4,7 +4,6 @@ namespace LastCall\Crawler\Fragment\Processor;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Common\HasResolvingNormalizer;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\FragmentSubscription;
 use LastCall\Crawler\Uri\Normalizations;
@@ -13,7 +12,6 @@ use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements FragmentProcessorInterface
 {
-
     public function getSubscribedMethods()
     {
         return [

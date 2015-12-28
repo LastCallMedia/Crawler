@@ -4,7 +4,6 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
-use LastCall\Crawler\Common\HasResolvingNormalizer;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;

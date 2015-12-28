@@ -20,16 +20,18 @@ class Matcher
      *
      * @return \LastCall\Crawler\Uri\Matcher
      */
-    public static function all() {
+    public static function all()
+    {
         return new self(self::ALL);
     }
 
     /**
      * Create a new matcher that requires any condition to be matched.
-     * 
+     *
      * @return \LastCall\Crawler\Uri\Matcher
      */
-    public static function any() {
+    public static function any()
+    {
         return new self(self::ANY);
     }
 

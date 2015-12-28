@@ -7,7 +7,8 @@ use LastCall\Crawler\Uri\Matcher;
 
 class MatcherTest extends \PHPUnit_Framework_TestCase
 {
-    private function uri($string) {
+    private function uri($string)
+    {
         return new Uri($string);
     }
     public function testAllReturnsTrueWhenAllReturnTrue()
@@ -79,7 +80,8 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider schemeMatchesTests
      */
-    public function testSchemeMatches($assertArgs, $uriString, $expected) {
+    public function testSchemeMatches($assertArgs, $uriString, $expected)
+    {
         $matcher = Matcher::all()->schemeMatches($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
@@ -96,7 +98,8 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider hostIsTests
      */
-    public function testHostIs($assertArgs, $uriString, $expected) {
+    public function testHostIs($assertArgs, $uriString, $expected)
+    {
         $matcher = Matcher::all()->hostIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
