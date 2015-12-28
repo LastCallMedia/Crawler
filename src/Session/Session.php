@@ -108,7 +108,7 @@ class Session implements SessionInterface
         return $this->queue->count() === 0;
     }
 
-    public function onSetup()
+    public function setup()
     {
         if ($this->queue instanceof SetupTeardownInterface) {
             $this->queue->onSetup();
@@ -116,7 +116,7 @@ class Session implements SessionInterface
         $this->dispatcher->dispatch(CrawlerEvents::SETUP);
     }
 
-    public function onTeardown()
+    public function teardown()
     {
         if ($this->queue instanceof SetupTeardownInterface) {
             $this->queue->onTeardown();

@@ -46,8 +46,8 @@ class CrawlCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if ($input->getOption('reset')) {
-            $session->onTeardown();
-            $session->onSetup();
+            $session->teardown();
+            $session->setup();
             $io->success('Resetting');
         }
 

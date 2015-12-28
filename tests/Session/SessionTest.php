@@ -107,7 +107,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $session = new Session('https://lastcallmedia.com', null,
             $dispatcher->reveal());
-        $session->onSetup();
+        $session->setup();
     }
 
     public function testTeardown()
@@ -117,7 +117,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $session = new Session('https://lastcallmedia.com', null,
             $dispatcher->reveal());
-        $session->onTeardown();
+        $session->teardown();
     }
 
     public function testNext()
@@ -228,7 +228,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $queue->onSetup()->shouldBeCalled();
 
         $session = new Session('https://lastcallmedia.com', $queue->reveal());
-        $session->onSetup();
+        $session->setup();
     }
 
     public function testTearsDownQueue()
@@ -238,6 +238,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $queue->onTeardown()->shouldBeCalled();
 
         $session = new Session('https://lastcallmedia.com', $queue->reveal());
-        $session->onTeardown();
+        $session->teardown();
     }
 }

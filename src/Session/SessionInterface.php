@@ -48,12 +48,12 @@ interface SessionInterface
     /**
      * Dispatch a setup event.
      */
-    public function onSetup();
+    public function setup();
 
     /**
      * Dispatch a teardown event.
      */
-    public function onTeardown();
+    public function teardown();
 
     /**
      * Dispatch a request sending event.

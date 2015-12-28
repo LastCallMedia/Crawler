@@ -58,11 +58,11 @@ class SetupTeardownCommand extends Command
         $session = $helper->getSession($config);
 
         if ($this->tearsDown) {
-            $session->onTeardown();
+            $session->teardown();
             $io->success('Teardown complete.');
         }
         if ($this->setsUp) {
-            $session->onSetup();
+            $session->setup();
             $io->success('Setup complete.');
         }
     }

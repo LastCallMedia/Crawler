@@ -35,8 +35,8 @@ class WorkCommandTest extends \PHPUnit_Framework_TestCase
     {
         $configuration = new Configuration('https://lastcallmedia.com');
         $session = $this->prophesize(SessionInterface::class);
-        $session->onTeardown()->shouldBeCalled();
-        $session->onSetup()->shouldBeCalled();
+        $session->teardown()->shouldBeCalled();
+        $session->setup()->shouldBeCalled();
 
         $crawler = $this->prophesize(Crawler::class);
         $crawler->start(Argument::any(), Argument::any())
