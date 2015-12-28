@@ -124,6 +124,11 @@ class Session implements SessionInterface
         $this->dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
 
+    public function finish()
+    {
+        $this->dispatcher->dispatch(CrawlerEvents::FINISH);
+    }
+
     private function dispatch($eventName, CrawlerEvent $event)
     {
         $this->dispatcher->dispatch($eventName, $event);

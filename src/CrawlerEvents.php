@@ -45,6 +45,8 @@ class CrawlerEvents
 
     /**
      * Setup tasks have been requested.
+     *
+     * @Event
      */
     const SETUP = 'crawler.setup';
 
@@ -54,4 +56,11 @@ class CrawlerEvents
      * @Event
      */
     const TEARDOWN = 'crawler.teardown';
+
+    /**
+     * Finish tasks have been requested.
+     *
+     * @Event
+     */
+    const FINISH = 'crawler.finish';
 }

@@ -120,6 +120,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $session->teardown();
     }
 
+    public function testFinish()
+    {
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->dispatch(CrawlerEvents::FINISH)->shouldBeCalledTimes(1);
+
+        $session = new Session('https://lastcallmedia.com', null, $dispatcher->reveal());
+        $session->finish();
+    }
+
     public function testNext()
     {
         $request = new Request('GET', 'https://lastcallmedia.com');

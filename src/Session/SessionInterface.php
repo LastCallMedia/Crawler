@@ -56,6 +56,11 @@ interface SessionInterface
     public function teardown();
 
     /**
+     * Dispatch a finish event.
+     */
+    public function finish();
+
+    /**
      * Dispatch a request sending event.
      *
      * @param \Psr\Http\Message\RequestInterface $request

@@ -37,6 +37,7 @@ class WorkCommandTest extends \PHPUnit_Framework_TestCase
         $session = $this->prophesize(SessionInterface::class);
         $session->teardown()->shouldBeCalled();
         $session->setup()->shouldBeCalled();
+        $session->finish()->shouldBeCalled();
 
         $crawler = $this->prophesize(Crawler::class);
         $crawler->start(Argument::any(), Argument::any())

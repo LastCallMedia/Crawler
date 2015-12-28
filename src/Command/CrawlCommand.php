@@ -57,6 +57,7 @@ class CrawlCommand extends Command
         $promise = $crawler->start($chunk, $seed);
 
         $promise->wait();
+        $session->finish();
         $io->success('Crawling complete.');
     }
 }
