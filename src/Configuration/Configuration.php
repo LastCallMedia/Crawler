@@ -57,9 +57,9 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         };
         $this['matcher'] = function () {
             $baseUri = new Uri($this['baseUrl']);
-            $matcher = Matcher::create();
-            $matcher->schemeIs($baseUri->getScheme());
-            $matcher->hostIs($baseUri->getHost());
+            $matcher = Matcher::all()
+                ->schemeIs($baseUri->getScheme())
+                ->hostIs($baseUri->getHost());
 
             return $matcher;
         };

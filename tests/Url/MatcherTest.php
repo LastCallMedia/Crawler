@@ -12,42 +12,38 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     }
     public function testAllReturnsTrueWhenAllReturnTrue()
     {
-        $matcher = Matcher::create()->all();
-        $matcher->always();
+        $matcher = Matcher::all()->always();
         $this->assertTrue($matcher(new Uri('foo')));
     }
 
     public function testAllReturnsFalseWhenAnyReturnFalse()
     {
-        $matcher = Matcher::create()->all();
-        $matcher->always()->never();
+        $matcher = Matcher::all()->always()->never();
         $this->assertFalse($matcher(new Uri('foo')));
     }
 
     public function testAnyReturnsTrueWhenAnyReturnTrue()
     {
-        $matcher = Matcher::create()->any();
-        $matcher->always()->never();
+        $matcher = Matcher::any()->always()->never();
         $this->assertTrue($matcher(new Uri('foo')));
     }
 
     public function testAnyReturnsFalseWhenNoneReturnTrue()
     {
-        $matcher = Matcher::create()->any();
-        $matcher->never()->never();
+        $matcher = Matcher::any()->never()->never();
         $this->assertFalse($matcher(new Uri('foo')));
     }
 
     public function testAlways()
     {
-        $matcher = Matcher::create();
+        $matcher = Matcher::all();
         $this->assertSame($matcher, $matcher->always());
         $this->assertTrue($matcher(new Uri('foo')));
     }
 
     public function testNever()
     {
-        $matcher = Matcher::create();
+        $matcher = Matcher::all();
         $this->assertSame($matcher, $matcher->never());
         $this->assertFalse($matcher(new Uri('foo')));
     }
@@ -66,7 +62,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testSchemeIs($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->schemeIs($assertArgs);
+        $matcher = Matcher::all()->schemeIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -84,7 +80,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      * @dataProvider schemeMatchesTests
      */
     public function testSchemeMatches($assertArgs, $uriString, $expected) {
-        $matcher = Matcher::create()->schemeMatches($assertArgs);
+        $matcher = Matcher::all()->schemeMatches($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -101,7 +97,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      * @dataProvider hostIsTests
      */
     public function testHostIs($assertArgs, $uriString, $expected) {
-        $matcher = Matcher::create()->hostIs($assertArgs);
+        $matcher = Matcher::all()->hostIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -119,7 +115,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testHostMatches($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->hostMatches($assertArgs);
+        $matcher = Matcher::all()->hostMatches($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -139,7 +135,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testPortIs($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->portIs($assertArgs);
+        $matcher = Matcher::all()->portIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -158,7 +154,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testPortIn($min, $max, $uriString, $expected)
     {
-        $matcher = Matcher::create()->portIn($min, $max);
+        $matcher = Matcher::all()->portIn($min, $max);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -177,7 +173,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testPathIs($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->pathIs($assertArgs);
+        $matcher = Matcher::all()->pathIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -199,7 +195,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testPathMatches($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->pathMatches($assertArgs);
+        $matcher = Matcher::all()->pathMatches($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -218,7 +214,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testPathExtensionIs($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->pathExtensionIs($assertArgs);
+        $matcher = Matcher::all()->pathExtensionIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -237,7 +233,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testQueryIs($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->queryIs($assertArgs);
+        $matcher = Matcher::all()->queryIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -256,7 +252,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testQueryMatches($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->queryMatches($assertArgs);
+        $matcher = Matcher::all()->queryMatches($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -275,7 +271,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testFragmentIs($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->fragmentIs($assertArgs);
+        $matcher = Matcher::all()->fragmentIs($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 
@@ -294,7 +290,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testFragmentMatches($assertArgs, $uriString, $expected)
     {
-        $matcher = Matcher::create()->fragmentMatches($assertArgs);
+        $matcher = Matcher::all()->fragmentMatches($assertArgs);
         $this->assertEquals($expected, $matcher($this->uri($uriString)));
     }
 }

@@ -16,17 +16,21 @@ class Matcher
     private $handlers = [];
 
     /**
-     * Create a new matcher instance.
-     *
-     * The root matcher requires that all conditions be fulfilled.
-     * If you want to add optional conditions, you can use the `any`
-     * method to return an OR branch.
+     * Create a new matcher instance that requires all conditions to be matched.
      *
      * @return \LastCall\Crawler\Uri\Matcher
      */
-    public static function create()
-    {
+    public static function all() {
         return new self(self::ALL);
+    }
+
+    /**
+     * Create a new matcher that requires any condition to be matched.
+     * 
+     * @return \LastCall\Crawler\Uri\Matcher
+     */
+    public static function any() {
+        return new self(self::ANY);
     }
 
     /**
@@ -72,7 +76,7 @@ class Matcher
      *
      * @return self
      */
-    public function all()
+    public function andAll()
     {
         return $this->handlers[] = new self(self::ALL);
     }
@@ -82,7 +86,7 @@ class Matcher
      *
      * @return self
      */
-    public function any()
+    public function andAny()
     {
         return $this->handlers[] = new self(self::ANY);
     }

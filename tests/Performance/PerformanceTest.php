@@ -224,7 +224,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
 
     public function testMatcher()
     {
-        $matcher = Matcher::create();
+        $matcher = Matcher::all();
         $matcher->schemeIs('http');
         $matcher->schemeMatches('/http/');
         $matcher->hostIs('lastcallmedia.com');
