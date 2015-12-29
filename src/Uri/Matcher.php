@@ -437,7 +437,7 @@ class Matcher
      *
      * @return self
      */
-    public function add(callable $handler)
+    private function add(callable $handler)
     {
         $this->handlers[] = $handler;
 
@@ -454,7 +454,7 @@ class Matcher
      *
      * @return self
      */
-    public function addNot(callable $handler)
+    private function addNot(callable $handler)
     {
         $this->handlers[] = MatcherAssert::not($handler);
 
