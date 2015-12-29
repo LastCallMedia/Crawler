@@ -30,6 +30,13 @@ class MatcherAssert
         };
     }
 
+    public static function not(callable $assert)
+    {
+        return function (UriInterface $uri) use ($assert) {
+            return !$assert($uri);
+        };
+    }
+
     /**
      * Match an explicit scheme.
      *

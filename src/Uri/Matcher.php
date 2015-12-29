@@ -110,7 +110,7 @@ class Matcher
      */
     public function never()
     {
-        return $this->add(MatcherAssert::never());
+        return $this->addNot(MatcherAssert::always());
     }
 
     /**
@@ -126,6 +126,18 @@ class Matcher
     }
 
     /**
+     * Add a condition that the scheme does not match exactly.
+     *
+     * @param $schemes
+     *
+     * @return \LastCall\Crawler\Uri\Matcher
+     */
+    public function schemeIsNot($schemes)
+    {
+        return $this->addNot(MatcherAssert::schemeIs($schemes));
+    }
+
+    /**
      * Add a condition that the scheme matches a PCRE pattern.
      *
      * @param string|string[] $patterns
@@ -135,6 +147,18 @@ class Matcher
     public function schemeMatches($patterns)
     {
         return $this->add(MatcherAssert::schemeMatches($patterns));
+    }
+
+    /**
+     * Add a condition that the scheme does not match a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return self
+     */
+    public function schemeNotMatches($patterns)
+    {
+        return $this->addNot(MatcherAssert::schemeMatches($patterns));
     }
 
     /**
@@ -150,6 +174,18 @@ class Matcher
     }
 
     /**
+     * Add a condition that the host does not match exactly.
+     *
+     * @param string|string[] $hosts
+     *
+     * @return self
+     */
+    public function hostIsNot($hosts)
+    {
+        return $this->addNot(MatcherAssert::hostIs($hosts));
+    }
+
+    /**
      * Add a condition that the host matches a PCRE pattern.
      *
      * @param string|string[] $patterns
@@ -162,6 +198,18 @@ class Matcher
     }
 
     /**
+     * Add a condition that the host does not match a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return self
+     */
+    public function hostNotMatches($patterns)
+    {
+        return $this->addNot(MatcherAssert::hostMatches($patterns));
+    }
+
+    /**
      * Add a condition that the port matches exactly.
      *
      * @param int|int[]|null $ports
@@ -171,6 +219,18 @@ class Matcher
     public function portIs($ports)
     {
         return $this->add(MatcherAssert::portIs($ports));
+    }
+
+    /**
+     * Add a condition that the port does not match exactly.
+     *
+     * @param int|int[]|null $ports
+     *
+     * @return self
+     */
+    public function portIsNot($ports)
+    {
+        return $this->addNot(MatcherAssert::portIs($ports));
     }
 
     /**
@@ -187,6 +247,19 @@ class Matcher
     }
 
     /**
+     * Add a condition that the port is outside a range.
+     *
+     * @param int $min
+     * @param int $max
+     *
+     * @return self
+     */
+    public function portNotIn($min, $max)
+    {
+        return $this->addNot(MatcherAssert::portIn($min, $max));
+    }
+
+    /**
      * Add a condition that the path matches exactly.
      *
      * @param string|string[] $paths
@@ -196,6 +269,18 @@ class Matcher
     public function pathIs($paths)
     {
         return $this->add(MatcherAssert::pathIs($paths));
+    }
+
+    /**
+     * Add a condition that the path does not match exactly.
+     *
+     * @param string|string[] $paths
+     *
+     * @return self
+     */
+    public function pathIsNot($paths)
+    {
+        return $this->addNot(MatcherAssert::pathIs($paths));
     }
 
     /**
@@ -211,6 +296,18 @@ class Matcher
     }
 
     /**
+     * Add a condition that the path does not end in a certain extension.
+     *
+     * @param string|string[] $exts
+     *
+     * @return self
+     */
+    public function pathExtensionIsNot($exts)
+    {
+        return $this->addNot(MatcherAssert::pathExtensionIs($exts));
+    }
+
+    /**
      * Add a condition that the path matches a PCRE pattern.
      *
      * @param string|string[] $patterns
@@ -220,6 +317,18 @@ class Matcher
     public function pathMatches($patterns)
     {
         return $this->add(MatcherAssert::pathMatches($patterns));
+    }
+
+    /**
+     * Add a condition that the path does not match a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return self
+     */
+    public function pathNotMatches($patterns)
+    {
+        return $this->addNot(MatcherAssert::pathMatches($patterns));
     }
 
     /**
@@ -235,6 +344,18 @@ class Matcher
     }
 
     /**
+     * Add a condition that the query string does not match exactly.
+     *
+     * @param string|string[] $queries
+     *
+     * @return self
+     */
+    public function queryIsNot($queries)
+    {
+        return $this->addNot(MatcherAssert::queryIs($queries));
+    }
+
+    /**
      * Add a condition that the query string matches a PCRE pattern.
      *
      * @param string|string[] $patterns
@@ -244,6 +365,18 @@ class Matcher
     public function queryMatches($patterns)
     {
         return $this->add(MatcherAssert::queryMatches($patterns));
+    }
+
+    /**
+     * Add a condition that the query string does not match a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return self
+     */
+    public function queryNotMatches($patterns)
+    {
+        return $this->addNot(MatcherAssert::queryMatches($patterns));
     }
 
     /**
@@ -259,6 +392,18 @@ class Matcher
     }
 
     /**
+     * Add a condition that the fragment does not match exactly.
+     *
+     * @param string|string[] $fragments
+     *
+     * @return self
+     */
+    public function fragmentIsNot($fragments)
+    {
+        return $this->addNot(MatcherAssert::fragmentIs($fragments));
+    }
+
+    /**
      * Add a condition that the fragment matches a PCRE pattern.
      *
      * @param string|string[] $patterns
@@ -268,6 +413,18 @@ class Matcher
     public function fragmentMatches($patterns)
     {
         return $this->add(MatcherAssert::fragmentMatches($patterns));
+    }
+
+    /**
+     * Add a condition that the fragment does not match a PCRE pattern.
+     *
+     * @param string|string[] $patterns
+     *
+     * @return self
+     */
+    public function fragmentNotMatches($patterns)
+    {
+        return $this->addNot(MatcherAssert::fragmentMatches($patterns));
     }
 
     /**
@@ -283,6 +440,23 @@ class Matcher
     public function add(callable $handler)
     {
         $this->handlers[] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Add an arbitrary callback function to the matcher, which will be negated.
+     *
+     * The callback must accept a `UriInterface` object as a parameter,
+     * and return a boolean value indicating whether the URI matches.
+     *
+     * @param callable $handler
+     *
+     * @return self
+     */
+    public function addNot(callable $handler)
+    {
+        $this->handlers[] = MatcherAssert::not($handler);
 
         return $this;
     }

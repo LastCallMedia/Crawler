@@ -40,8 +40,19 @@ class MatcherPerformanceTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function inverseMatcherPasses()
+    {
+        $passes = $this->getMatcherPasses();
+        foreach ($passes as &$pass) {
+            $pass[0] = MatcherAssert::not($pass[0]);
+            $pass[1] = substr($pass[1], 0, -1).', negative)';
+        }
+
+        return array_merge($this->getMatcherPasses(), $passes);
+    }
+
     /**
-     * @dataProvider getMatcherPasses
+     * @dataProvider inverseMatcherPasses
      */
     public function testMatcherPass(callable $pass, $name)
     {
