@@ -9,6 +9,7 @@ use LastCall\Crawler\Fragment\FragmentSubscription;
 use LastCall\Crawler\Uri\MatcherInterface;
 use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\Normalizer;
+use LastCall\Crawler\Uri\NormalizerInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements FragmentProcessorInterface
@@ -26,7 +27,7 @@ class LinkProcessor implements FragmentProcessorInterface
 
     public function __construct(
         MatcherInterface $matcher,
-        callable $normalizer
+        NormalizerInterface $normalizer
     ) {
         $this->matcher = $matcher;
         $this->normalizer = $normalizer;
@@ -40,12 +41,11 @@ class LinkProcessor implements FragmentProcessorInterface
 
         $request = $event->getRequest();
         $resolve = Normalizations::resolve($request->getUri());
-        $normalizer = $this->normalizer;
 
         foreach ($urls as $url) {
             $uri = new Uri($url);
             $uri = $resolve($uri);
-            $uri = $normalizer($uri);
+            $uri = $this->normalizer->normalize($uri);
 
             if ($this->matcher->matches($uri)) {
                 $newRequest = new Request('GET', $uri);

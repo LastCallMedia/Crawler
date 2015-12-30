@@ -9,7 +9,7 @@ use Psr\Http\Message\UriInterface;
  *
  * @see https://tools.ietf.org/html/rfc3986
  */
-class Normalizer
+class Normalizer implements NormalizerInterface
 {
     private $handlers = [];
 
@@ -20,6 +20,11 @@ class Normalizer
     }
 
     public function __invoke(UriInterface $uri)
+    {
+        return $this->normalize($uri);
+    }
+
+    public function normalize(UriInterface $uri)
     {
         if ($this->matcher) {
             if (!$this->matcher->matches($uri)) {
