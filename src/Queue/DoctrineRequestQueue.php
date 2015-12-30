@@ -63,16 +63,18 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $requests = array_diff_key($requests, $exists);
         if (count($requests)) {
             try {
-                $params = $clauses = [];
+                $params = $clauses = $types = [];
                 $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) VALUES ";
                 foreach ($requests as $i => $request) {
                     $clauses[] = '(0, ?, 1, ?)';
                     $params[] = $keys[$i];
                     $params[] = serialize($request);
                     $return[$i] = true;
+                    $types[] = \PDO::PARAM_STR;
+                    $types[] = \PDO::PARAM_STR;
                 }
                 $this->connection->executeUpdate($sql.implode(', ', $clauses),
-                    $params);
+                    $params, $types);
             } catch (UniqueConstraintViolationException $e) {
                 return $return;
             }
