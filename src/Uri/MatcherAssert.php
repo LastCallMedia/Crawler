@@ -34,8 +34,7 @@ class MatcherAssert
      */
     public static function schemeIs($schemes)
     {
-        $schemes = is_array($schemes) ? $schemes : [$schemes];
-        $schemes = array_flip($schemes);
+        $schemes = self::convertToKeyedArray($schemes);
 
         return function (UriInterface $uri) use ($schemes) {
             return isset($schemes[$uri->getScheme()]);
@@ -74,8 +73,7 @@ class MatcherAssert
      */
     public static function hostIs($hosts)
     {
-        $hosts = is_array($hosts) ? $hosts : [$hosts];
-        $hosts = array_flip($hosts);
+        $hosts = self::convertToKeyedArray($hosts);
 
         return function (UriInterface $uri) use ($hosts) {
             return isset($hosts[$uri->getHost()]);
@@ -147,8 +145,7 @@ class MatcherAssert
      */
     public static function pathIs($paths)
     {
-        $paths = is_array($paths) ? $paths : [$paths];
-        $paths = array_flip($paths);
+        $paths = self::convertToKeyedArray($paths);
 
         return function (UriInterface $uri) use ($paths) {
             return isset($paths[$uri->getPath()]);
@@ -157,8 +154,7 @@ class MatcherAssert
 
     public static function pathExtensionIs($extensions)
     {
-        $extensions = is_array($extensions) ? $extensions : [$extensions];
-        $extensions = array_flip($extensions);
+        $extensions = self::convertToKeyedArray($extensions);
 
         return function (UriInterface $uri) use ($extensions) {
             $ext = pathinfo($uri->getPath(), PATHINFO_EXTENSION);
@@ -199,8 +195,7 @@ class MatcherAssert
      */
     public static function queryIs($queries)
     {
-        $queries = is_array($queries) ? $queries : [$queries];
-        $queries = array_flip($queries);
+        $queries = self::convertToKeyedArray($queries);
 
         return function (UriInterface $uri) use ($queries) {
             return isset($queries[$uri->getQuery()]);
@@ -239,8 +234,7 @@ class MatcherAssert
      */
     public static function fragmentIs($fragments)
     {
-        $fragments = is_array($fragments) ? $fragments : [$fragments];
-        $fragments = array_flip($fragments);
+        $fragments = self::convertToKeyedArray($fragments);
 
         return function (UriInterface $uri) use ($fragments) {
             return isset($fragments[$uri->getFragment()]);
@@ -268,5 +262,12 @@ class MatcherAssert
 
             return false;
         };
+    }
+
+    private static function convertToKeyedArray($args)
+    {
+        $args = is_array($args) ? $args : [$args];
+
+        return array_flip($args);
     }
 }
