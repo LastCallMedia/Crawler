@@ -11,42 +11,75 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     {
         return new Uri($string);
     }
+
+    public function testAllReturnWithNoConditions()
+    {
+        $matcher = Matcher::all();
+        $this->assertTrue($matcher($this->uri('foo')));
+    }
+
+    public function testAnyReturnWithNoConditions()
+    {
+        $matcher = Matcher::any();
+        $this->assertTrue($matcher($this->uri('foo')));
+    }
+
     public function testAllReturnsTrueWhenAllReturnTrue()
     {
         $matcher = Matcher::all()->always();
-        $this->assertTrue($matcher(new Uri('foo')));
+        $this->assertTrue($matcher($this->uri('foo')));
     }
 
     public function testAllReturnsFalseWhenAnyReturnFalse()
     {
         $matcher = Matcher::all()->always()->never();
-        $this->assertFalse($matcher(new Uri('foo')));
+        $this->assertFalse($matcher($this->uri('foo')));
     }
 
     public function testAnyReturnsTrueWhenAnyReturnTrue()
     {
         $matcher = Matcher::any()->always()->never();
-        $this->assertTrue($matcher(new Uri('foo')));
+        $this->assertTrue($matcher($this->uri('foo')));
     }
 
     public function testAnyReturnsFalseWhenNoneReturnTrue()
     {
         $matcher = Matcher::any()->never()->never();
-        $this->assertFalse($matcher(new Uri('foo')));
+        $this->assertFalse($matcher($this->uri('foo')));
+    }
+
+    public function testAndAll()
+    {
+        $matcher = Matcher::all();
+        $subMatcher = $matcher->andAll();
+        $subMatcher->always();
+        $this->assertTrue($matcher($this->uri('foo')));
+        $subMatcher->never();
+        $this->assertFalse($matcher($this->uri('foo')));
+    }
+
+    public function testAndAny()
+    {
+        $matcher = Matcher::all();
+        $subMatcher = $matcher->andAny();
+        $subMatcher->never();
+        $this->assertFalse($matcher($this->uri('foo')));
+        $subMatcher->always();
+        $this->assertTrue($matcher($this->uri('foo')));
     }
 
     public function testAlways()
     {
         $matcher = Matcher::all();
         $this->assertSame($matcher, $matcher->always());
-        $this->assertTrue($matcher(new Uri('foo')));
+        $this->assertTrue($matcher($this->uri('foo')));
     }
 
     public function testNever()
     {
         $matcher = Matcher::all();
         $this->assertSame($matcher, $matcher->never());
-        $this->assertFalse($matcher(new Uri('foo')));
+        $this->assertFalse($matcher($this->uri('foo')));
     }
 
     public function schemeIsTests()

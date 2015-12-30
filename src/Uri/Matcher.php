@@ -54,6 +54,9 @@ class Matcher
      */
     public function __invoke(UriInterface $uri)
     {
+        if (empty($this->handlers)) {
+            return true;
+        }
         if (self::ALL === $this->mode) {
             foreach ($this->handlers as $handler) {
                 if (true !== $handler($uri)) {

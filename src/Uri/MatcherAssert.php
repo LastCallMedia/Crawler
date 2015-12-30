@@ -7,18 +7,6 @@ use Psr\Http\Message\UriInterface;
 class MatcherAssert
 {
     /**
-     * Never match.
-     *
-     * @return \Closure
-     */
-    public static function never()
-    {
-        return function () {
-            return false;
-        };
-    }
-
-    /**
      * Always match.
      *
      * @return \Closure
@@ -120,7 +108,7 @@ class MatcherAssert
     /**
      * Match an explicit port.
      *
-     * @param int|array $ports
+     * @param int|null|array $ports
      *
      * @return \Closure
      */
