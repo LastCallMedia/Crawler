@@ -7,6 +7,7 @@ use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Uri\MatcherInterface;
 use LastCall\Crawler\Uri\Normalizations;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -34,7 +35,7 @@ class RedirectDiscoverer implements EventSubscriberInterface
     }
 
     public function __construct(
-        callable $matcher,
+        MatcherInterface $matcher,
         callable $normalizer
     ) {
         $this->matcher = $matcher;
@@ -48,13 +49,12 @@ class RedirectDiscoverer implements EventSubscriberInterface
             $request = $event->getRequest();
             $resolve = Normalizations::resolve($request->getUri());
             $normalizer = $this->normalizer;
-            $matcher = $this->matcher;
 
             $location = new Uri($response->getHeaderLine('Location'));
             $location = $resolve($location);
             $location = $normalizer($location);
 
-            if ($matcher($location)) {
+            if ($this->matcher->matches($location)) {
                 $request = new Request('GET', $location);
                 $event->addAdditionalRequest($request);
             }

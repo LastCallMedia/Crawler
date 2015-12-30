@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\FragmentSubscription;
+use LastCall\Crawler\Uri\MatcherInterface;
 use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\Normalizer;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
@@ -24,7 +25,7 @@ class LinkProcessor implements FragmentProcessorInterface
     private $normalizer;
 
     public function __construct(
-        callable $matcher,
+        MatcherInterface $matcher,
         callable $normalizer
     ) {
         $this->matcher = $matcher;
@@ -40,14 +41,13 @@ class LinkProcessor implements FragmentProcessorInterface
         $request = $event->getRequest();
         $resolve = Normalizations::resolve($request->getUri());
         $normalizer = $this->normalizer;
-        $matcher = $this->matcher;
 
         foreach ($urls as $url) {
             $uri = new Uri($url);
             $uri = $resolve($uri);
             $uri = $normalizer($uri);
 
-            if ($matcher($uri)) {
+            if ($this->matcher->matches($uri)) {
                 $newRequest = new Request('GET', $uri);
                 $event->addAdditionalRequest($newRequest);
             }

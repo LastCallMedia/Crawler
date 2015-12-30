@@ -7,7 +7,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * Matches URLs against a predefined set of conditions.
  */
-class Matcher
+class Matcher implements MatcherInterface
 {
     const ALL = 'all';
     const ANY = 'any';
@@ -53,6 +53,11 @@ class Matcher
      * @return bool
      */
     public function __invoke(UriInterface $uri)
+    {
+        return $this->matches($uri);
+    }
+
+    public function matches(UriInterface $uri)
     {
         if (empty($this->handlers)) {
             return true;

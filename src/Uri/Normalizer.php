@@ -13,7 +13,7 @@ class Normalizer
 {
     private $handlers = [];
 
-    public function __construct(array $handlers = [], callable $matcher = null)
+    public function __construct(array $handlers = [], MatcherInterface $matcher = null)
     {
         $this->handlers = $handlers;
         $this->matcher = $matcher;
@@ -22,8 +22,7 @@ class Normalizer
     public function __invoke(UriInterface $uri)
     {
         if ($this->matcher) {
-            $matcher = $this->matcher;
-            if (!$matcher($uri)) {
+            if (!$this->matcher->matches($uri)) {
                 return $uri;
             }
         }
