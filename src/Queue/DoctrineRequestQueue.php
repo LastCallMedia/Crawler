@@ -137,22 +137,11 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $table = $this->table;
         switch ($status) {
             case self::FREE:
-                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire <= ?",
-                    [
-                        self::FREE,
-                        time(),
-                    ])->fetchColumn();
+                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 1 AND expire <= " . time())->fetchColumn();
             case self::PENDING:
-                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ? AND expire > ?",
-                    [
-                        self::FREE,
-                        time(),
-                    ])->fetchColumn();
+                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 1 AND expire > " . time())->fetchColumn();
             case self::COMPLETE:
-                return (int) $this->connection->executeQuery("SELECT COUNT(*) FROM $table WHERE status = ?",
-                    [
-                        self::COMPLETE,
-                    ])->fetchColumn();
+                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 3")->fetchColumn();
         }
         throw new \RuntimeException(sprintf('Unexpected status %s',
             (string) $status));
