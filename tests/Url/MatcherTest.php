@@ -311,6 +311,8 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['', 'http://test.com', true],
+            ['', 'http://test.com/foo', true],
+            ['', 'http://test.com/foo/', true],
             ['html', 'http://test.com/index.html', true],
             ['php', 'http://test.com/index.html', false],
             [['', 'php'], 'http://test.com/index.php', true],
