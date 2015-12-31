@@ -27,5 +27,5 @@ You can also add the dependency directly to your project's composer.json:
 Documentation can be found here:
 
 * [Configurations](docs/configuration.md)
-* [CLI](docs/cli.md)
-* [Handlers](docs/handler.md)
+* [Running](docs/running.md)
+* [Handlers](docs/handlers.md)

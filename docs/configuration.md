@@ -1,8 +1,6 @@
 Configuration
 =============
 
-What is a Configuration
------------------------
 A configuration describes what you want to crawl, and what you want to do with the responses that are received.
 
 Creating a Configuration
