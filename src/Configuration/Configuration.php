@@ -3,8 +3,10 @@
 namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\OutputAwareInterface;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Fragment\Parser\CSSSelectorParser;
 use LastCall\Crawler\Fragment\Parser\XPathParser;
 use LastCall\Crawler\Fragment\Processor\LinkProcessor;
@@ -31,10 +33,12 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['baseUrl'] = $baseUrl;
         $this['queue'] = function () {
             if (isset($this['doctrine'])) {
-                return new DoctrineRequestQueue($this['doctrine']);
+                $queue = new DoctrineRequestQueue($this['doctrine']);
             }
-
-            return new ArrayRequestQueue();
+            else {
+                $queue = new ArrayRequestQueue();
+            }
+            return $queue;
         };
         $this['client'] = function () {
             return new Client(['allow_redirects' => false]);
@@ -90,16 +94,16 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             ];
         };
         $this['html_extensions'] = ['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm'];
+
+        // On start, add the default request.
+        $this->addListener(CrawlerEvents::START, function() {
+            $this['queue']->push(new Request('GET', $this['baseUrl']));
+        });
     }
 
     public function setOutput(OutputInterface $output)
     {
         $this['output'] = $output;
-    }
-
-    public function getBaseUrl()
-    {
-        return $this['baseUrl'];
     }
 
     public function getQueue()

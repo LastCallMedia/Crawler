@@ -14,11 +14,9 @@ interface SessionInterface
     /**
      * Prepare the session for crawling.
      *
-     * @param string $startUrl
-     *
      * @return mixed
      */
-    public function init($startUrl = '');
+    public function start();
 
     /**
      * Retrieve the next request.

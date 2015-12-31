@@ -46,14 +46,6 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getBaseContainer
      */
-    public function testBaseUrl($config)
-    {
-        $this->assertEquals('https://lastcallmedia.com', $config->getBaseUrl());
-    }
-
-    /**
-     * @dataProvider getBaseContainer
-     */
     public function testGetQueue($config)
     {
         $this->assertInstanceOf(ArrayRequestQueue::class, $config->getQueue());
@@ -104,7 +96,8 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetListeners(Configuration $config)
     {
-        $this->assertEquals([], $config->getListeners());
+        $listeners = $config->getListeners();
+        $this->assertTrue(is_array($listeners));
     }
 
     /**

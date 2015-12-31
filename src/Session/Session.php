@@ -2,7 +2,6 @@
 
 namespace LastCall\Crawler\Session;
 
-use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\CrawlerEvents;
@@ -56,8 +55,7 @@ class Session implements SessionInterface
             }
         }
 
-        return new self($config->getBaseUrl(), $config->getQueue(),
-            $dispatcher);
+        return new self($config->getQueue(), $dispatcher);
     }
 
     /**
@@ -68,19 +66,16 @@ class Session implements SessionInterface
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
      */
     public function __construct(
-        $baseUrl,
         RequestQueueInterface $queue = null,
         EventDispatcherInterface $dispatcher = null
     ) {
-        $this->baseUrl = $baseUrl;
         $this->dispatcher = $dispatcher ?: new EventDispatcher();
         $this->queue = $queue ?: new ArrayRequestQueue();
     }
 
-    public function init($baseUrl = null)
+    public function start()
     {
-        $baseUrl = $baseUrl ?: $this->baseUrl;
-        $this->queue->push(new Request('GET', $baseUrl));
+        $this->dispatcher->dispatch(CrawlerEvents::START);
     }
 
     public function next()

@@ -54,7 +54,7 @@ class CrawlCommand extends Command
         $crawler = $helper->getCrawler($configuration, $session);
         $chunk = $input->getOption('chunk');
         $seed = $input->getArgument('seed');
-        $promise = $crawler->start($chunk, $seed);
+        $promise = $crawler->start($chunk);
 
         $promise->wait();
         $session->finish();

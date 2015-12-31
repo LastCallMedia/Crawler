@@ -46,9 +46,9 @@ class Crawler
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function start($chunk = 5, $baseUrl = null)
+    public function start($chunk = 5)
     {
-        $this->session->init($baseUrl);
+        $this->session->start();
         // We need to use a double loop of generators here, because
         // if $chunk is greater than the number of items in the queue,
         // the requestWorkerFn exits the generator loop before any new

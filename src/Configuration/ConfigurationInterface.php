@@ -22,13 +22,6 @@ interface ConfigurationInterface
     public function getQueue();
 
     /**
-     * Get the base URL to be used for this configuration.
-     *
-     * @return string
-     */
-    public function getBaseUrl();
-
-    /**
      * Get any event listeners to be used for this configuration.
      *
      * @return array

@@ -8,6 +8,11 @@ namespace LastCall\Crawler;
 class CrawlerEvents
 {
     /**
+     * A crawler session is starting.
+     */
+    const START = 'crawler.start';
+
+    /**
      * Request is sending.
      *
      * The listener method receives a CrawlerEvent instance.

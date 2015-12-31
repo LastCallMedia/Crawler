@@ -40,11 +40,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             ->will(function ($args) use ($queue) {
                 return $queue->complete($args[0]);
             });
-        $session->init(Argument::type('string'))->will(function ($args) use (
-            $queue
-        ) {
-            $queue->push(new Request('GET', $args[0]));
-        });
+        $session->start()->shouldBeCalled();
 
         return $session;
     }
@@ -52,6 +48,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testItemIsCompletedOnSuccess()
     {
         $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'https://lastcallmedia.com'));
+
         $client = $this->mockClient([new Response(200)]);
 
         $session = $this->getMockSession($queue);
@@ -61,13 +59,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client);
-        $crawler->start(1, 'https://lastcallmedia.com')->wait();
+        $crawler->start(1)->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testItemIsCompletedOnFailure()
     {
         $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'https://lastcallmedia.com'));
         $client = $this->mockClient([new Response(400)]);
 
         $session = $this->getMockSession($queue);
@@ -78,13 +77,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client);
-        $crawler->start(1, 'https://lastcallmedia.com')->wait();
+        $crawler->start(1)->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testExceptionEventIsFiredOnSuccesfulResponseException()
     {
         $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'https://lastcallmedia.com'));
         $client = $this->mockClient([new Response(200)]);
         $session = $this->getMockSession($queue);
 
@@ -97,7 +97,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client);
-        $crawler->start(1, 'https://lastcallmedia.com')->wait();
+        $crawler->start(1)->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
@@ -105,6 +105,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     {
         $client = $this->mockClient([new Response(400)]);
         $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'https://lastcallmedia.com'));
 
         $session = $this->getMockSession($queue);
 
@@ -118,13 +119,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type(ResponseInterface::class))->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client);
-        $crawler->start(1, 'https://lastcallmedia.com')->wait();
+        $crawler->start(1)->wait();
         $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testExceptionEventIsFiredOnSendingException()
     {
         $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'https://lastcallmedia.com'));
         $client = $this->mockClient([new Response(400)]);
 
         $session = $this->getMockSession($queue);
@@ -135,7 +137,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             Argument::type('Exception'), null)->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client);
-        $crawler->start(1, 'https://lastcallmedia.com')->wait();
+        $crawler->start(1)->wait();
 
         // @todo: Should this job be completed?
 //        $this->assertEquals(1, $queue->count(Job::COMPLETE));
@@ -147,6 +149,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $count = 0;
 
         $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'https://lastcallmedia.com/1'));
         $client = $this->mockClient($responses);
         $session = $this->getMockSession($queue);
 
@@ -165,7 +168,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         });
 
         $crawler = new Crawler($session->reveal(), $client);
-        $crawler->start(5, 'https://lastcallmedia.com/1')->wait();
+        $crawler->start(5)->wait();
 
         $this->assertEquals(2, $count);
     }
