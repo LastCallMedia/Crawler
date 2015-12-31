@@ -28,15 +28,11 @@ Logging:
 
 Modules:
 
-* [FragmentHandler](../src/Handler/Module/FragmentHandler.php)
+* [FragmentHandler](../src/Handler/Fragment/FragmentHandler.php)
 
 Discovery:
 
 * [RedirectDiscoverer](../src/Handler/Discovery/RedirectDiscoverer.php)
-
-Reporting
-
-* [CrawlerStatusReporter](../src/Handler/Reporting/CrawlerStatusReporter.php)
 
 The FragmentHandler also allows for additional processing to be done on subtrees of a page.  For example, the [LinkProcessor](../src/Module/Processor/LinkProcessor.php) hooks into the FragmentHandler to parse and re-add links.
 
