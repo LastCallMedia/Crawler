@@ -41,9 +41,6 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['client'] = function () {
             return new Client(['allow_redirects' => false]);
         };
-        $this['normalizers'] = function() {
-            return [];
-        };
         $this['listeners'] = function () {
             return [];
         };
@@ -77,7 +74,9 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['normalizer'] = function () {
             return new Normalizer($this['normalizers'], $this['matcher']);
         };
-        $this['normalizers'] = [];
+        $this['normalizers'] = function() {
+            return [];
+        };
         $this['parsers'] = function () {
             $parsers = [
                 'xpath' => new XPathParser(),
