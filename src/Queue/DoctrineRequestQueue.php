@@ -22,10 +22,15 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
 
     private $table = 'queue';
 
+    private $lockHint;
+
     public function __construct(Connection $connection, $table = 'queue')
     {
         $this->connection = $connection;
         $this->table = $table;
+        $this->lockHint = $this->connection->getDatabasePlatform()
+            ->appendLockHint($this->table,
+                LockMode::PESSIMISTIC_READ);
     }
 
     private function getKey(RequestInterface $request)
@@ -84,31 +89,22 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     public function pop($leaseTime = 30)
     {
         $conn = $this->connection;
-        $sql = 'SELECT * FROM '.$conn->getDatabasePlatform()
-                ->appendLockHint($this->table,
-                    LockMode::PESSIMISTIC_READ).' WHERE status = ? AND expire <= ? LIMIT 1';
+        $sql = 'SELECT * FROM '.$this->lockHint.' WHERE status = 1 AND expire <= ' . time() . ' LIMIT 1';
 
         $return = null;
 
-        $conn->transactional(function () use (
-            $sql,
-            $conn,
-            &$return,
-            $leaseTime
-        ) {
-            if ($res = $conn->executeQuery($sql, [self::FREE, time()])
-                ->fetch()
-            ) {
+        $this->connection->beginTransaction();
+        try {
+            if($res = $conn->query($sql)->fetch()) {
                 $expire = time() + $leaseTime;
-                $conn->update($this->table, [
-                    'expire' => $expire,
-                ], [
-                    'identifier' => $res['identifier'],
-                ]);
+                $conn->exec("UPDATE {$this->table} SET expire = $expire WHERE identifier = ".$this->connection->quote($res['identifier']));
                 $return = unserialize($res['data']);
             }
-        });
-
+            $this->connection->commit();
+        }
+        catch(\Exception $e) {
+            $this->connection->rollBack();
+        }
         return $return;
     }
 
