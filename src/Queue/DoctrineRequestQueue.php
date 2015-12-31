@@ -104,6 +104,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         }
         catch(\Exception $e) {
             $this->connection->rollBack();
+            throw $e;
         }
         return $return;
     }
