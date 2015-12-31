@@ -22,10 +22,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Session implements SessionInterface
 {
-    /**
-     * @var string
-     */
-    private $baseUrl;
 
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -61,7 +57,6 @@ class Session implements SessionInterface
     /**
      * Session constructor.
      *
-     * @param string                                                           $baseUrl
      * @param \LastCall\Crawler\Queue\RequestQueueInterface|null               $queue
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
      */

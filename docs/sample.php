@@ -3,10 +3,8 @@
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Uri\Normalizations;
 use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
 
-include_once __DIR__ . '/../vendor/autoload.php';
-
+include_once __DIR__.'/../vendor/autoload.php';
 
 // Create a new configuration, using our website as a base URL.
 $config = new Configuration('https://lastcallmedia.com');
@@ -14,12 +12,12 @@ $config = new Configuration('https://lastcallmedia.com');
 // Add some normalizers to clean up URLs.
 $config['normalizers'] = [
     Normalizations::lowercaseHostname(),
-    Normalizations::dropFragment()
+    Normalizations::dropFragment(),
 ];
 
 // Add a logger.  Normally, we'd use something like Monolog.
 // In this case, we'll just log directly to the console.
-$config['logger'] = function() use ($config) {
+$config['logger'] = function () use ($config) {
     return new ConsoleLogger($config['output']);
 };
 
