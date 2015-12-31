@@ -22,7 +22,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Session implements SessionInterface
 {
-
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */

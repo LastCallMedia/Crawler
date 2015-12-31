@@ -41,7 +41,7 @@ class Crawler
     /**
      * Start crawling.
      *
-     * @param int    $chunk
+     * @param int $chunk
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
