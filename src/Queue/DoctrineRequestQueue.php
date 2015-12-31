@@ -96,7 +96,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $this->connection->beginTransaction();
         try {
             if($res = $conn->query($sql)->fetch()) {
-                $expire = time() + $leaseTime;
+                $expire = (int) time() + $leaseTime;
                 $conn->exec("UPDATE {$this->table} SET expire = $expire WHERE identifier = ".$this->connection->quote($res['identifier']));
                 $return = unserialize($res['data']);
             }
