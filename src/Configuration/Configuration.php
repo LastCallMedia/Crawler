@@ -32,10 +32,10 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['queue'] = function () {
             if (isset($this['doctrine'])) {
                 $queue = new DoctrineRequestQueue($this['doctrine']);
-            }
-            else {
+            } else {
                 $queue = new ArrayRequestQueue();
             }
+
             return $queue;
         };
         $this['client'] = function () {
@@ -74,7 +74,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['normalizer'] = function () {
             return new Normalizer($this['normalizers'], $this['matcher']);
         };
-        $this['normalizers'] = function() {
+        $this['normalizers'] = function () {
             return [];
         };
         $this['parsers'] = function () {
@@ -96,7 +96,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['html_extensions'] = ['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm'];
 
         // On start, add the default request.
-        $this->addListener(CrawlerEvents::START, function() {
+        $this->addListener(CrawlerEvents::START, function () {
             $this['queue']->push(new Request('GET', $this['baseUrl']));
         });
     }

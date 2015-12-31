@@ -10,8 +10,10 @@ use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
+use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Uri\Normalizer;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -106,5 +108,17 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testGetNormalizer(Configuration $config)
     {
         $this->assertInstanceOf(Normalizer::class, $config['normalizer']);
+    }
+
+    /**
+     * @dataProvider getBaseContainer
+     */
+    public function testAddsInitialRequestOnStart(Configuration $config)
+    {
+        $queue = $config->getQueue();
+        $this->assertEquals(0, $queue->count());
+        $session = Session::createFromConfig($config, new EventDispatcher());
+        $session->start();
+        $this->assertEquals(1, $queue->count());
     }
 }
