@@ -70,11 +70,9 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
                     $params[] = $keys[$i];
                     $params[] = serialize($request);
                     $return[$i] = true;
-                    $types[] = \PDO::PARAM_STR;
-                    $types[] = \PDO::PARAM_STR;
                 }
-                $this->connection->executeUpdate($sql.implode(', ', $clauses),
-                    $params, $types);
+                $sql = $sql.implode(', ', $clauses);
+                $this->connection->executeUpdate($sql, $params);
             } catch (UniqueConstraintViolationException $e) {
                 return $return;
             }
