@@ -68,7 +68,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $requests = array_diff_key($requests, $exists);
         if (count($requests)) {
             try {
-                $params = $clauses = $types = [];
+                $params = $clauses = [];
                 $sql = "INSERT INTO {$this->table} (expire, identifier, status, data) VALUES ";
                 foreach ($requests as $i => $request) {
                     $clauses[] = '(0, ?, 1, ?)';
@@ -76,7 +76,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
                     $params[] = serialize($request);
                     $return[$i] = true;
                 }
-                $sql = $sql.implode(', ', $clauses);
+                $sql .= implode(', ', $clauses);
                 $this->connection->executeUpdate($sql, $params);
             } catch (UniqueConstraintViolationException $e) {
                 return $return;
@@ -89,23 +89,23 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     public function pop($leaseTime = 30)
     {
         $conn = $this->connection;
-        $sql = 'SELECT * FROM '.$this->lockHint.' WHERE status = 1 AND expire <= ' . time() . ' LIMIT 1';
+        $sql = 'SELECT * FROM '.$this->lockHint.' WHERE status = 1 AND expire <= '.time().' LIMIT 1';
 
         $return = null;
 
         $this->connection->beginTransaction();
         try {
-            if($res = $conn->query($sql)->fetch()) {
+            if ($res = $conn->query($sql)->fetch()) {
                 $expire = (int) time() + $leaseTime;
                 $conn->exec("UPDATE {$this->table} SET expire = $expire WHERE identifier = ".$this->connection->quote($res['identifier']));
                 $return = unserialize($res['data']);
             }
             $this->connection->commit();
-        }
-        catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->connection->rollBack();
             throw $e;
         }
+
         return $return;
     }
 
@@ -134,9 +134,9 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         $table = $this->table;
         switch ($status) {
             case self::FREE:
-                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 1 AND expire <= " . time())->fetchColumn();
+                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 1 AND expire <= ".time())->fetchColumn();
             case self::PENDING:
-                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 1 AND expire > " . time())->fetchColumn();
+                return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 1 AND expire > ".time())->fetchColumn();
             case self::COMPLETE:
                 return (int) $this->connection->query("SELECT COUNT(*) FROM {$table} WHERE status = 3")->fetchColumn();
         }
