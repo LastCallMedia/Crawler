@@ -20,11 +20,11 @@ class RedirectDiscoverer implements EventSubscriberInterface
     use RedirectDetectionTrait;
 
     /**
-     * @var callable
+     * @var MatcherInterface
      */
     private $matcher;
     /**
-     * @var callable
+     * @var NormalizerInterface
      */
     private $normalizer;
 
