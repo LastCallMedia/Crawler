@@ -11,7 +11,15 @@ use Psr\Http\Message\UriInterface;
  */
 class Normalizer implements NormalizerInterface
 {
+    /**
+     * @var callable[]
+     */
     private $handlers = [];
+
+    /**
+     * @var \LastCall\Crawler\Uri\MatcherInterface
+     */
+    private $matcher;
 
     public function __construct(array $handlers = [], MatcherInterface $matcher = null)
     {

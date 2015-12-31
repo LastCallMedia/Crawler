@@ -187,8 +187,6 @@ class Normalizations
      * This is a breaking normalization.  It may or may not be safe to use,
      * depending on the server setup.
      *
-     * @param string $indexRegex
-     *
      * @return \Closure
      */
     public static function dropIndex()
