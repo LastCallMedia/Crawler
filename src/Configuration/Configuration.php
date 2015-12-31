@@ -27,9 +27,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 {
     public function __construct($baseUrl = null)
     {
-        parent::__construct([
-            'normalizers' => [],
-        ]);
+        parent::__construct();
         $this['baseUrl'] = $baseUrl;
         $this['queue'] = function () {
             if (isset($this['doctrine'])) {
@@ -42,6 +40,9 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         };
         $this['client'] = function () {
             return new Client(['allow_redirects' => false]);
+        };
+        $this['normalizers'] = function() {
+            return [];
         };
         $this['listeners'] = function () {
             return [];
