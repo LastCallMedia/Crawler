@@ -15,37 +15,37 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testAllReturnWithNoConditions()
     {
         $matcher = Matcher::all();
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
     }
 
     public function testAnyReturnWithNoConditions()
     {
         $matcher = Matcher::any();
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
     }
 
     public function testAllReturnsTrueWhenAllReturnTrue()
     {
         $matcher = Matcher::all()->always();
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
     }
 
     public function testAllReturnsFalseWhenAnyReturnFalse()
     {
         $matcher = Matcher::all()->always()->never();
-        $this->assertFalse($matcher($this->uri('foo')));
+        $this->assertFalse($matcher->matches($this->uri('foo')));
     }
 
     public function testAnyReturnsTrueWhenAnyReturnTrue()
     {
         $matcher = Matcher::any()->always()->never();
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
     }
 
     public function testAnyReturnsFalseWhenNoneReturnTrue()
     {
         $matcher = Matcher::any()->never()->never();
-        $this->assertFalse($matcher($this->uri('foo')));
+        $this->assertFalse($matcher->matches($this->uri('foo')));
     }
 
     public function testAndAll()
@@ -53,9 +53,9 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = Matcher::all();
         $subMatcher = $matcher->andAll();
         $subMatcher->always();
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
         $subMatcher->never();
-        $this->assertFalse($matcher($this->uri('foo')));
+        $this->assertFalse($matcher->matches($this->uri('foo')));
     }
 
     public function testAndAny()
@@ -63,23 +63,23 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = Matcher::all();
         $subMatcher = $matcher->andAny();
         $subMatcher->never();
-        $this->assertFalse($matcher($this->uri('foo')));
+        $this->assertFalse($matcher->matches($this->uri('foo')));
         $subMatcher->always();
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
     }
 
     public function testAlways()
     {
         $matcher = Matcher::all();
         $this->assertSame($matcher, $matcher->always());
-        $this->assertTrue($matcher($this->uri('foo')));
+        $this->assertTrue($matcher->matches($this->uri('foo')));
     }
 
     public function testNever()
     {
         $matcher = Matcher::all();
         $this->assertSame($matcher, $matcher->never());
-        $this->assertFalse($matcher($this->uri('foo')));
+        $this->assertFalse($matcher->matches($this->uri('foo')));
     }
 
     public function schemeIsTests()
@@ -97,7 +97,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->schemeIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -106,7 +106,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->schemeIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function schemeMatchesTests()
@@ -125,7 +125,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeMatches($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->schemeMatches($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -134,7 +134,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeNotMatches($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->schemeNotMatches($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function hostIsTests()
@@ -152,7 +152,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testHostIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->hostIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -161,7 +161,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testHostIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->hostIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function hostMatchesTests()
@@ -179,7 +179,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testHostMatches($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->hostMatches($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -188,7 +188,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testHostNotMatches($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->hostNotMatches($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function portIsTests()
@@ -208,7 +208,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPortIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->portIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -217,7 +217,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPortIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->portIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function portInTests()
@@ -236,7 +236,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPortIn($min, $max, $uriString, $expected)
     {
         $matcher = Matcher::all()->portIn($min, $max);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -245,7 +245,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPortNotIn($min, $max, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->portNotIn($min, $max);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function pathIsTests()
@@ -264,7 +264,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPathIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->pathIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -273,7 +273,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPathIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->pathIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function pathMatchesTests()
@@ -295,7 +295,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPathMatches($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->pathMatches($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -304,7 +304,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPathNotMatches($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->pathNotMatches($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function pathExtensionIsTests()
@@ -323,7 +323,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPathExtensionIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->pathExtensionIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -332,7 +332,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testPathExtensionIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->pathExtensionIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function queryIsTests()
@@ -351,7 +351,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testQueryIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->queryIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -360,7 +360,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testQueryIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->queryIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function queryMatchesTests()
@@ -379,7 +379,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testQueryMatches($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->queryMatches($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -388,7 +388,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testQueryNotMatches($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->queryNotMatches($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function fragmentIsTests()
@@ -407,7 +407,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testFragmentIs($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->fragmentIs($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -416,7 +416,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testFragmentIsNot($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->fragmentIsNot($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 
     public function fragmentMatchesTests()
@@ -435,7 +435,7 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testFragmentMatches($assertArgs, $uriString, $expected)
     {
         $matcher = Matcher::all()->fragmentMatches($assertArgs);
-        $this->assertEquals($expected, $matcher($this->uri($uriString)));
+        $this->assertEquals($expected, $matcher->matches($this->uri($uriString)));
     }
 
     /**
@@ -444,6 +444,6 @@ class MatcherTest extends \PHPUnit_Framework_TestCase
     public function testFragmentNotMatches($assertArgs, $uriString, $expectedInverse)
     {
         $matcher = Matcher::all()->fragmentNotMatches($assertArgs);
-        $this->assertEquals(!$expectedInverse, $matcher($this->uri($uriString)));
+        $this->assertEquals(!$expectedInverse, $matcher->matches($this->uri($uriString)));
     }
 }

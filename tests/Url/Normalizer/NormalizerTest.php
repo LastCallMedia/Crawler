@@ -20,7 +20,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $uri = new Uri('http://foo.com');
         $normalizer = new Normalizer();
-        $this->assertUrlEquals('http://foo.com', $normalizer($uri));
+        $this->assertUrlEquals('http://foo.com', $normalizer->normalize($uri));
     }
 
     public function testCallsNormalizers()
@@ -32,7 +32,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             },
         ]);
 
-        $normalizer(new Uri('http://foo.com'));
+        $normalizer->normalize(new Uri('http://foo.com'));
         $this->assertTrue($success);
     }
 
@@ -53,7 +53,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             },
         ]);
         $uri = new Uri('http://foo.com');
-        $this->assertUrlEquals('http://www2.foo.com', $normalizer($uri));
+        $this->assertUrlEquals('http://www2.foo.com', $normalizer->normalize($uri));
         $this->assertEquals(3, $calls);
     }
 
@@ -66,7 +66,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             },
         ], $matcher);
         $uri = new Uri('http://foo.com');
-        $normalizer($uri);
+        $normalizer->normalize($uri);
     }
 
     public function testNormalizesMatchedUrls()
@@ -81,7 +81,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
            },
         ], $matcher);
         $uri = new Uri('http://foo.com');
-        $normalizer($uri);
+        $normalizer->normalize($uri);
         $this->assertEquals(1, $calls);
     }
 }

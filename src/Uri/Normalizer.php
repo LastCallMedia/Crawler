@@ -19,11 +19,6 @@ class Normalizer implements NormalizerInterface
         $this->matcher = $matcher;
     }
 
-    public function __invoke(UriInterface $uri)
-    {
-        return $this->normalize($uri);
-    }
-
     public function normalize(UriInterface $uri)
     {
         if ($this->matcher) {
