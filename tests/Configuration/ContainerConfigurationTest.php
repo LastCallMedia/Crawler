@@ -4,45 +4,27 @@ namespace LastCall\Crawler\Test\Configuration;
 
 use Doctrine\DBAL\DriverManager;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Fragment\FragmentHandler;
 use LastCall\Crawler\Handler\Logging\ExceptionLogger;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Session\Session;
+use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Normalizer;
-use Psr\Log\NullLogger;
+use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Psr\Log\LoggerInterface;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     public function getBaseContainer()
     {
         return [[new Configuration('https://lastcallmedia.com')]];
-    }
-
-    public function getDoctrineContainer()
-    {
-        $config = new Configuration('https://lastcallmedia.com');
-        $config['doctrine'] = function () {
-            return DriverManager::getConnection([
-                'driver' => 'pdo_sqlite',
-                'memory' => true,
-            ]);
-        };
-
-        return [[$config]];
-    }
-
-    public function getLoggingContainer()
-    {
-        $config = new Configuration('https://lastcallmedia.com');
-        $config['logger'] = function () {
-            return new NullLogger();
-        };
-
-        return [[$config]];
     }
 
     /**
@@ -54,10 +36,14 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getDoctrineContainer
+     * @dataProvider getBaseContainer
      */
     public function testGetQueueWithDoctrine($config)
     {
+        $config['doctrine'] = DriverManager::getConnection([
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+        ]);
         $this->assertInstanceOf(DoctrineRequestQueue::class,
             $config->getQueue());
     }
@@ -76,21 +62,33 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testGetSubscribers(Configuration $config)
     {
         $subscribers = $config->getSubscribers();
-        $this->assertCount(1, $subscribers);
-        $this->assertInstanceOf(FragmentHandler::class,
-            $subscribers['moduleHandler']);
+        $this->assertInstanceOf(FragmentHandler::class, $subscribers['fragment']);
+        $this->assertInstanceOf(RequestLogger::class, $subscribers['requestLogger']);
+        $this->assertInstanceOf(ExceptionLogger::class, $subscribers['exceptionLogger']);
     }
 
     /**
-     * @dataProvider getLoggingContainer
+     * @dataProvider getBaseContainer
      */
-    public function testGetSubscribersWithLogger(Configuration $config)
+    public function testUsesLogger(Configuration $config)
     {
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->warning(Argument::any(), Argument::any())->shouldBeCalled();
+        $config['logger'] = $logger->reveal();
         $subscribers = $config->getSubscribers();
-        $this->assertInstanceOf(RequestLogger::class,
-            $subscribers['requestLogger']);
-        $this->assertInstanceOf(ExceptionLogger::class,
-            $subscribers['exceptionLogger']);
+        $subscribers['requestLogger']->onFailure(new CrawlerResponseEvent(
+            new Request('GET', 'http://google.com'),
+            new Response()
+        ));
+    }
+
+    public function testHasMatcher()
+    {
+        $config = new Configuration('https://lastcallmedia.com');
+        $expected = Matcher::all()
+            ->schemeIs(['http', 'https'])
+            ->hostIs('lastcallmedia.com');
+        $this->assertEquals($expected, $config['matcher']);
     }
 
     /**

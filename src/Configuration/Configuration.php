@@ -4,19 +4,13 @@ namespace LastCall\Crawler\Configuration;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\OutputAwareInterface;
+use LastCall\Crawler\Configuration\ServiceProvider\FragmentServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Fragment\Parser\CSSSelectorParser;
-use LastCall\Crawler\Fragment\Parser\XPathParser;
-use LastCall\Crawler\Fragment\Processor\LinkProcessor;
-use LastCall\Crawler\Handler\Fragment\FragmentHandler;
-use LastCall\Crawler\Handler\Logging\ExceptionLogger;
-use LastCall\Crawler\Handler\Logging\RequestLogger;
-use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Uri\Matcher;
-use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -29,15 +23,6 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
     {
         parent::__construct();
         $this['baseUrl'] = $baseUrl;
-        $this['queue'] = function () {
-            if (isset($this['doctrine'])) {
-                $queue = new DoctrineRequestQueue($this['doctrine']);
-            } else {
-                $queue = new ArrayRequestQueue();
-            }
-
-            return $queue;
-        };
         $this['client'] = function () {
             return new Client(['allow_redirects' => false]);
         };
@@ -45,55 +30,14 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return [];
         };
         $this['subscribers'] = function () {
-            $subscribers = [
-                'moduleHandler' => new FragmentHandler($this['parsers'],
-                    $this['processors']),
-            ];
-
-            if (isset($this['logger'])) {
-                $subscribers['requestLogger'] = new RequestLogger($this['logger']);
-                $subscribers['exceptionLogger'] = new ExceptionLogger($this['logger']);
-            }
-
-            return $subscribers;
-        };
-        $this['matcher'] = function () {
-            $baseUri = new Uri($this['baseUrl']);
-            $matcher = Matcher::all()
-                ->schemeIs($baseUri->getScheme())
-                ->hostIs($baseUri->getHost());
-
-            return $matcher;
-        };
-        $this['html_matcher'] = function () {
-            $matcher = clone $this['matcher'];
-            $matcher->pathExtensionIs($this['html_extensions']);
-
-            return $matcher;
-        };
-        $this['normalizer'] = function () {
-            return new Normalizer($this['normalizers'], $this['matcher']);
-        };
-        $this['normalizers'] = function () {
             return [];
         };
-        $this['parsers'] = function () {
-            $parsers = [
-                'xpath' => new XPathParser(),
-            ];
-            if (class_exists('Symfony\Component\CssSelector\CssSelectorConverter')) {
-                $parsers['css'] = new CSSSelectorParser();
-            }
 
-            return $parsers;
-        };
-        $this['processors'] = function () {
-            return [
-                'link' => new LinkProcessor($this['html_matcher'],
-                    $this['normalizer']),
-            ];
-        };
-        $this['html_extensions'] = ['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm'];
+        $this->register(new QueueServiceProvider());
+        $this->register(new MatcherServiceProvider());
+        $this->register(new NormalizerServiceProvider());
+        $this->register(new LoggerServiceProvider());
+        $this->register(new FragmentServiceProvider());
 
         // On start, add the default request.
         $this->addListener(CrawlerEvents::START, function () {
