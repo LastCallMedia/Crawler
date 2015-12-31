@@ -9,6 +9,10 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Proxies calls to a handler, blocking events fired on pages that don't
+ * match a given URI pattern.
+ */
 class MatchingProxy implements EventSubscriberInterface
 {
     private $proxied;
