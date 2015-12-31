@@ -1,9 +1,7 @@
 <?php
 
 use LastCall\Crawler\Configuration\Configuration;
-use LastCall\Crawler\Uri\Normalizer;
 use LastCall\Crawler\Uri\Normalizations;
-use Psr\Log\NullLogger;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,15 +18,16 @@ $config['normalizers'] = [
 ];
 
 // Add a logger.  Normally, we'd use something like Monolog.
-$config['logger'] = function() {
-    return new NullLogger();
+// In this case, we'll just log directly to the console.
+$config['logger'] = function() use ($config) {
+    return new ConsoleLogger($config['output']);
 };
 
 // Add an event subscriber.
-$config->extend('subscribers', function($subscribers) {
-    $subscribers['mysubscriber'] = new MySubscriber();
-    return $subscribers;
-});
+//$config->extend('subscribers', function($subscribers) {
+//    $subscribers['mysubscriber'] = new MySubscriber();
+//    return $subscribers;
+//});
 
 // Return the Configuration so the CLI runner can run it.
 return $config;
