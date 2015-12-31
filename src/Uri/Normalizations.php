@@ -87,20 +87,6 @@ class Normalizations
     }
 
     /**
-     * Strip a trailing slash off of the url path.
-     *
-     * @return \Closure
-     */
-    public static function stripTrailingSlash()
-    {
-        return function (UriInterface $uri) {
-            return substr($uri->getPath(),
-                -1) === '/' ? $uri->withPath(substr($uri->getPath(), 0,
-                strlen($uri->getPath()) - 1)) : $uri;
-        };
-    }
-
-    /**
      * Lowercase the scheme and host segments of the URL.
      *
      * This is considered a "safe" normalization as per RFC 3986

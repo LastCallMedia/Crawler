@@ -18,24 +18,6 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, (string) $url);
     }
 
-    public function getTrailingSlashTests()
-    {
-        return [
-            ['http://google.com', 'http://google.com'],
-            ['http://google.com/', 'http://google.com'],
-        ];
-    }
-
-    /**
-     * @dataProvider getTrailingSlashTests
-     */
-    public function testStripTrailingSlash($uriString, $expected)
-    {
-        $uri = $this->uri($uriString);
-        $handler = Normalizations::stripTrailingSlash();
-        $this->assertUrlEquals($expected, $handler($uri));
-    }
-
     public function lowercaseSchemeAndHostTests()
     {
         return [
