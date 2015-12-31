@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Command;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Reporter\ConsoleOutputReporter;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,8 +24,6 @@ class CrawlCommand extends Command
         $this->addOption('reset', 'r', InputOption::VALUE_NONE,
             'Reset the migration prior to running');
         parent::configure();
-        $this->addArgument('seed', InputArgument::OPTIONAL,
-            'The URL to pre-seed the crawler with');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -53,7 +50,6 @@ class CrawlCommand extends Command
 
         $crawler = $helper->getCrawler($configuration, $session);
         $chunk = $input->getOption('chunk');
-        $seed = $input->getArgument('seed');
         $promise = $crawler->start($chunk);
 
         $promise->wait();
