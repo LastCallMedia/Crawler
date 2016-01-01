@@ -22,7 +22,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
     public function __construct($baseUrl = null)
     {
         parent::__construct();
-        $this['baseUrl'] = $baseUrl;
+        $this['base_url'] = $baseUrl;
         $this['client'] = function () {
             return new Client(['allow_redirects' => false]);
         };
@@ -41,7 +41,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 
         // On start, add the default request.
         $this->addListener(CrawlerEvents::START, function () {
-            $this['queue']->push(new Request('GET', $this['baseUrl']));
+            $this['queue']->push(new Request('GET', $this['base_url']));
         });
     }
 

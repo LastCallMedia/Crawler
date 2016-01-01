@@ -84,7 +84,7 @@ class InputAwareCrawlerHelperTest extends \PHPUnit_Framework_TestCase
         $helper->setInput($this->getInput($file));
         $config = $helper->getConfiguration();
         $this->assertInstanceOf(ConfigurationInterface::class, $config);
-        $this->assertEquals('http://google.com', $config['baseUrl']);
+        $this->assertEquals('http://google.com', $config['base_url']);
     }
 
     public function testGetSessionWithReporter()
