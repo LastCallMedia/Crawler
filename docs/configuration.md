@@ -21,11 +21,11 @@ Container Parameters
 --------------------
 The following parameters are simple values.
 
-### base_url 
+#### base_url 
 
 `string` - The base URL is a string representing the URL you want to crawl.  It will be set when the container is created.
 
-### html_extensions 
+#### html_extensions 
 
 `string[]` - An array containing the file extensions we assume contain HTML content.
 
