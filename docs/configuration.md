@@ -25,6 +25,8 @@ The following parameters are simple values.
 
 `string` - The base URL is a string representing the URL you want to crawl.  It will be set when the container is created.
 
+There is no default value for the base_url.
+
 #### html_extensions 
 
 `string[]` - An array containing the file extensions we assume contain HTML content.
