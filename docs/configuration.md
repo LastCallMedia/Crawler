@@ -13,9 +13,9 @@ use LastCall\Crawler\Configuration\Configuration;
 return new Configuration('http://url.for/my/site);
 ```
 
-[Sample configuration](sample.php)
-
 Configurations are [Pimple](http://pimple.sensiolabs.org/) dependency injection containers.  You can use array syntax to extend, redefine, or extend services on the configuration.  See the [Pimple docs](http://pimple.sensiolabs.org/) for more information on how to use the container. 
+
+[Sample configuration](sample.php)
 
 Container Parameters
 --------------------
