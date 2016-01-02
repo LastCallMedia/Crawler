@@ -170,7 +170,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->start(1)->wait();
 
         // @todo: Should this job be completed?
-//        $this->assertEquals(1, $queue->count(Job::COMPLETE));
+//        $this->assertEquals(1, $queue->count($queue::COMPLETE));
     }
 
     public function testQueueIsWorkedUntilEmpty()

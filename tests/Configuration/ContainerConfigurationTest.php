@@ -3,7 +3,9 @@
 namespace LastCall\Crawler\Test\Configuration;
 
 use GuzzleHttp\ClientInterface;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -35,5 +37,19 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $session = Session::createFromConfig($config, new EventDispatcher());
         $session->start();
         $this->assertEquals(1, $queue->count());
+    }
+
+    public function testSetsUpAndTearsDownQueue()
+    {
+        $config = new Configuration();
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $queue->willImplement(SetupTeardownInterface::class);
+        $queue->onSetup()->shouldBeCalled();
+        $queue->onTeardown()->shouldBeCalled();
+
+        $config['queue'] = $queue->reveal();
+        $session = Session::createFromConfig($config, new EventDispatcher());
+        $session->setup();
+        $session->teardown();
     }
 }
