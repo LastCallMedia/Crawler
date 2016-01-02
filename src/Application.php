@@ -50,7 +50,7 @@ class Application extends BaseApplication
      *
      * @return Command[]
      */
-    public function getDefaultCommands()
+    protected function getDefaultCommands()
     {
         return array_merge(parent::getDefaultCommands(), [
             new CrawlCommand(),
