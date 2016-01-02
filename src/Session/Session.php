@@ -24,11 +24,6 @@ class Session implements SessionInterface
      */
     private $dispatcher;
 
-    /**
-     * @var \LastCall\Crawler\Queue\RequestQueueInterface
-     */
-    private $queue;
-
     public static function createFromConfig(
         ConfigurationInterface $config,
         EventDispatcherInterface $dispatcher
