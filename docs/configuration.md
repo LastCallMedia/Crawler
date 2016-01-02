@@ -41,14 +41,19 @@ The following services are registered with the container and can be replaced or 
 
 `LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs discovered during processing responses should be included in the session.
 
-[The default matcher](../src/Configuration/ServiceProvider/MatcherServiceProvider.php)
+[Default matcher](../src/Configuration/ServiceProvider/MatcherServiceProvider.php)
 
 
 #### normalizer 
 
 `LastCall\Crawler\Uri\NormalizerInterface` - The normalizer is used to "fix" URIs by applying some standard formatting rules.  This helps prevent duplicate URIs from being added.  For example, if the crawler discovers a link to http://GOOGLE.com and a link to http://google.com, the default normalizer will lowercase the domain name, and these links will be treated as equivalent.
 
-[The default normalizer](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
+[Default normalizer](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
+
+#### normalizations
+`array` - An array of normalizations that are performed by the normalizer.
+
+[Default normalizations](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
 
 #### queue 
 
@@ -61,7 +66,7 @@ The following services are registered with the container and can be replaced or 
 
 `PSR\Log\LoggerInterface` - A PSR-3 compatible logger instance that will be used for logging request/response events, including exceptions during processing.
 
-[The default logger](../src/Configuration/ServiceProvider/LoggerServiceProvider.php)
+[Default logger](../src/Configuration/ServiceProvider/LoggerServiceProvider.php)
 
 #### doctrine 
 

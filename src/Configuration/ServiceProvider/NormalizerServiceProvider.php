@@ -17,9 +17,9 @@ class NormalizerServiceProvider implements ServiceProviderInterface
                 $matcher = $pimple['normalizer_matcher'];
             }
 
-            return new Normalizer($pimple['normalizers'], $matcher);
+            return new Normalizer($pimple['normalizations'], $matcher);
         };
-        $pimple['normalizers'] = function () {
+        $pimple['normalizations'] = function () {
             return [
                 'lowercaseHostname' => Normalizations::lowercaseHostname(),
                 'capitalizeEscaped' => Normalizations::capitalizeEscaped(),

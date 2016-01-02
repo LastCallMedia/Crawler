@@ -10,10 +10,10 @@ include_once __DIR__.'/../vendor/autoload.php';
 $config = new Configuration('https://lastcallmedia.com');
 
 // Add some normalizers to clean up URLs.
-$config->extend('normalizers', function (array $normalizers) {
-    $normalizers['convert_to_ssl'] = Normalizations::rewriteScheme(['http' => 'https']);
+$config->extend('normalizations', function (array $normalizations) {
+    $normalizations['convert_to_ssl'] = Normalizations::rewriteScheme(['http' => 'https']);
 
-    return $normalizers;
+    return $normalizations;
 });
 
 // Add a logger.  Normally, we'd use something like Monolog.
@@ -23,7 +23,7 @@ $config['logger'] = function () use ($config) {
 };
 
 // Add an event subscriber.
-$config->extend('subscribers', function($subscribers) {
+$config->extend('subscribers', function ($subscribers) {
     // Add your subscriber here.  Use a descriptive array key
     // so you can find it later if you need to.
     //$subscribers['mysubscriber'] = new MySubscriber();
