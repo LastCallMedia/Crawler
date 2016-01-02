@@ -121,8 +121,6 @@ class Crawler
                     $this->enqueue($requests);
                     throw $e;
                 }
-
-//                throw $reason;
             }
 
             return \GuzzleHttp\Promise\rejection_for($reason);
