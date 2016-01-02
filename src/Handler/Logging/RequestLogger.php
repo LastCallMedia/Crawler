@@ -76,7 +76,7 @@ class RequestLogger implements EventSubscriberInterface
         }
     }
 
-    public function onFailure(CrawlerEvent $event)
+    public function onFailure(CrawlerResponseEvent $event)
     {
         $uri = $this->getUri($event);
         $status = $this->getStatus($event);
