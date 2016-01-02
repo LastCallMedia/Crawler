@@ -76,6 +76,12 @@ class Session implements SessionInterface
         $this->dispatcher->dispatch(CrawlerEvents::FINISH);
     }
 
+    /**
+     * @param                                      $eventName
+     * @param \LastCall\Crawler\Event\CrawlerEvent $event
+     *
+     * @return \Psr\Http\Message\RequestInterface[]
+     */
     private function dispatch($eventName, CrawlerEvent $event)
     {
         $this->dispatcher->dispatch($eventName, $event);

@@ -27,6 +27,11 @@ class Crawler
     private $client;
 
     /**
+     * @var \LastCall\Crawler\Queue\RequestQueueInterface
+     */
+    private $queue;
+
+    /**
      * Crawler constructor.
      *
      * @param \LastCall\Crawler\Session\SessionInterface $session

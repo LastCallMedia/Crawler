@@ -45,6 +45,8 @@ interface SessionInterface
      *
      * @param \Psr\Http\Message\RequestInterface  $request
      * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return \Psr\Http\Message\RequestInterface[]
      */
     public function onRequestSuccess(
         RequestInterface $request,
@@ -56,6 +58,8 @@ interface SessionInterface
      *
      * @param \Psr\Http\Message\RequestInterface  $request
      * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return \Psr\Http\Message\RequestInterface[]
      */
     public function onRequestFailure(
         RequestInterface $request,
@@ -69,7 +73,7 @@ interface SessionInterface
      * @param \Exception                               $exception
      * @param \Psr\Http\Message\ResponseInterface|null $response
      *
-     * @return vod
+     * @return \Psr\Http\Message\RequestInterface[]
      */
     public function onRequestException(
         RequestInterface $request,
