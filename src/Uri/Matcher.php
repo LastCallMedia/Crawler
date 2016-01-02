@@ -56,22 +56,30 @@ class Matcher implements MatcherInterface
             return true;
         }
         if (self::ALL === $this->mode) {
-            foreach ($this->handlers as $handler) {
-                if (true !== $handler($uri)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return $this->matchesAll($uri);
         } else {
-            foreach ($this->handlers as $handler) {
-                if (false !== $handler($uri)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return $this->matchesAny($uri);
         }
+    }
+
+    private function matchesAll(UriInterface $uri) {
+        foreach ($this->handlers as $handler) {
+            if (true !== $handler($uri)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function matchesAny(UriInterface $uri) {
+        foreach ($this->handlers as $handler) {
+            if (false !== $handler($uri)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
