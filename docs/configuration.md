@@ -59,8 +59,19 @@ The following services are registered with the container and can be replaced or 
 
 `LastCall\Crawler\Queue\RequestQueueInterface` - The queue is where requests are stored.  Initially, the queue only contains a request to the baseUrl, and the queue is filled by subscribers processing the page. 
 
-[The default queue](../src/Configuration/ServiceProvider/QueueServiceProvider.php)
+[Default queue](../src/Configuration/ServiceProvider/QueueServiceProvider.php)
 
+#### parsers
+
+`array` - An array of parsers that the FragmentHandler can use to break down content.
+
+[Default parsers](../src/Configuration/ServiceProvider/FragmentServiceProvider.php)
+
+#### processors
+
+`array` - An array of fragment processors that the FragmentHandler feeds HTML fragments to.
+
+[Default processors](../src/Configuration/ServiceProvider/FragmentServiceProvider.php)
 
 #### logger 
 
