@@ -15,8 +15,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MatchingProxy implements EventSubscriberInterface
 {
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventSubscriberInterface
+     */
     private $proxied;
+
+    /**
+     * @var \LastCall\Crawler\Uri\MatcherInterface
+     */
     private $matcher;
+
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    private $dispatcher;
 
     public function __construct(EventSubscriberInterface $subscriber, MatcherInterface $matcher)
     {
