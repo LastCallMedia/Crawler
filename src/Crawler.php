@@ -5,6 +5,7 @@ namespace LastCall\Crawler;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\SessionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -32,10 +33,12 @@ class Crawler
      */
     public function __construct(
         SessionInterface $session,
-        ClientInterface $client
+        ClientInterface $client,
+        RequestQueueInterface $queue
     ) {
         $this->session = $session;
         $this->client = $client;
+        $this->queue = $queue;
     }
 
     /**
@@ -55,7 +58,7 @@ class Crawler
 
         // The outer generator ($gen) restarts the processing in that case.
         $gen = function () use ($chunk) {
-            while (!$this->session->isFinished()) {
+            while ($this->queue->count() > 0) {
                 $inner = new EachPromise($this->getRequestWorkerFn(), [
                     'concurrency' => $chunk,
                 ]);
@@ -70,7 +73,7 @@ class Crawler
 
     private function getRequestWorkerFn()
     {
-        while ($request = $this->session->next()) {
+        while ($request = $this->queue->pop()) {
             try {
                 $this->session->onRequestSending($request);
                 $promise = $this->client->sendAsync($request)
@@ -87,12 +90,14 @@ class Crawler
     private function getRequestFulfilledFn(RequestInterface $request)
     {
         return function (ResponseInterface $response) use ($request) {
-            $this->session->complete($request);
+            $this->queue->complete($request);
 
             try {
-                $this->session->onRequestSuccess($request, $response);
+                $requests = $this->session->onRequestSuccess($request, $response);
+                $this->enqueue($requests);
             } catch (\Exception $e) {
-                $this->session->onRequestException($request, $e, $response);
+                $requests = $this->session->onRequestException($request, $e, $response);
+                $this->enqueue($requests);
                 throw $e;
             }
 
@@ -103,22 +108,31 @@ class Crawler
     private function getRequestRejectedFn(RequestInterface $request)
     {
         return function ($reason) use ($request) {
-            $this->session->complete($request);
+            $this->queue->complete($request);
             // Delegate processing of the item out to the session.
             if ($reason instanceof BadResponseException) {
                 $response = $reason->getResponse();
 
                 try {
-                    $this->session->onRequestFailure($request, $response);
+                    $requests = $this->session->onRequestFailure($request, $response);
+                    $this->enqueue($requests);
                 } catch (\Exception $e) {
-                    $this->session->onRequestException($request, $e, $response);
+                    $requests = $this->session->onRequestException($request, $e, $response);
+                    $this->enqueue($requests);
                     throw $e;
                 }
 
-                throw $reason;
+//                throw $reason;
             }
 
             return \GuzzleHttp\Promise\rejection_for($reason);
         };
+    }
+
+    private function enqueue($requests)
+    {
+        if (is_array($requests) && !empty($requests)) {
+            $this->queue->pushMultiple($requests);
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace LastCall\Crawler\Configuration;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ServiceProvider\FragmentServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
@@ -42,6 +43,16 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         // On start, add the default request.
         $this->addListener(CrawlerEvents::START, function () {
             $this['queue']->push(new Request('GET', $this['base_url']));
+        });
+        $this->addListener(CrawlerEvents::SETUP, function () {
+            if ($this['queue'] instanceof SetupTeardownInterface) {
+                $this['queue']->onSetup();
+            }
+        });
+        $this->addListener(CrawlerEvents::TEARDOWN, function () {
+            if ($this['queue'] instanceof SetupTeardownInterface) {
+                $this['queue']->onTeardown();
+            }
         });
     }
 

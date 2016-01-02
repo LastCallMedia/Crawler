@@ -5,23 +5,24 @@ namespace LastCall\Crawler\Test\Configuration;
 use GuzzleHttp\ClientInterface;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Session\Session;
-use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function testHasClient() {
+    public function testHasClient()
+    {
         $config = new Configuration();
         $this->assertInstanceOf(ClientInterface::class, $config->getClient());
     }
 
-    public function testHasListenersArray() {
+    public function testHasListenersArray()
+    {
         $config = new Configuration();
         $this->assertTrue(is_array($config['listeners']));
     }
 
-    public function testHasSubscribersArray() {
+    public function testHasSubscribersArray()
+    {
         $config = new Configuration();
         $this->assertTrue(is_array($config['subscribers']));
     }

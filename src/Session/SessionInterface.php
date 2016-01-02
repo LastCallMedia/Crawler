@@ -19,31 +19,6 @@ interface SessionInterface
     public function start();
 
     /**
-     * Retrieve the next request.
-     *
-     * @return RequestInterface|null
-     */
-    public function next();
-
-    public function complete(RequestInterface $request);
-
-    public function release(RequestInterface $request);
-
-    /**
-     * Add a request to the current session.
-     *
-     * @param \Psr\Http\Message\RequestInterface $request
-     */
-    public function addRequest(RequestInterface $request);
-
-    /**
-     * Check whether the session has completed.
-     *
-     * @return bool
-     */
-    public function isFinished();
-
-    /**
      * Dispatch a setup event.
      */
     public function setup();

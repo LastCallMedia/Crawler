@@ -255,7 +255,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
     ) {
         $session = Session::createFromConfig($configuration,
             new EventDispatcher());
-        $crawler = new Crawler($session, $configuration->getClient());
+        $crawler = new Crawler($session, $configuration->getClient(), $configuration->getQueue());
         $stopwatch = new Stopwatch();
         $stopwatch->start(__FUNCTION__, $category);
         $promise = $crawler->start();

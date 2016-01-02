@@ -36,6 +36,6 @@ abstract class AbstractCrawlerHelper extends Helper implements CrawlerHelperInte
         ConfigurationInterface $config,
         SessionInterface $session
     ) {
-        return new Crawler($session, $config->getClient());
+        return new Crawler($session, $config->getClient(), $config->getQueue());
     }
 }

@@ -2,14 +2,11 @@
 
 namespace LastCall\Crawler\Session;
 
-use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
-use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -50,21 +47,18 @@ class Session implements SessionInterface
             }
         }
 
-        return new self($config->getQueue(), $dispatcher);
+        return new self($dispatcher);
     }
 
     /**
      * Session constructor.
      *
-     * @param \LastCall\Crawler\Queue\RequestQueueInterface|null               $queue
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $dispatcher
      */
     public function __construct(
-        RequestQueueInterface $queue = null,
         EventDispatcherInterface $dispatcher = null
     ) {
         $this->dispatcher = $dispatcher ?: new EventDispatcher();
-        $this->queue = $queue ?: new ArrayRequestQueue();
     }
 
     public function start()
@@ -72,44 +66,13 @@ class Session implements SessionInterface
         $this->dispatcher->dispatch(CrawlerEvents::START);
     }
 
-    public function next()
-    {
-        return $this->queue->pop();
-    }
-
-    public function complete(RequestInterface $request)
-    {
-        return $this->queue->complete($request);
-    }
-
-    public function release(RequestInterface $request)
-    {
-        return $this->queue->release($request);
-    }
-
-    public function addRequest(RequestInterface $request)
-    {
-        return $this->queue->push($request);
-    }
-
-    public function isFinished()
-    {
-        return $this->queue->count() === 0;
-    }
-
     public function setup()
     {
-        if ($this->queue instanceof SetupTeardownInterface) {
-            $this->queue->onSetup();
-        }
         $this->dispatcher->dispatch(CrawlerEvents::SETUP);
     }
 
     public function teardown()
     {
-        if ($this->queue instanceof SetupTeardownInterface) {
-            $this->queue->onTeardown();
-        }
         $this->dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
 
@@ -121,13 +84,15 @@ class Session implements SessionInterface
     private function dispatch($eventName, CrawlerEvent $event)
     {
         $this->dispatcher->dispatch($eventName, $event);
-        $this->queue->pushMultiple($event->getAdditionalRequests());
+
+        return $event->getAdditionalRequests();
     }
 
     public function onRequestSending(RequestInterface $request)
     {
         $event = new CrawlerEvent($request);
-        $this->dispatch(CrawlerEvents::SENDING, $event);
+
+        return $this->dispatch(CrawlerEvents::SENDING, $event);
     }
 
     public function onRequestSuccess(
@@ -135,7 +100,8 @@ class Session implements SessionInterface
         ResponseInterface $response
     ) {
         $event = new CrawlerResponseEvent($request, $response);
-        $this->dispatch(CrawlerEvents::SUCCESS, $event);
+
+        return $this->dispatch(CrawlerEvents::SUCCESS, $event);
     }
 
     public function onRequestFailure(
@@ -143,7 +109,8 @@ class Session implements SessionInterface
         ResponseInterface $response
     ) {
         $event = new CrawlerResponseEvent($request, $response);
-        $this->dispatch(CrawlerEvents::FAILURE, $event);
+
+        return $this->dispatch(CrawlerEvents::FAILURE, $event);
     }
 
     public function onRequestException(
@@ -152,6 +119,7 @@ class Session implements SessionInterface
         ResponseInterface $response = null
     ) {
         $event = new CrawlerExceptionEvent($request, $response, $exception);
-        $this->dispatch(CrawlerEvents::EXCEPTION, $event);
+
+        return $this->dispatch(CrawlerEvents::EXCEPTION, $event);
     }
 }
