@@ -12,12 +12,7 @@ class NormalizerServiceProvider implements ServiceProviderInterface
     public function register(Container $pimple)
     {
         $pimple['normalizer'] = function () use ($pimple) {
-            $matcher = null;
-            if (isset($pimple['normalizer_matcher'])) {
-                $matcher = $pimple['normalizer_matcher'];
-            }
-
-            return new Normalizer($pimple['normalizations'], $matcher);
+            return new Normalizer($pimple['normalizations']);
         };
         $pimple['normalizations'] = function () {
             return [
