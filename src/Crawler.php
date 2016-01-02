@@ -11,7 +11,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Dispatches requests to the client, and responses to the session.
+ * Works through a request queue, dispatching requests to the client,
+ * and responses to the session.
  */
 class Crawler
 {
