@@ -34,7 +34,7 @@ Discovery:
 
 * [RedirectDiscoverer](../src/Handler/Discovery/RedirectDiscoverer.php)
 
-The FragmentHandler also allows for additional processing to be done on subtrees of a page.  For example, the [LinkProcessor](../src/Module/Processor/LinkProcessor.php) hooks into the FragmentHandler to parse and re-add links.
+The FragmentHandler also allows for additional processing to be done on subtrees of a page.  For example, the [LinkProcessor](../src/Fragment/Processor/LinkProcessor.php) hooks into the FragmentHandler to parse and re-add links.
 
 Creating Handlers
 -----------------
