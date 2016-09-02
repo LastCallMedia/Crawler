@@ -4,56 +4,58 @@ namespace LastCall\Crawler\Command;
 
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Reporter\ConsoleOutputReporter;
+use LastCall\Crawler\Configuration\Factory\ConfigurationFactoryInterface;
+use LastCall\Crawler\Session\Session;
+use LastCall\Crawler\Crawler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use LastCall\Crawler\Handler\Reporting\CrawlerStatusReporter;
+
 
 class CrawlCommand extends Command
 {
-    public function configure()
-    {
-        if (!$this->getName()) {
-            $this->setName('crawl');
-        }
+    /**
+     * @var \LastCall\LinkChecker\ConfigurationFactory\ConfigurationFactoryInterface
+     */
+    private $factory;
 
-        $this->setDescription('Work through items in the request queue.');
-        $this->addOption('chunk', null, InputOption::VALUE_REQUIRED,
-            'The amount of items to process.', 5);
-        $this->addOption('reset', 'r', InputOption::VALUE_NONE,
-            'Reset the migration prior to running');
+    public function __construct(ConfigurationFactoryInterface $factory) {
+        $this->factory = $factory;
+        parent::__construct(NULL);
+    }
+
+    public function configure() {
+        $this->setName($this->factory->getName());
+        $this->setDescription($this->factory->getDescription());
+        $this->setHelp($this->factory->getHelp());
+        $this->factory->configureInput($this->getDefinition());
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
+    public function execute(InputInterface $input, OutputInterface $output) {
+        $configuration = $this->factory->getConfiguration($input);
 
-        /** @var \LastCall\Crawler\Helper\CrawlerHelperInterface $helper */
-        $helper = $this->getHelper('crawler');
-        $configuration = $helper->getConfiguration();
-
-        if ($configuration instanceof OutputAwareInterface) {
+        if($configuration instanceof OutputAwareInterface) {
             $configuration->setOutput($output);
         }
 
-        $reporter = new ConsoleOutputReporter($output);
-        $session = $helper->getSession($configuration, $reporter);
+        $dispatcher = new EventDispatcher();
+        // Set up the reporter.
+        $dispatcher->addSubscriber(
+            new CrawlerStatusReporter(
+                $configuration->getQueue(),
+                [new ConsoleOutputReporter($output)]
+            )
+        );
 
-        $io = new SymfonyStyle($input, $output);
+        $session = Session::createFromConfig($configuration, $dispatcher);
+        $crawler = new Crawler($session, $configuration->getClient(), $configuration->getQueue());
 
-        if ($input->getOption('reset')) {
-            $session->teardown();
-            $session->setup();
-            $io->success('Resetting');
-        }
-
-        $crawler = $helper->getCrawler($configuration, $session);
-        $chunk = $input->getOption('chunk');
-        $promise = $crawler->start($chunk);
+        $promise = $crawler->start($this->factory->getChunk($input));
 
         $promise->wait();
         $session->finish();
-        $io->success('Crawling complete.');
     }
 }
