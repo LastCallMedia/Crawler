@@ -1,20 +1,18 @@
 <?php
 
-
 namespace LastCall\Crawler\Configuration\Factory;
-
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 
-interface ConfigurationFactoryInterface {
+interface ConfigurationFactoryInterface
+{
+    public function getName();
 
-  public function getName();
+    public function getDescription();
 
-  public function getDescription();
-
-  public function getHelp();
+    public function getHelp();
 
   /**
    * @param \Symfony\Component\Console\Input\InputDefinition $definition

@@ -9,6 +9,7 @@ use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Session\Session;
@@ -41,7 +42,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testStart()
     {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::START)->shouldBeCalledTimes(1);
+        $dispatcher->dispatch(CrawlerEvents::START, Argument::type(CrawlerStartEvent::class))->shouldBeCalledTimes(1);
 
         $session = new Session($dispatcher->reveal());
         $session->start();
