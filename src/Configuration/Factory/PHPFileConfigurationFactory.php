@@ -57,12 +57,12 @@ class PHPFileConfigurationFactory implements ConfigurationFactoryInterface
     {
         $filename = $input->getArgument('filename');
 
-        if(!file_exists($filename)) {
+        if (!file_exists($filename)) {
             throw new \Exception(sprintf('Configuration file %s does not exist.', $filename));
         }
         $configuration = require $filename;
 
-        if(!$configuration || !$configuration instanceof ConfigurationInterface) {
+        if (!$configuration || !$configuration instanceof ConfigurationInterface) {
             throw new \Exception(sprintf('Configuration must implement %s', ConfigurationInterface::class));
         }
 

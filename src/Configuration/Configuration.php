@@ -12,8 +12,11 @@ use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Handler\Reporting\CrawlerStatusReporter;
+use LastCall\Crawler\Reporter\ConsoleOutputReporter;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * A crawler configuration based on the Pimple DI container.
@@ -31,8 +34,19 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return [];
         };
         $this['subscribers'] = function () {
-            return [];
+            return [
+                'reporter' => new CrawlerStatusReporter($this['queue'], $this['reporters']),
+            ];
         };
+        $this['reporters'] = function () {
+            $reporters = array();
+            if ($output = $this['output']) {
+                $reporters['console'] = new ConsoleOutputReporter($output);
+            }
+
+            return $reporters;
+        };
+        $this['output'] = false;
 
         $this->register(new QueueServiceProvider());
         $this->register(new MatcherServiceProvider());
@@ -89,5 +103,14 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 
                 return $listeners;
             });
+    }
+
+    public function addSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->extend('subscribers', function (array $subscribers) use ($subscriber) {
+            $subscribers[] = $subscriber;
+
+            return $subscribers;
+        });
     }
 }
