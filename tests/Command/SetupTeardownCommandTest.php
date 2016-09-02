@@ -4,6 +4,8 @@ namespace LastCall\Crawler\Test\Command;
 
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Configuration\Factory\PreloadedConfigurationFactory;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Helper\PreloadedCrawlerHelper;
 use Symfony\Component\Console\Command\Command;
@@ -12,16 +14,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
 {
-    protected function getCrawlerHelper(
-        callable $setupListener,
-        callable $teardownListener
-    ) {
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->addListener(CrawlerEvents::SETUP, $setupListener);
-        $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
-
-        return new PreloadedCrawlerHelper($config);
-    }
 
     public function getCommands()
     {
@@ -32,14 +24,28 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider getCommands
-     */
-    public function testCommand(
-        Command $command,
-        $teardownExpected,
-        $setupExpected
-    ) {
+    public function testSetup() {
+        $config = new Configuration('https://lastcallmedia.com');
+        $factory = new PreloadedConfigurationFactory($config);
+        $command = SetupTeardownCommand::setup($factory);
+        $this->assertCommandSetupTeardown($config, $command, TRUE, FALSE);
+    }
+
+    public function testTeardown() {
+        $config = new Configuration('https://lastcallmedia.com');
+        $factory = new PreloadedConfigurationFactory($config);
+        $command = SetupTeardownCommand::teardown($factory);
+        $this->assertCommandSetupTeardown($config, $command, FALSE, TRUE);
+    }
+
+    public function testReset() {
+        $config = new Configuration('https://lastcallmedia.com');
+        $factory = new PreloadedConfigurationFactory($config);
+        $command = SetupTeardownCommand::reset($factory);
+        $this->assertCommandSetupTeardown($config, $command, TRUE, TRUE);
+    }
+
+    protected function assertCommandSetupTeardown(ConfigurationInterface $configuration, SetupTeardownCommand $command, $setupExpected, $teardownExpected) {
         $setupCalled = $teardownCalled = false;
         $setupListener = function () use (&$setupCalled) {
             $setupCalled = true;
@@ -47,25 +53,11 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         $teardownListener = function () use (&$teardownCalled) {
             $teardownCalled = true;
         };
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->addListener(CrawlerEvents::SETUP, $setupListener);
-        $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
-
-        $command->setHelperSet(new HelperSet([
-            new PreloadedCrawlerHelper($config),
-        ]));
-
+        $configuration->addListener(CrawlerEvents::SETUP, $setupListener);
+        $configuration->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
         $tester = new CommandTester($command);
-        $tester->execute(['config' => 'test.php']);
-
-        $this->assertEquals($teardownExpected, $teardownCalled);
+        $tester->execute([]);
         $this->assertEquals($setupExpected, $setupCalled);
-
-        if ($teardownExpected) {
-            $this->assertContains('Teardown complete', $tester->getDisplay());
-        }
-        if ($setupExpected) {
-            $this->assertContains('Setup complete', $tester->getDisplay());
-        }
+        $this->assertEquals($teardownExpected, $teardownCalled);
     }
 }

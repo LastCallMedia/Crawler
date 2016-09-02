@@ -50,8 +50,7 @@ class SetupTeardownCommand extends Command
 
     public function configure()
     {
-        $this->addArgument('config', InputArgument::REQUIRED,
-            'The path to the crawler configuration.');
+        $this->factory->configureInput($this->getDefinition());
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
