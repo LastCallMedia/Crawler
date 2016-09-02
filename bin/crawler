@@ -11,7 +11,7 @@ elseif(file_exists(__DIR__ . '/../../../autoload.php')) {
 $factory = new LastCall\Crawler\Configuration\Factory\PHPFileConfigurationFactory();
 $application = new Symfony\Component\Console\Application('LCM Crawler', '1.1.1');
 $application->add(new LastCall\Crawler\Command\CrawlCommand($factory));
-$application->add(LastCall\Crawler\Command\SetupTeardownCommand::setup());
-$application->add(LastCall\Crawler\Command\SetupTeardownCommand::teardown());
-$application->add(LastCall\Crawler\Command\SetupTeardownCommand::reset());
+$application->add(LastCall\Crawler\Command\SetupTeardownCommand::setup($factory));
+$application->add(LastCall\Crawler\Command\SetupTeardownCommand::teardown($factory));
+$application->add(LastCall\Crawler\Command\SetupTeardownCommand::reset($factory));
 return $application->run();
