@@ -13,6 +13,9 @@ class PHPConfigurationLoader implements ConfigurationLoaderInterface
         if (!file_exists($filename)) {
             throw new \Exception(sprintf('Configuration file %s does not exist.', $filename));
         }
+        if ('php' !== pathinfo($filename, PATHINFO_EXTENSION)) {
+            throw new \Exception(sprintf('Configuration file %s does not have a .php file extension.', $filename));
+        }
         $configuration = require $filename;
 
         if (!$configuration || !$configuration instanceof ConfigurationInterface) {
