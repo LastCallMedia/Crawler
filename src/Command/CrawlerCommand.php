@@ -6,6 +6,7 @@ namespace LastCall\Crawler\Command;
 
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\Configuration\Loader\PHPConfigurationLoader;
+use LastCall\Crawler\Session\SessionInterface;
 use Symfony\Component\Console\Command\Command;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Common\OutputAwareInterface;
@@ -52,9 +53,6 @@ abstract class CrawlerCommand extends Command
         if($configuration instanceof OutputAwareInterface) {
             $configuration->setOutput($output);
         }
-        if($input->hasOption('reset')) {
-            // @todo: Figure out reset here?
-        }
     }
 
     protected function getSession(ConfigurationInterface $configuration)
@@ -62,10 +60,8 @@ abstract class CrawlerCommand extends Command
         return Session::createFromConfig($configuration, $this->getDispatcher());
     }
 
-    protected function getCrawler(ConfigurationInterface $configuration)
+    protected function getCrawler(ConfigurationInterface $configuration, SessionInterface $session)
     {
-        $session = $this->getSession($configuration);
-
         return new Crawler($session, $configuration->getClient(), $configuration->getQueue());
     }
 
