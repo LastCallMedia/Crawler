@@ -53,8 +53,7 @@ class SetupTeardownCommand extends CrawlerCommand
 
         $config = $this->getConfiguration($input->getArgument('filename'));
         $this->prepareConfiguration($config, $input, $output);
-
-        $session = $this->getSession($config);
+        $session = $this->getSession($config, $this->getDispatcher());
 
         if ($this->tearsDown) {
             $session->teardown();

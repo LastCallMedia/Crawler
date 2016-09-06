@@ -20,6 +20,7 @@ class CrawlCommand extends CrawlerCommand
         $this->setHelp('Pass in the name of a PHP file that contains the crawler configuration.');
         $this->addArgument('filename', InputArgument::OPTIONAL, 'Path to a configuration file.', 'crawler.php');
         $this->addOption('reset', 'r', InputOption::VALUE_NONE, 'Run teardown/setup tasks before starting.');
+        $this->addOption('chunk', 'c', InputOption::VALUE_REQUIRED, 'The concurrency to send requests at', 5);
         parent::configure();
     }
 
@@ -27,7 +28,8 @@ class CrawlCommand extends CrawlerCommand
     {
         $configuration = $this->getConfiguration($input->getArgument('filename'));
         $this->prepareConfiguration($configuration, $input, $output);
-        $session = $this->getSession($configuration);
+        $dispatcher = $this->getDispatcher();
+        $session = $this->getSession($configuration, $dispatcher);
 
         if ($input->getOption('reset')) {
             $session->teardown();
@@ -36,7 +38,7 @@ class CrawlCommand extends CrawlerCommand
 
         $this
             ->getCrawler($configuration, $session)
-            ->start(5)
+            ->start($input->getOption('chunk'))
             ->wait();
     }
 }

@@ -13,6 +13,7 @@ use LastCall\Crawler\Session\Session;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class CrawlerCommand extends Command
 {
@@ -54,9 +55,9 @@ abstract class CrawlerCommand extends Command
         }
     }
 
-    protected function getSession(ConfigurationInterface $configuration)
+    protected function getSession(ConfigurationInterface $configuration, EventDispatcherInterface $dispatcher)
     {
-        return Session::createFromConfig($configuration, $this->getDispatcher());
+        return Session::createFromConfig($configuration, $dispatcher);
     }
 
     protected function getCrawler(ConfigurationInterface $configuration, SessionInterface $session)
