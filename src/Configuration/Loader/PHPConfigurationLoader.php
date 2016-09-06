@@ -1,10 +1,8 @@
 <?php
 
-
 namespace LastCall\Crawler\Configuration\Loader;
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
-
 
 class PHPConfigurationLoader implements ConfigurationLoaderInterface
 {
@@ -24,6 +22,4 @@ class PHPConfigurationLoader implements ConfigurationLoaderInterface
 
         return $configuration;
     }
-
-
 }

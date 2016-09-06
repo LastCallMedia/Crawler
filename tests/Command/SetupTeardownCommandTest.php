@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Test\Command;
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
-use LastCall\Crawler\Configuration\Factory\PreloadedConfigurationFactory;
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\CrawlerEvents;
 use Prophecy\Argument;
@@ -22,9 +21,11 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    private function getDummyLoader($config) {
+    private function getDummyLoader($config)
+    {
         $loader = $this->prophesize(ConfigurationLoaderInterface::class);
         $loader->loadFile(Argument::any())->willReturn($config);
+
         return $loader->reveal();
     }
 

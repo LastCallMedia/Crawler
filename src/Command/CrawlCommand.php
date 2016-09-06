@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class CrawlCommand extends CrawlerCommand
 {
-
     public function __construct($name = 'crawl')
     {
         parent::__construct($name);
@@ -30,7 +29,7 @@ class CrawlCommand extends CrawlerCommand
         $this->prepareConfiguration($configuration, $input, $output);
         $session = $this->getSession($configuration);
 
-        if($input->getOption('reset')) {
+        if ($input->getOption('reset')) {
             $session->teardown();
             $session->setup();
         }

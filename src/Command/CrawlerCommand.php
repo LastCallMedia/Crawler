@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Command;
-
 
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\Configuration\Loader\PHPConfigurationLoader;
@@ -28,9 +26,10 @@ abstract class CrawlerCommand extends Command
 
     protected function getLoader()
     {
-        if(!$this->loader) {
+        if (!$this->loader) {
             $this->loader = new PHPConfigurationLoader();
         }
+
         return $this->loader;
     }
 
@@ -41,7 +40,7 @@ abstract class CrawlerCommand extends Command
 
     protected function getDispatcher()
     {
-        if(!$this->dispatcher) {
+        if (!$this->dispatcher) {
             $this->dispatcher = new EventDispatcher();
         }
 
@@ -50,7 +49,7 @@ abstract class CrawlerCommand extends Command
 
     protected function prepareConfiguration(ConfigurationInterface $configuration, InputInterface $input, OutputInterface $output)
     {
-        if($configuration instanceof OutputAwareInterface) {
+        if ($configuration instanceof OutputAwareInterface) {
             $configuration->setOutput($output);
         }
     }
@@ -64,5 +63,4 @@ abstract class CrawlerCommand extends Command
     {
         return new Crawler($session, $configuration->getClient(), $configuration->getQueue());
     }
-
 }
