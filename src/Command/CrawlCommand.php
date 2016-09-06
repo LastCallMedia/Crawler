@@ -2,57 +2,34 @@
 
 namespace LastCall\Crawler\Command;
 
-use LastCall\Crawler\Common\OutputAwareInterface;
-use LastCall\Crawler\Configuration\ConfigurationInterface;
-use LastCall\Crawler\Configuration\Factory\ConfigurationFactoryInterface;
-use LastCall\Crawler\Session\Session;
-use LastCall\Crawler\Crawler;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Input\InputArgument;
 
-class CrawlCommand extends Command
+class CrawlCommand extends CrawlerCommand
 {
-    /**
-     * @var ConfigurationFactoryInterface
-     */
-    private $factory;
 
-    public function __construct(ConfigurationFactoryInterface $factory)
+    public function __construct($name = 'crawl')
     {
-        $this->factory = $factory;
-        parent::__construct(null);
+        parent::__construct($name);
     }
 
     public function configure()
     {
-        $this->setName($this->factory->getName());
-        $this->setDescription($this->factory->getDescription());
-        $this->setHelp($this->factory->getHelp());
-        $this->factory->configureInput($this->getDefinition());
+        $this->setDescription('Execute a crawler session on a configuration.');
+        $this->setHelp('Pass in the name of a PHP file that contains the crawler configuration.');
+        $this->addArgument('filename', InputArgument::OPTIONAL, 'Path to a configuration file.', 'crawler.php');
         parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->factory->getConfiguration($input);
+        $configuration = $this->getConfiguration($input->getArgument('filename'));
+        $this->prepareConfiguration($configuration, $input, $output);
 
-        if ($configuration instanceof OutputAwareInterface) {
-            $configuration->setOutput($output);
-        }
-
-        $promise = $this->getCrawler($configuration)
-            ->start($this->factory->getChunk($input));
-
-        $promise->wait();
-    }
-
-    protected function getCrawler(ConfigurationInterface $configuration)
-    {
-        $dispatcher = new EventDispatcher();
-        $session = Session::createFromConfig($configuration, $dispatcher);
-
-        return new Crawler($session, $configuration->getClient(), $configuration->getQueue());
+        $this
+            ->getCrawler($configuration)
+            ->start(5)
+            ->wait();
     }
 }

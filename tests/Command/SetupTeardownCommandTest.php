@@ -6,7 +6,9 @@ use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Configuration\Factory\PreloadedConfigurationFactory;
+use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\CrawlerEvents;
+use Prophecy\Argument;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
@@ -20,27 +22,33 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    private function getDummyLoader($config) {
+        $loader = $this->prophesize(ConfigurationLoaderInterface::class);
+        $loader->loadFile(Argument::any())->willReturn($config);
+        return $loader->reveal();
+    }
+
     public function testSetup()
     {
         $config = new Configuration('https://lastcallmedia.com');
-        $factory = new PreloadedConfigurationFactory($config);
-        $command = SetupTeardownCommand::setup($factory);
+        $command = SetupTeardownCommand::setup();
+        $command->setLoader($this->getDummyLoader($config));
         $this->assertCommandSetupTeardown($config, $command, true, false);
     }
 
     public function testTeardown()
     {
         $config = new Configuration('https://lastcallmedia.com');
-        $factory = new PreloadedConfigurationFactory($config);
-        $command = SetupTeardownCommand::teardown($factory);
+        $command = SetupTeardownCommand::teardown();
+        $command->setLoader($this->getDummyLoader($config));
         $this->assertCommandSetupTeardown($config, $command, false, true);
     }
 
     public function testReset()
     {
         $config = new Configuration('https://lastcallmedia.com');
-        $factory = new PreloadedConfigurationFactory($config);
-        $command = SetupTeardownCommand::reset($factory);
+        $command = SetupTeardownCommand::reset();
+        $command->setLoader($this->getDummyLoader($config));
         $this->assertCommandSetupTeardown($config, $command, true, true);
     }
 
