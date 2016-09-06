@@ -58,16 +58,6 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this->addListener(CrawlerEvents::START, function () {
             $this['queue']->push(new Request('GET', $this['base_url']));
         });
-        $this->addListener(CrawlerEvents::SETUP, function () {
-            if ($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onSetup();
-            }
-        });
-        $this->addListener(CrawlerEvents::TEARDOWN, function () {
-            if ($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onTeardown();
-            }
-        });
     }
 
     public function setOutput(OutputInterface $output)
