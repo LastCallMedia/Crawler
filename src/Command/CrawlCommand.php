@@ -2,10 +2,12 @@
 
 namespace LastCall\Crawler\Command;
 
+use LastCall\Crawler\Handler\CrawlMonitor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CrawlCommand extends CrawlerCommand
 {
@@ -30,6 +32,9 @@ class CrawlCommand extends CrawlerCommand
         $this->prepareConfiguration($configuration, $input, $output);
         $dispatcher = $this->getDispatcher();
         $session = $this->getSession($configuration, $dispatcher);
+
+        $monitor = new CrawlMonitor($configuration->getQueue(), new SymfonyStyle($input, $output));
+        $dispatcher->addSubscriber($monitor);
 
         if ($input->getOption('reset')) {
             $session->teardown();

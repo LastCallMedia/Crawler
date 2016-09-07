@@ -3,7 +3,6 @@
 namespace LastCall\Crawler\Configuration\ServiceProvider;
 
 use LastCall\Crawler\Common\SetupTeardownInterface;
-use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
@@ -25,14 +24,14 @@ class QueueServiceProvider implements ServiceProviderInterface
         };
 
         // Register the queue setup and teardown listeners.
-        $pimple->extend('listeners', function(array $listeners) use ($pimple) {
-            $listeners[CrawlerEvents::SETUP]['queue.setup'] = [function() use ($pimple) {
-                if($pimple['queue'] instanceof SetupTeardownInterface) {
+        $pimple->extend('listeners', function (array $listeners) use ($pimple) {
+            $listeners[CrawlerEvents::SETUP]['queue.setup'] = [function () use ($pimple) {
+                if ($pimple['queue'] instanceof SetupTeardownInterface) {
                     $pimple['queue']->onSetup();
                 }
             }, 0];
-            $listeners[CrawlerEvents::TEARDOWN]['queue.teardown'] = [function() use ($pimple) {
-                if($pimple['queue'] instanceof SetupTeardownInterface) {
+            $listeners[CrawlerEvents::TEARDOWN]['queue.teardown'] = [function () use ($pimple) {
+                if ($pimple['queue'] instanceof SetupTeardownInterface) {
                     $pimple['queue']->onTeardown();
                 }
             }, 0];

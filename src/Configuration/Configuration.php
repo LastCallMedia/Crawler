@@ -5,15 +5,12 @@ namespace LastCall\Crawler\Configuration;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
-use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ServiceProvider\FragmentServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Handler\Reporting\CrawlerStatusReporter;
-use LastCall\Crawler\Reporter\ConsoleOutputReporter;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,17 +31,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return [];
         };
         $this['subscribers'] = function () {
-            return [
-                'reporter' => new CrawlerStatusReporter($this['queue'], $this['reporters']),
-            ];
-        };
-        $this['reporters'] = function () {
-            $reporters = array();
-            if ($output = $this['output']) {
-                $reporters['console'] = new ConsoleOutputReporter($output);
-            }
-
-            return $reporters;
+            return [];
         };
         $this['output'] = false;
 

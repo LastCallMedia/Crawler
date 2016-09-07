@@ -7,7 +7,6 @@ use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Queue\RequestQueueInterface;
 use Pimple\Container;
 
 class QueueServiceProviderTest extends \PHPUnit_Framework_TestCase
@@ -15,7 +14,7 @@ class QueueServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetDefaultQueue()
     {
         $container = new Container();
-        $container['listeners'] = function() {
+        $container['listeners'] = function () {
             return [];
         };
         $container->register(new QueueServiceProvider());
@@ -26,7 +25,7 @@ class QueueServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetDoctrineQueue()
     {
         $container = new Container();
-        $container['listeners'] = function() {
+        $container['listeners'] = function () {
             return [];
         };
         $container->register(new QueueServiceProvider());
@@ -43,9 +42,10 @@ class QueueServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new DoctrineRequestQueue($connection), $container['queue']);
     }
 
-    public function testRegistersSetupTeardownListeners() {
+    public function testRegistersSetupTeardownListeners()
+    {
         $container = new Container();
-        $container['listeners'] = function() {
+        $container['listeners'] = function () {
             return [];
         };
         $container->register(new QueueServiceProvider());
@@ -62,5 +62,4 @@ class QueueServiceProviderTest extends \PHPUnit_Framework_TestCase
         $setup();
         $teardown();
     }
-
 }
