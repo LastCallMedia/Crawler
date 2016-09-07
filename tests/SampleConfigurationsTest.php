@@ -8,7 +8,7 @@ class SampleConfigurationsTest extends \PHPUnit_Framework_TestCase
 {
     public function testSimpleConfig()
     {
-        $config = require_once __DIR__.'/../docs/sample.php';
+        $config = require __DIR__.'/../docs/sample.php';
         $this->assertInstanceOf(ConfigurationInterface::class, $config);
     }
 }

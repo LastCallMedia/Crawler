@@ -4,25 +4,14 @@ namespace LastCall\Crawler\Test\Command;
 
 use LastCall\Crawler\Command\SetupTeardownCommand;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\Configuration\ConfigurationInterface;
+use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Helper\PreloadedCrawlerHelper;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\HelperSet;
+use Prophecy\Argument;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
 {
-    protected function getCrawlerHelper(
-        callable $setupListener,
-        callable $teardownListener
-    ) {
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->addListener(CrawlerEvents::SETUP, $setupListener);
-        $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
-
-        return new PreloadedCrawlerHelper($config);
-    }
-
     public function getCommands()
     {
         return [
@@ -32,14 +21,40 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider getCommands
-     */
-    public function testCommand(
-        Command $command,
-        $teardownExpected,
-        $setupExpected
-    ) {
+    private function getDummyLoader($config)
+    {
+        $loader = $this->prophesize(ConfigurationLoaderInterface::class);
+        $loader->loadFile(Argument::any())->willReturn($config);
+
+        return $loader->reveal();
+    }
+
+    public function testSetup()
+    {
+        $config = new Configuration('https://lastcallmedia.com');
+        $command = SetupTeardownCommand::setup();
+        $command->setLoader($this->getDummyLoader($config));
+        $this->assertCommandSetupTeardown($config, $command, true, false);
+    }
+
+    public function testTeardown()
+    {
+        $config = new Configuration('https://lastcallmedia.com');
+        $command = SetupTeardownCommand::teardown();
+        $command->setLoader($this->getDummyLoader($config));
+        $this->assertCommandSetupTeardown($config, $command, false, true);
+    }
+
+    public function testReset()
+    {
+        $config = new Configuration('https://lastcallmedia.com');
+        $command = SetupTeardownCommand::reset();
+        $command->setLoader($this->getDummyLoader($config));
+        $this->assertCommandSetupTeardown($config, $command, true, true);
+    }
+
+    protected function assertCommandSetupTeardown(ConfigurationInterface $configuration, SetupTeardownCommand $command, $setupExpected, $teardownExpected)
+    {
         $setupCalled = $teardownCalled = false;
         $setupListener = function () use (&$setupCalled) {
             $setupCalled = true;
@@ -47,25 +62,11 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         $teardownListener = function () use (&$teardownCalled) {
             $teardownCalled = true;
         };
-        $config = new Configuration('https://lastcallmedia.com');
-        $config->addListener(CrawlerEvents::SETUP, $setupListener);
-        $config->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
-
-        $command->setHelperSet(new HelperSet([
-            new PreloadedCrawlerHelper($config),
-        ]));
-
+        $configuration->addListener(CrawlerEvents::SETUP, $setupListener);
+        $configuration->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
         $tester = new CommandTester($command);
-        $tester->execute(['config' => 'test.php']);
-
-        $this->assertEquals($teardownExpected, $teardownCalled);
+        $tester->execute([]);
         $this->assertEquals($setupExpected, $setupCalled);
-
-        if ($teardownExpected) {
-            $this->assertContains('Teardown complete', $tester->getDisplay());
-        }
-        if ($setupExpected) {
-            $this->assertContains('Setup complete', $tester->getDisplay());
-        }
+        $this->assertEquals($teardownExpected, $teardownCalled);
     }
 }

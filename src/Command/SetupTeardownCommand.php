@@ -2,13 +2,13 @@
 
 namespace LastCall\Crawler\Command;
 
-use Symfony\Component\Console\Command\Command;
+use LastCall\Crawler\Session\Session;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class SetupTeardownCommand extends Command
+class SetupTeardownCommand extends CrawlerCommand
 {
     private $tearsDown = true;
     private $setsUp = true;
@@ -36,26 +36,24 @@ class SetupTeardownCommand extends Command
         $setsUp = true,
         $description = ''
     ) {
+        $this->setDescription($description);
         parent::__construct($name);
         $this->tearsDown = $tearsDown;
         $this->setsUp = $setsUp;
-        $this->setDescription($description);
     }
 
     public function configure()
     {
-        $this->addArgument('config', InputArgument::REQUIRED,
-            'The path to the crawler configuration.');
+        $this->addArgument('filename', InputArgument::OPTIONAL, 'Path to a configuration file.', 'crawler.php');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
-        /** @var \LastCall\Crawler\Helper\CrawlerHelperInterface $helper */
-        $helper = $this->getHelper('crawler');
-        $config = $helper->getConfiguration();
-        $session = $helper->getSession($config);
+        $config = $this->getConfiguration($input->getArgument('filename'));
+        $this->prepareConfiguration($config, $input, $output);
+        $session = $this->getSession($config, $this->getDispatcher());
 
         if ($this->tearsDown) {
             $session->teardown();

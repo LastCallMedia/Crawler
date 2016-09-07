@@ -11,5 +11,5 @@ Once you have a [configuration](configuration.md), you can start running your cr
 Example of using the crawl command to run the sample configuration:
 
 ```bash
-vendor/bin/crawler crawl -c docs/sample.php
+vendor/bin/crawler crawl docs/sample.php
 ```

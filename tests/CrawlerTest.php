@@ -81,6 +81,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->start()->shouldBeCalled();
         $session->onRequestSending($req)->shouldBeCalled();
         $session->onRequestSuccess($req, $res)->shouldBeCalled();
+        $session->finish()->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client, $queue);
         $crawler->start(1)->wait();
@@ -100,6 +101,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->start()->shouldBeCalled();
         $session->onRequestSending($req)->shouldBeCalled();
         $session->onRequestFailure($req, $res)->shouldBeCalled();
+        $session->finish()->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client, $queue);
         $crawler->start(1)->wait();
@@ -120,6 +122,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->start()->shouldBeCalled();
         $session->onRequestSending($req)->shouldBeCalled();
         $session->onRequestSuccess($req, $res)->willThrow($e);
+        $session->finish()->shouldBeCalled();
 
         $session->onRequestException($req, $e, $res)->shouldBeCalled();
 
@@ -144,6 +147,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->onRequestSending($req)->shouldBeCalled();
         $session->onRequestFailure($req, $res)->willThrow($e);
         $session->onRequestException($req, $e, $res)->shouldBeCalled();
+        $session->finish()->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client, $queue);
         $crawler->start(1)->wait();
@@ -165,6 +169,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $session->start()->shouldBeCalled();
         $session->onRequestSending($req)->willThrow($e);
         $session->onRequestException($req, $e, null)->shouldBeCalled();
+        $session->finish()->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client, $queue);
         $crawler->start(1)->wait();
@@ -198,6 +203,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             }
             ++$count;
         });
+        $session->finish()->shouldBeCalled();
 
         $crawler = new Crawler($session->reveal(), $client, $queue);
         $crawler->start(5)->wait();

@@ -7,6 +7,7 @@ use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Event\CrawlerStartEvent;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -58,7 +59,7 @@ class Session implements SessionInterface
 
     public function start()
     {
-        $this->dispatcher->dispatch(CrawlerEvents::START);
+        $this->dispatcher->dispatch(CrawlerEvents::START, new CrawlerStartEvent($this));
     }
 
     public function setup()

@@ -74,7 +74,13 @@ class Crawler
 
         $outer = new EachPromise($gen(), ['concurrency' => 1]);
 
-        return $outer->promise();
+        $finish = function ($results) {
+            $this->session->finish();
+
+            return $results;
+        };
+
+        return $outer->promise()->then($finish, $finish);
     }
 
     private function getRequestWorkerFn()

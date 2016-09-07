@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Configuration;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
-use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ServiceProvider\FragmentServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
@@ -14,6 +13,7 @@ use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * A crawler configuration based on the Pimple DI container.
@@ -33,6 +33,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['subscribers'] = function () {
             return [];
         };
+        $this['output'] = false;
 
         $this->register(new QueueServiceProvider());
         $this->register(new MatcherServiceProvider());
@@ -43,16 +44,6 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         // On start, add the default request.
         $this->addListener(CrawlerEvents::START, function () {
             $this['queue']->push(new Request('GET', $this['base_url']));
-        });
-        $this->addListener(CrawlerEvents::SETUP, function () {
-            if ($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onSetup();
-            }
-        });
-        $this->addListener(CrawlerEvents::TEARDOWN, function () {
-            if ($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onTeardown();
-            }
         });
     }
 
@@ -89,5 +80,14 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 
                 return $listeners;
             });
+    }
+
+    public function addSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->extend('subscribers', function (array $subscribers) use ($subscriber) {
+            $subscribers[] = $subscriber;
+
+            return $subscribers;
+        });
     }
 }
