@@ -31,10 +31,8 @@ class CrawlCommand extends CrawlerCommand
         $configuration = $this->getConfiguration($input->getArgument('filename'));
         $this->prepareConfiguration($configuration, $input, $output);
         $dispatcher = $this->getDispatcher();
+        $this->prepareDispatcher($configuration, $dispatcher, $input, $output);
         $session = $this->getSession($configuration, $dispatcher);
-
-        $monitor = new CrawlMonitor($configuration->getQueue(), new SymfonyStyle($input, $output));
-        $dispatcher->addSubscriber($monitor);
 
         if ($input->getOption('reset')) {
             $session->teardown();

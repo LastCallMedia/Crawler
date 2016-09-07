@@ -8,6 +8,7 @@ use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Session\Session;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +28,20 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Configuration();
         $this->assertTrue(is_array($config['subscribers']));
+    }
+
+    public function testAddListener() {
+        $fn = function() {};
+        $config = new Configuration();
+        $config->addListener('foo.bar', $fn, 5);
+        $this->assertEquals([[$fn, 5]], $config['listeners']['foo.bar']);
+    }
+
+    public function testAddSubscriber() {
+        $subscriber = $this->prophesize(EventSubscriberInterface::class)->reveal();
+        $config = new Configuration();
+        $config->addSubscriber($subscriber);
+        $this->assertTrue(in_array($subscriber, $config['subscribers']));
     }
 
     public function testAddsInitialRequestOnStart()
