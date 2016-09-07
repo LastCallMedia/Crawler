@@ -6,6 +6,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\Crawler;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Test\Resources\DummyCrawlCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -14,6 +15,10 @@ class WorkCommandTest extends \PHPUnit_Framework_TestCase
     public function testRunsCrawler()
     {
         $config = $this->prophesize(ConfigurationInterface::class);
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $config->getQueue()->willReturn($queue);
+        $config->getListeners()->willReturn([]);
+        $config->getSubscribers()->willReturn([]);
 
         $loader = $this->prophesize(ConfigurationLoaderInterface::class);
         $loader->loadFile('crawler.php')->willReturn($config);
