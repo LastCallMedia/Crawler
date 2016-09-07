@@ -59,13 +59,12 @@ class CrawlMonitor implements EventSubscriberInterface
 
     public function onStart()
     {
-        $this->indicator = new ProgressIndicator($this->io);
-        $this->indicator->start('');
+        $this->getIndicator();
     }
 
     public function onFinish()
     {
-        $this->indicator->finish('Complete');
+        $this->getIndicator()->finish('Complete');
     }
 
     public function onSending()
@@ -96,7 +95,7 @@ class CrawlMonitor implements EventSubscriberInterface
     {
         if (!$this->indicator) {
             $this->indicator = new ProgressIndicator($this->io);
-            $this->indicator->start('');
+            $this->indicator->start('Starting...');
         }
 
         return $this->indicator;
@@ -107,7 +106,7 @@ class CrawlMonitor implements EventSubscriberInterface
         $indicator = $this->getIndicator();
         $indicator->advance();
 
-        $message = strtr('Crawling {{sent}} sent - {{remaining}} left', [
+        $message = strtr('Crawling... {{sent}} sent - {{remaining}} left', [
             '{{sent}}' => $stats['sent'],
             '{{remaining}}' => $this->queue->count(),
         ]);

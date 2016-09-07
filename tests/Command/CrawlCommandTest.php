@@ -10,7 +10,7 @@ use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\Test\Resources\DummyCrawlCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class WorkCommandTest extends \PHPUnit_Framework_TestCase
+class CrawlCommandTest extends \PHPUnit_Framework_TestCase
 {
     public function testRunsCrawler()
     {
