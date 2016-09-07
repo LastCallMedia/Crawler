@@ -41,7 +41,7 @@ class NormalizationsTest extends \PHPUnit_Framework_TestCase
     public function capitalizeEscapedTests()
     {
         return [
-            ['http://foo%3a.com/%3a?bar%3a', 'http://foo%3A.com/%3A?bar%3A'],
+            ['http://foo%3a.com/%3a?bar%3a', 'http://foo%3a.com/%3A?bar%3A'],
         ];
     }
 

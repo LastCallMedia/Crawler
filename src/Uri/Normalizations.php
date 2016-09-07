@@ -75,8 +75,8 @@ class Normalizations
         '%58' => 'X',
         '%59' => 'Y',
         '%5a' => 'Z',
-        '%2D' => '-',
-        '%5F' => '_',
+        '%2d' => '-',
+        '%5f' => '_',
     );
 
     public static function resolve(UriInterface $base)
@@ -142,7 +142,7 @@ class Normalizations
      */
     public static function decodeUnreserved()
     {
-        $regex = '/('.implode('|', array_keys(self::$unreservedChars)).')+/';
+        $regex = '/('.implode('|', array_keys(self::$unreservedChars)).')+/i';
 
         return function (UriInterface $uri) use ($regex) {
             foreach (['Host', 'Path', 'Query', 'Fragment'] as $partName) {
