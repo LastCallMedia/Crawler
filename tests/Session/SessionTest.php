@@ -41,11 +41,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testStart()
     {
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::START, Argument::type(CrawlerStartEvent::class))->shouldBeCalledTimes(1);
-
-        $session = new Session($dispatcher->reveal());
+        $called = 0;
+        $dispatcher = new EventDispatcher();
+        $session = new Session($dispatcher);
+        $dispatcher->addListener(CrawlerEvents::START, function(CrawlerStartEvent $event) use (&$called, $session) {
+            $this->assertSame($session, $event->getSession());
+            $called++;
+        });
         $session->start();
+        $this->assertEquals(1, $called);
     }
 
     public function testSetup()
@@ -111,13 +115,20 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testOnRequestException()
     {
-        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $dispatcher->dispatch(CrawlerEvents::EXCEPTION,
-            Argument::type(CrawlerExceptionEvent::class))
-            ->shouldBeCalledTimes(1);
+        $called = 0;
+        $exception = new \Exception('foo');
+        $request = new Request('GET', 'http://google.com');
+        $response = new Response();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(CrawlerEvents::EXCEPTION, function(CrawlerExceptionEvent $event) use (&$called, $request, $exception, $response) {
+            $this->assertSame($request, $event->getRequest());
+            $this->assertSame($response, $event->getResponse());
+            $this->assertSame($exception, $event->getException());
+            $called++;
+        });
+        $session = new Session($dispatcher);
+        $session->onRequestException($request, $exception, $response);
 
-        $session = new Session($dispatcher->reveal());
-        $session->onRequestException(new Request('GET', 'http://google.com'),
-            new \Exception('foo'), new Response());
+        $this->assertEquals(1, $called);
     }
 }
