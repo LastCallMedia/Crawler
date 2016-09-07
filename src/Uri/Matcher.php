@@ -62,7 +62,8 @@ class Matcher implements MatcherInterface
         }
     }
 
-    private function matchesAll(UriInterface $uri) {
+    private function matchesAll(UriInterface $uri)
+    {
         foreach ($this->handlers as $handler) {
             if (true !== $handler($uri)) {
                 return false;
@@ -72,7 +73,8 @@ class Matcher implements MatcherInterface
         return true;
     }
 
-    private function matchesAny(UriInterface $uri) {
+    private function matchesAny(UriInterface $uri)
+    {
         foreach ($this->handlers as $handler) {
             if (false !== $handler($uri)) {
                 return true;
