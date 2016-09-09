@@ -24,18 +24,4 @@ interface ConfigurationInterface
     public function getQueue();
 
     public function attachToDispatcher(EventDispatcherInterface $dispatcher);
-
-    /**
-     * Get any event listeners to be used for this configuration.
-     *
-     * @return array
-     */
-    public function getListeners();
-
-    /**
-     * Get any event subscribers to be used for this configuration.
-     *
-     * @return array
-     */
-    public function getSubscribers();
 }

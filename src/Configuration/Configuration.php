@@ -76,16 +76,6 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         }
     }
 
-    public function getListeners()
-    {
-        return $this['listeners'];
-    }
-
-    public function getSubscribers()
-    {
-        return $this['subscribers'];
-    }
-
     public function addListener($eventName, callable $callback, $priority = 0)
     {
         $this->extend('listeners',
