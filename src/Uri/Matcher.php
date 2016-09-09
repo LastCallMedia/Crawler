@@ -448,7 +448,7 @@ class Matcher implements MatcherInterface
      *
      * @return self
      */
-    private function add(callable $handler)
+    public function add(callable $handler)
     {
         $this->handlers[] = $handler;
 
@@ -465,7 +465,7 @@ class Matcher implements MatcherInterface
      *
      * @return self
      */
-    private function addNot(callable $handler)
+    public function addNot(callable $handler)
     {
         $this->handlers[] = MatcherAssert::not($handler);
 
