@@ -25,6 +25,14 @@ class CrawlMonitor implements EventSubscriberInterface
         'exception' => 0,
     ];
 
+    /**
+     * @var \LastCall\Crawler\Queue\RequestQueueInterface
+     */
+    private $queue;
+
+    /**
+     * @var ProgressIndicator
+     */
     private $indicator;
 
     public static function getSubscribedEvents()
