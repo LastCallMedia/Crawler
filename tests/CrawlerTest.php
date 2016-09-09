@@ -9,15 +9,16 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
-use LastCall\Crawler\Session\Session;
-use LastCall\Crawler\Session\SessionInterface;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use Prophecy\Argument;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,186 +29,151 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         return new Client(['handler' => HandlerStack::create($handler)]);
     }
 
-    public function testRequestsAreBubbledUpFromSession()
+    public function testFiresSetupEvent()
+    {
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->dispatch(CrawlerEvents::SETUP)->shouldBeCalled();
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal());
+        $crawler->setup();
+    }
+
+    public function testFiresTeardownEvent()
+    {
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->dispatch(CrawlerEvents::TEARDOWN)->shouldBeCalled();
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal());
+        $crawler->teardown();
+    }
+
+    public function testFiresStartFinish()
+    {
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->dispatch(CrawlerEvents::START, Argument::type(CrawlerStartEvent::class))->shouldBeCalled();
+        $dispatcher->dispatch(CrawlerEvents::FINISH, Argument::type(Event::class))->shouldBeCalled();
+        $queue = $this->prophesize(RequestQueueInterface::class);
+        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal());
+        $crawler->start()->wait();
+    }
+
+    public function testRequestBubbledFromSuccess()
     {
         $queue = new ArrayRequestQueue();
-        $req = new Request('GET', '1');
-        $res = new Response(200);
-        $queue->push($req);
-
-        $client = $this->mockClient([new Response(200), new Response(200), new Response(400), new Response(400)]);
-
+        $queue->push(new Request('GET', 'success'));
+        $client = $this->mockClient([new Response(200), new Response(200)]);
         $dispatcher = new EventDispatcher();
-        $session = new Session($dispatcher);
 
         $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerResponseEvent $event) {
-            if ($event->getRequest()->getUri() == '1') {
-                $event->addAdditionalRequest(new Request('GET', '2'));
-
-                return;
+            if ($event->getRequest()->getUri() == 'success') {
+                $event->addAdditionalRequest(new Request('GET', 'request2'));
             }
-            throw new \Exception('foo');
         });
+
+        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler->start(1)->wait();
+        $this->assertEquals(2, $queue->count($queue::COMPLETE));
+    }
+
+    public function testRequestBubbledFromFailure()
+    {
+        $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'failure'));
+        $client = $this->mockClient([new Response(400), new Response(400)]);
+        $dispatcher = new EventDispatcher();
+
         $dispatcher->addListener(CrawlerEvents::FAILURE, function (CrawlerResponseEvent $event) {
-            if ($event->getRequest()->getUri() == '3') {
-                $event->addAdditionalRequest(new Request('GET', '4'));
+            if ($event->getRequest()->getUri() == 'failure') {
+                $event->addAdditionalRequest(new Request('GET', 'failure2'));
+            }
+        });
+
+        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler->start(1)->wait();
+        $this->assertEquals(2, $queue->count($queue::COMPLETE));
+    }
+
+    public function testRequestBubbledFromSendingException()
+    {
+        $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'sendingexception'));
+        $dispatcher = new EventDispatcher();
+        $client = $this->mockClient([new Response(200), new Response(200)]);
+
+        $dispatcher->addListener(CrawlerEvents::SENDING, function (CrawlerEvent $event) {
+            if ($event->getRequest()->getUri() == 'sendingexception') {
+                throw new \Exception('Testing');
             }
         });
         $dispatcher->addListener(CrawlerEvents::EXCEPTION, function (CrawlerExceptionEvent $event) {
-            if ($event->getRequest()->getUri() == '2') {
-                $event->addAdditionalRequest(new Request('GET', '3'));
-
-                return;
-            }
+            $event->addAdditionalRequest(new Request('GET', 'sendingexception2'));
         });
 
-        $crawler = new Crawler($session, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
-
-        $this->assertEquals(4, $queue->count($queue::COMPLETE));
+        $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
-    public function testItemIsCompletedOnSuccess()
+    public function testRequestBubbledFromSuccessException()
     {
         $queue = new ArrayRequestQueue();
-        $req = new Request('GET', 'https://lastcallmedia.com');
-        $res = new Response(200);
-        $queue->push($req);
+        $queue->push(new Request('GET', 'successexception'));
+        $dispatcher = new EventDispatcher();
+        $client = $this->mockClient([new Response(200), new Response(200)]);
 
-        $client = $this->mockClient([$res]);
+        $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerResponseEvent $event) {
+            if ($event->getRequest()->getUri() == 'successexception') {
+                throw new \Exception('Testing');
+            }
+        });
+        $dispatcher->addListener(CrawlerEvents::EXCEPTION, function (CrawlerExceptionEvent $event) {
+            $event->addAdditionalRequest(new Request('GET', 'successexception2'));
+        });
 
-        $session = $this->prophesize(SessionInterface::class);
-
-        $session->start()->shouldBeCalled();
-        $session->onRequestSending($req)->shouldBeCalled();
-        $session->onRequestSuccess($req, $res)->shouldBeCalled();
-        $session->finish()->shouldBeCalled();
-
-        $crawler = new Crawler($session->reveal(), $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
-        $this->assertEquals(1, $queue->count($queue::COMPLETE));
+        $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
-    public function testItemIsCompletedOnFailure()
+    public function testRequestBubbledFromFailureException()
     {
         $queue = new ArrayRequestQueue();
-        $req = new Request('GET', 'https://lastcallmedia.com');
-        $res = new Response(400);
-        $queue->push($req);
-        $client = $this->mockClient([$res]);
+        $queue->push(new Request('GET', 'failureexception'));
+        $dispatcher = new EventDispatcher();
+        $client = $this->mockClient([new Response(400), new Response(400)]);
 
-        $session = $this->prophesize(SessionInterface::class);
+        $dispatcher->addListener(CrawlerEvents::FAILURE, function (CrawlerResponseEvent $event) {
+            if ($event->getRequest()->getUri() == 'failureexception') {
+                throw new \Exception('Testing');
+            }
+        });
+        $dispatcher->addListener(CrawlerEvents::EXCEPTION, function (CrawlerExceptionEvent $event) {
+            $event->addAdditionalRequest(new Request('GET', 'failureexception2'));
+        });
 
-        $session->start()->shouldBeCalled();
-        $session->onRequestSending($req)->shouldBeCalled();
-        $session->onRequestFailure($req, $res)->shouldBeCalled();
-        $session->finish()->shouldBeCalled();
-
-        $crawler = new Crawler($session->reveal(), $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
-        $this->assertEquals(1, $queue->count($queue::COMPLETE));
-    }
-
-    public function testExceptionEventIsFiredOnSuccesfulResponseException()
-    {
-        $req = new Request('GET', 'https://lastcallmedia.com');
-        $res = new Response(200);
-        $e = new \Exception('foo');
-
-        $queue = new ArrayRequestQueue();
-        $queue->push($req);
-        $client = $this->mockClient([$res]);
-        $session = $this->prophesize(SessionInterface::class);
-
-        $session->start()->shouldBeCalled();
-        $session->onRequestSending($req)->shouldBeCalled();
-        $session->onRequestSuccess($req, $res)->willThrow($e);
-        $session->finish()->shouldBeCalled();
-
-        $session->onRequestException($req, $e, $res)->shouldBeCalled();
-
-        $crawler = new Crawler($session->reveal(), $client, $queue);
-        $crawler->start(1)->wait();
-        $this->assertEquals(1, $queue->count($queue::COMPLETE));
-    }
-
-    public function testExceptionEventIsFiredOnFailureResponseException()
-    {
-        $req = new Request('GET', 'https://lastcallmedia.com');
-        $res = new Response(400);
-        $e = new \Exception('foo');
-
-        $client = $this->mockClient([$res]);
-        $queue = new ArrayRequestQueue();
-        $queue->push($req);
-
-        $session = $this->prophesize(SessionInterface::class);
-
-        $session->start()->shouldBeCalled();
-        $session->onRequestSending($req)->shouldBeCalled();
-        $session->onRequestFailure($req, $res)->willThrow($e);
-        $session->onRequestException($req, $e, $res)->shouldBeCalled();
-        $session->finish()->shouldBeCalled();
-
-        $crawler = new Crawler($session->reveal(), $client, $queue);
-        $crawler->start(1)->wait();
-        $this->assertEquals(1, $queue->count($queue::COMPLETE));
-    }
-
-    public function testExceptionEventIsFiredOnSendingException()
-    {
-        $req = new Request('GET', 'https://lastcallmedia.com');
-        $res = new Response(400);
-        $e = new \Exception('foo');
-
-        $queue = new ArrayRequestQueue();
-        $queue->push($req);
-        $client = $this->mockClient([$res]);
-
-        $session = $this->prophesize(SessionInterface::class);
-
-        $session->start()->shouldBeCalled();
-        $session->onRequestSending($req)->willThrow($e);
-        $session->onRequestException($req, $e, null)->shouldBeCalled();
-        $session->finish()->shouldBeCalled();
-
-        $crawler = new Crawler($session->reveal(), $client, $queue);
-        $crawler->start(1)->wait();
-
-        // @todo: Should this job be completed?
-//        $this->assertEquals(1, $queue->count($queue::COMPLETE));
+        $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
     public function testQueueIsWorkedUntilEmpty()
     {
-        $responses = array_fill(0, 2, new Response(200));
         $count = 0;
 
         $queue = new ArrayRequestQueue();
-        $queue->push(new Request('GET', 'https://lastcallmedia.com/1'));
-        $client = $this->mockClient($responses);
+        $queue->push(new Request('GET', '1'));
+        $client = $this->mockClient([new Response(200), new Response(200)]);
 
-        $session = $this->prophesize(SessionInterface::class);
-
-        $session->start()->shouldBeCalled();
-        $session->onRequestSending(Argument::type(RequestInterface::class))
-            ->shouldBeCalled();
-        $session->onRequestSuccess(Argument::type(RequestInterface::class),
-            Argument::type(ResponseInterface::class))->will(function ($args) use (
-            &$queue,
-            &$count
-        ) {
-            $request = $args[0];
-            if ($request->getUri() == 'https://lastcallmedia.com/1') {
-                $queue->push(new Request('GET', 'http://google.com/2'));
-            }
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerResponseEvent $event) use ($queue, &$count) {
             ++$count;
+            if ($event->getRequest()->getUri() == '1') {
+                $queue->push(new Request('GET', '2'));
+            }
         });
-        $session->finish()->shouldBeCalled();
 
-        $crawler = new Crawler($session->reveal(), $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(5)->wait();
-
         $this->assertEquals(2, $count);
     }
 }

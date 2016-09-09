@@ -5,10 +5,15 @@ namespace LastCall\Crawler;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
+use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerExceptionEvent;
+use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Queue\RequestQueueInterface;
-use LastCall\Crawler\Session\SessionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Works through a request queue, dispatching requests to the client,
@@ -16,11 +21,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Crawler
 {
-    /**
-     * @var \LastCall\Crawler\Session\SessionInterface
-     */
-    private $session;
-
     /**
      * @var \GuzzleHttp\ClientInterface
      */
@@ -32,17 +32,22 @@ class Crawler
     private $queue;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
      * Crawler constructor.
      *
-     * @param \LastCall\Crawler\Session\SessionInterface $session
-     * @param \GuzzleHttp\ClientInterface                $client
+     * @param EventDispatcherInterface    $dispatcher
+     * @param \GuzzleHttp\ClientInterface $client
      */
     public function __construct(
-        SessionInterface $session,
+        EventDispatcherInterface $dispatcher,
         ClientInterface $client,
         RequestQueueInterface $queue
     ) {
-        $this->session = $session;
+        $this->dispatcher = $dispatcher;
         $this->client = $client;
         $this->queue = $queue;
     }
@@ -56,7 +61,7 @@ class Crawler
      */
     public function start($chunk = 5)
     {
-        $this->session->start();
+        $this->dispatchStart();
         // We need to use a double loop of generators here, because
         // if $chunk is greater than the number of items in the queue,
         // the requestWorkerFn exits the generator loop before any new
@@ -75,7 +80,7 @@ class Crawler
         $outer = new EachPromise($gen(), ['concurrency' => 1]);
 
         $finish = function ($results) {
-            $this->session->finish();
+            $this->dispatchFinish();
 
             return $results;
         };
@@ -83,17 +88,29 @@ class Crawler
         return $outer->promise()->then($finish, $finish);
     }
 
+    public function setup()
+    {
+        $this->dispatchSetup();
+    }
+
+    public function teardown()
+    {
+        $this->dispatchTeardown();
+    }
+
     private function getRequestWorkerFn()
     {
         while ($request = $this->queue->pop()) {
             try {
-                $this->session->onRequestSending($request);
+                $this->dispatchSending($request);
                 $promise = $this->client->sendAsync($request)
                     ->then($this->getRequestFulfilledFn($request),
                         $this->getRequestRejectedFn($request));
                 yield $promise;
             } catch (\Exception $e) {
-                $this->session->onRequestException($request, $e, null);
+                // Mark the request as complete so we don't get stuck on it.
+                $this->queue->complete($request);
+                $this->dispatchException($request, $e, null);
                 yield \GuzzleHttp\Promise\rejection_for($e);
             }
         }
@@ -105,11 +122,9 @@ class Crawler
             $this->queue->complete($request);
 
             try {
-                $requests = $this->session->onRequestSuccess($request, $response);
-                $this->enqueue($requests);
+                $this->dispatchSuccess($request, $response);
             } catch (\Exception $e) {
-                $requests = $this->session->onRequestException($request, $e, $response);
-                $this->enqueue($requests);
+                $this->dispatchException($request, $e, $response);
                 throw $e;
             }
 
@@ -126,17 +141,65 @@ class Crawler
                 $response = $reason->getResponse();
 
                 try {
-                    $requests = $this->session->onRequestFailure($request, $response);
-                    $this->enqueue($requests);
+                    $this->dispatchFailure($request, $response);
                 } catch (\Exception $e) {
-                    $requests = $this->session->onRequestException($request, $e, $response);
-                    $this->enqueue($requests);
+                    $this->dispatchException($request, $e, $response);
                     throw $e;
                 }
             }
 
             return \GuzzleHttp\Promise\rejection_for($reason);
         };
+    }
+
+    private function dispatchSetup()
+    {
+        $this->dispatcher->dispatch(CrawlerEvents::SETUP);
+    }
+
+    private function dispatchTeardown()
+    {
+        $this->dispatcher->dispatch(CrawlerEvents::TEARDOWN);
+    }
+
+    private function dispatchStart()
+    {
+        $event = new CrawlerStartEvent();
+        $this->dispatcher->dispatch(CrawlerEvents::START, $event);
+    }
+
+    private function dispatchFinish()
+    {
+        $event = new Event();
+        $this->dispatcher->dispatch(CrawlerEvents::FINISH, $event);
+    }
+
+    private function dispatchSending(RequestInterface $request)
+    {
+        $event = new CrawlerEvent($request);
+        $this->dispatcher->dispatch(CrawlerEvents::SENDING, $event);
+        $this->enqueue($event->getAdditionalRequests());
+    }
+
+    private function dispatchSuccess(RequestInterface $request, ResponseInterface $response)
+    {
+        $event = new CrawlerResponseEvent($request, $response);
+        $this->dispatcher->dispatch(CrawlerEvents::SUCCESS, $event);
+        $this->enqueue($event->getAdditionalRequests());
+    }
+
+    private function dispatchFailure(RequestInterface $request, ResponseInterface $response)
+    {
+        $event = new CrawlerResponseEvent($request, $response);
+        $this->dispatcher->dispatch(CrawlerEvents::FAILURE, $event);
+        $this->enqueue($event->getAdditionalRequests());
+    }
+
+    private function dispatchException(RequestInterface $request, \Exception $e, ResponseInterface $response = null)
+    {
+        $event = new CrawlerExceptionEvent($request, $response, $e);
+        $this->dispatcher->dispatch(CrawlerEvents::EXCEPTION, $event);
+        $this->enqueue($event->getAdditionalRequests());
     }
 
     private function enqueue($requests)

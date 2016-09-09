@@ -14,6 +14,7 @@ use LastCall\Crawler\CrawlerEvents;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A crawler configuration based on the Pimple DI container.
@@ -60,6 +61,18 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
     public function getClient()
     {
         return $this['client'];
+    }
+
+    public function attachToDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        foreach ($this['subscribers'] as $subscriber) {
+            $dispatcher->addSubscriber($subscriber);
+        }
+        foreach ($this['listeners'] as $eventName => $listeners) {
+            foreach ($listeners as $listener) {
+                $dispatcher->addListener($eventName, $listener[0], $listener[1]);
+            }
+        }
     }
 
     public function getListeners()

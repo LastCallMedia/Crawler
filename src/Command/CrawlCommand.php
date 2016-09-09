@@ -2,12 +2,10 @@
 
 namespace LastCall\Crawler\Command;
 
-use LastCall\Crawler\Handler\CrawlMonitor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CrawlCommand extends CrawlerCommand
 {
@@ -32,15 +30,15 @@ class CrawlCommand extends CrawlerCommand
         $this->prepareConfiguration($configuration, $input, $output);
         $dispatcher = $this->getDispatcher();
         $this->prepareDispatcher($configuration, $dispatcher, $input, $output);
-        $session = $this->getSession($configuration, $dispatcher);
+
+        $crawler = $this->getCrawler($configuration, $dispatcher);
 
         if ($input->getOption('reset')) {
-            $session->teardown();
-            $session->setup();
+            $crawler->teardown();
+            $crawler->setup();
         }
 
-        $this
-            ->getCrawler($configuration, $session)
+        $crawler
             ->start($input->getOption('chunk'))
             ->wait();
     }

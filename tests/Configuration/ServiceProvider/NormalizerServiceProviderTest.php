@@ -28,7 +28,8 @@ class NormalizerServiceProviderTest extends \PHPUnit_Framework_TestCase
         $container = new Container();
         $container->register(new NormalizerServiceProvider());
 
-        $fn = function () {};
+        $fn = function () {
+        };
         $container['normalizations'] = ['foo' => $fn];
         $expected = new Normalizer([
             'foo' => $fn,

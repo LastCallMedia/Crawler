@@ -18,7 +18,6 @@ use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
-use LastCall\Crawler\Session\Session;
 use LastCall\Crawler\Uri\Matcher;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -253,9 +252,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         ConfigurationInterface $configuration,
         $category
     ) {
-        $session = Session::createFromConfig($configuration,
-            new EventDispatcher());
-        $crawler = new Crawler($session, $configuration->getClient(), $configuration->getQueue());
+        $dispatcher = new EventDispatcher();
+        $crawler = new Crawler($dispatcher, $configuration->getClient(), $configuration->getQueue());
         $stopwatch = new Stopwatch();
         $stopwatch->start(__FUNCTION__, $category);
         $promise = $crawler->start();

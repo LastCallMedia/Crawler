@@ -36,7 +36,7 @@ interface RequestQueueInterface
      * Retrieve the next request to be processed.
      *
      * @param int $leaseTime The amount of time to hold the request in pending
-     *                       state.
+     *                       state
      *
      * @return \Psr\Http\Message\RequestInterface|null
      */
@@ -49,7 +49,7 @@ interface RequestQueueInterface
      *
      * @return bool
      *
-     * @throws \RuntimeException When the request is not in a pending state.
+     * @throws \RuntimeException When the request is not in a pending state
      */
     public function complete(RequestInterface $request);
 
@@ -60,7 +60,7 @@ interface RequestQueueInterface
      *
      * @return bool
      *
-     * @throws \RuntimeException When the request is not in a pending state.
+     * @throws \RuntimeException When the request is not in a pending state
      */
     public function release(RequestInterface $request);
 
@@ -72,7 +72,7 @@ interface RequestQueueInterface
      * @return int
      *
      * @throws \RuntimeException When status is not one of the accepted
-     *                           statuses.
+     *                           statuses
      */
     public function count($status = self::FREE);
 }

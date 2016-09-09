@@ -5,8 +5,9 @@ namespace LastCall\Crawler\Test\Configuration;
 use GuzzleHttp\ClientInterface;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\Configuration;
+use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Queue\RequestQueueInterface;
-use LastCall\Crawler\Session\Session;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -30,14 +31,17 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($config['subscribers']));
     }
 
-    public function testAddListener() {
-        $fn = function() {};
+    public function testAddListener()
+    {
+        $fn = function () {
+        };
         $config = new Configuration();
         $config->addListener('foo.bar', $fn, 5);
         $this->assertEquals([[$fn, 5]], $config['listeners']['foo.bar']);
     }
 
-    public function testAddSubscriber() {
+    public function testAddSubscriber()
+    {
         $subscriber = $this->prophesize(EventSubscriberInterface::class)->reveal();
         $config = new Configuration();
         $config->addSubscriber($subscriber);
@@ -49,8 +53,9 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = new Configuration('https://lastcallmedia.com');
         $queue = $config->getQueue();
         $this->assertEquals(0, $queue->count());
-        $session = Session::createFromConfig($config, new EventDispatcher());
-        $session->start();
+        $dispatcher = new EventDispatcher();
+        $config->attachToDispatcher($dispatcher);
+        $dispatcher->dispatch(CrawlerEvents::START, new CrawlerStartEvent());
         $this->assertEquals(1, $queue->count());
     }
 
@@ -63,8 +68,9 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $queue->onTeardown()->shouldBeCalled();
 
         $config['queue'] = $queue->reveal();
-        $session = Session::createFromConfig($config, new EventDispatcher());
-        $session->setup();
-        $session->teardown();
+        $dispatcher = new EventDispatcher();
+        $config->attachToDispatcher($dispatcher);
+        $dispatcher->dispatch(CrawlerEvents::SETUP);
+        $dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
 }

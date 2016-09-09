@@ -5,12 +5,10 @@ namespace LastCall\Crawler\Command;
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\Configuration\Loader\PHPConfigurationLoader;
 use LastCall\Crawler\Handler\CrawlMonitor;
-use LastCall\Crawler\Session\SessionInterface;
 use Symfony\Component\Console\Command\Command;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Crawler;
-use LastCall\Crawler\Session\Session;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,15 +59,11 @@ abstract class CrawlerCommand extends Command
     {
         $monitor = new CrawlMonitor($configuration->getQueue(), new SymfonyStyle($input, $output));
         $dispatcher->addSubscriber($monitor);
+        $configuration->attachToDispatcher($dispatcher);
     }
 
-    protected function getSession(ConfigurationInterface $configuration, EventDispatcherInterface $dispatcher)
+    protected function getCrawler(ConfigurationInterface $configuration, EventDispatcherInterface $dispatcher)
     {
-        return Session::createFromConfig($configuration, $dispatcher);
-    }
-
-    protected function getCrawler(ConfigurationInterface $configuration, SessionInterface $session)
-    {
-        return new Crawler($session, $configuration->getClient(), $configuration->getQueue());
+        return new Crawler($dispatcher, $configuration->getClient(), $configuration->getQueue());
     }
 }

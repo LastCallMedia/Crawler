@@ -2,6 +2,8 @@
 
 namespace LastCall\Crawler\Configuration;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 /**
  * A single crawler configuration.
  */
@@ -20,6 +22,8 @@ interface ConfigurationInterface
      * @return \LastCall\Crawler\Queue\RequestQueueInterface
      */
     public function getQueue();
+
+    public function attachToDispatcher(EventDispatcherInterface $dispatcher);
 
     /**
      * Get any event listeners to be used for this configuration.

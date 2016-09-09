@@ -2,11 +2,11 @@
 
 namespace LastCall\Crawler\Command;
 
-use LastCall\Crawler\Session\Session;
+use LastCall\Crawler\Crawler;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SetupTeardownCommand extends CrawlerCommand
 {
@@ -49,19 +49,18 @@ class SetupTeardownCommand extends CrawlerCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-
         $config = $this->getConfiguration($input->getArgument('filename'));
         $this->prepareConfiguration($config, $input, $output);
-        $session = $this->getSession($config, $this->getDispatcher());
+        $dispatcher = new EventDispatcher();
+        $this->prepareDispatcher($config, $dispatcher, $input, $output);
+
+        $crawler = new Crawler($dispatcher, $config->getClient(), $config->getQueue());
 
         if ($this->tearsDown) {
-            $session->teardown();
-            $io->success('Teardown complete.');
+            $crawler->teardown();
         }
         if ($this->setsUp) {
-            $session->setup();
-            $io->success('Setup complete.');
+            $crawler->setup();
         }
     }
 }
