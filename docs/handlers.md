@@ -41,7 +41,7 @@ Creating Handlers
 Handlers are just `Symfony\Component\EventDispatcher\EventSubscriberInterface` objects that react when events happen in the crawler.  The events you can listen for are:
 
 * **CrawlerEvents::START** - The crawler session is starting and the configuration should be prepared by adding any initial requests to the queue.
-* **CrawlerEvents::SENDING** (`CrawlerEvent $event`)- A request is about to be sent.
+* **CrawlerEvents::SENDING** (`CrawlerRequestEvent $event`)- A request is about to be sent.
 * **CrawlerEvents::SUCCESS** (`CrawlerResponseEvent $event`) - A request has been sent and a response has been received.  The response has been deemed "successful" by the client.
 * **CrawlerEvents::FAILURE** (`CrawlerResponseEvent $event`) - A request has been sent and a response has been received.  The response has been deemed "failed" by the client.
 * **CrawlerEvents::EXCEPTION** (`CrawlerExceptionEvent $event`) - An exception has occurred during crawling.  This could be before or after the response was received.

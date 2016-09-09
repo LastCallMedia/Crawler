@@ -5,7 +5,7 @@ namespace LastCall\Crawler;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
-use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Event\CrawlerStartEvent;
@@ -166,6 +166,7 @@ class Crawler
     {
         $event = new CrawlerStartEvent();
         $this->dispatcher->dispatch(CrawlerEvents::START, $event);
+        $this->enqueue($event->getAdditionalRequests());
     }
 
     private function dispatchFinish()
@@ -176,7 +177,7 @@ class Crawler
 
     private function dispatchSending(RequestInterface $request)
     {
-        $event = new CrawlerEvent($request);
+        $event = new CrawlerRequestEvent($request);
         $this->dispatcher->dispatch(CrawlerEvents::SENDING, $event);
         $this->enqueue($event->getAdditionalRequests());
     }
@@ -202,9 +203,9 @@ class Crawler
         $this->enqueue($event->getAdditionalRequests());
     }
 
-    private function enqueue($requests)
+    private function enqueue(array $requests)
     {
-        if (is_array($requests) && !empty($requests)) {
+        if (!empty($requests)) {
             $this->queue->pushMultiple($requests);
         }
     }

@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Test\Handler;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Handler\MatchingProxy;
 use LastCall\Crawler\Test\Resources\DummyEventSubscriber;
 use LastCall\Crawler\Uri\Matcher;
@@ -54,7 +54,7 @@ class MatchingProxyTest extends \PHPUnit_Framework_TestCase
         $match = Matcher::all()->always();
         $sub = new DummyEventSubscriber();
         $proxy = new MatchingProxy($sub, $match);
-        $event = new CrawlerEvent(new Request('GET', $uri));
+        $event = new CrawlerRequestEvent(new Request('GET', $uri));
         $this->invokeEvent($proxy, $eName, $event);
         $this->assertEquals([$eName => 1], $sub->getCalls());
     }
@@ -67,7 +67,7 @@ class MatchingProxyTest extends \PHPUnit_Framework_TestCase
         $match = Matcher::all()->never();
         $sub = new DummyEventSubscriber();
         $proxy = new MatchingProxy($sub, $match);
-        $event = new CrawlerEvent(new Request('GET', $uri));
+        $event = new CrawlerRequestEvent(new Request('GET', $uri));
         $this->invokeEvent($proxy, $eName, $event);
         $this->assertEquals([], $sub->getCalls());
     }

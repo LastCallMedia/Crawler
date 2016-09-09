@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Event\CrawlerStartEvent;
@@ -57,6 +57,24 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->start()->wait();
     }
 
+    public function testRequestBubbledFromStart()
+    {
+        $queue = new ArrayRequestQueue();
+        $client = $this->mockClient([new Response(200)]);
+        $dispatcher = new EventDispatcher();
+
+        $dispatcher->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
+            $event->addAdditionalRequest(new Request('GET', 'start'));
+        });
+
+        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler->start()->wait();
+
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
+        $this->assertEquals(1, $queue->count($queue::COMPLETE));
+    }
+
     public function testRequestBubbledFromSuccess()
     {
         $queue = new ArrayRequestQueue();
@@ -72,6 +90,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
@@ -90,6 +110,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
+
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
@@ -100,7 +123,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $client = $this->mockClient([new Response(200), new Response(200)]);
 
-        $dispatcher->addListener(CrawlerEvents::SENDING, function (CrawlerEvent $event) {
+        $dispatcher->addListener(CrawlerEvents::SENDING, function (CrawlerRequestEvent $event) {
             if ($event->getRequest()->getUri() == 'sendingexception') {
                 throw new \Exception('Testing');
             }
@@ -111,6 +134,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
+
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
@@ -132,6 +158,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
+
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
@@ -153,6 +182,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(1)->wait();
+
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
@@ -174,6 +206,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler($dispatcher, $client, $queue);
         $crawler->start(5)->wait();
+
+        $this->assertEquals(0, $queue->count($queue::FREE));
+        $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $count);
     }
 }

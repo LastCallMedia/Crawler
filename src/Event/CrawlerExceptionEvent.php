@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Contains data about an exception during the crawl cycle.
  */
-class CrawlerExceptionEvent extends CrawlerEvent
+class CrawlerExceptionEvent extends CrawlerRequestEvent
 {
     private $exception;
 

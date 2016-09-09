@@ -3,7 +3,7 @@
 namespace LastCall\Crawler\Handler;
 
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Uri\MatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -56,7 +56,7 @@ class MatchingProxy implements EventSubscriberInterface
         $this->dispatcher->dispatch($name, $event);
     }
 
-    public function checkAndProxyEvent(CrawlerEvent $event, $name)
+    public function checkAndProxyEvent(CrawlerRequestEvent $event, $name)
     {
         $uri = $event->getRequest()->getUri();
         if ($this->matcher->matches($uri)) {

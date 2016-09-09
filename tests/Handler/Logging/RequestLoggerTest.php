@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Test\Handler\Logging;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Handler\Logging\RequestLogger;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
@@ -20,7 +20,7 @@ class RequestLoggerTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'https://lastcallmedia.com');
         $logger = $this->prophesize(LoggerInterface::class);
         $handler = new RequestLogger($logger->reveal());
-        $event = new CrawlerEvent($request);
+        $event = new CrawlerRequestEvent($request);
         $this->invokeEvent($handler, CrawlerEvents::SENDING, $event);
         $logger->debug('Sending https://lastcallmedia.com', [
             'url' => 'https://lastcallmedia.com',

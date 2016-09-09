@@ -11,6 +11,7 @@ use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerStartEvent;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,8 +44,8 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this->register(new FragmentServiceProvider());
 
         // On start, add the default request.
-        $this->addListener(CrawlerEvents::START, function () {
-            $this['queue']->push(new Request('GET', $this['base_url']));
+        $this->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
+            $event->addAdditionalRequest(new Request('GET', $this['base_url']));
         });
     }
 

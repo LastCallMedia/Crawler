@@ -4,7 +4,7 @@ namespace LastCall\Crawler\Handler\Logging;
 
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerEvent;
+use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,7 +31,7 @@ class RequestLogger implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    private function getUri(CrawlerEvent $event)
+    private function getUri(CrawlerRequestEvent $event)
     {
         return $event->getRequest()->getUri();
     }
@@ -46,7 +46,7 @@ class RequestLogger implements EventSubscriberInterface
         return $event->getResponse()->getHeaderLine('Location');
     }
 
-    public function onSending(CrawlerEvent $event)
+    public function onSending(CrawlerRequestEvent $event)
     {
         $uri = $this->getUri($event);
 

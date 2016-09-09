@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Contains data about a response that was received by the crawler.
  */
-class CrawlerResponseEvent extends CrawlerEvent
+class CrawlerResponseEvent extends CrawlerRequestEvent
 {
     private $response;
 

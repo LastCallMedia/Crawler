@@ -15,7 +15,7 @@ class CrawlerEvents
     /**
      * Request is sending.
      *
-     * The listener method receives a CrawlerEvent instance.
+     * The listener method receives a CrawlerRequestEvent instance.
      *
      * @Event
      */

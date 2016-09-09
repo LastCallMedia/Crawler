@@ -55,8 +55,10 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $queue->count());
         $dispatcher = new EventDispatcher();
         $config->attachToDispatcher($dispatcher);
-        $dispatcher->dispatch(CrawlerEvents::START, new CrawlerStartEvent());
-        $this->assertEquals(1, $queue->count());
+
+        $event = new CrawlerStartEvent();
+        $dispatcher->dispatch(CrawlerEvents::START, $event);
+        $this->assertCount(1, $event->getAdditionalRequests());
     }
 
     public function testSetsUpAndTearsDownQueue()

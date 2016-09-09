@@ -2,8 +2,10 @@
 
 namespace LastCall\Crawler\Event;
 
+use LastCall\Crawler\Common\HasAdditionalRequests;
 use Symfony\Component\EventDispatcher\Event;
 
 class CrawlerStartEvent extends Event
 {
+    use HasAdditionalRequests;
 }
