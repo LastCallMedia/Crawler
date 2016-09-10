@@ -11,27 +11,44 @@ class MatcherServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)
     {
-        $pimple['matcher'] = function () use ($pimple) {
-            $uri = new Uri($pimple['base_url']);
+        // Configure specialized matchers.
+        $pimple['html_extensions'] = ['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm'];
+        $pimple['asset_extensions'] = ['css', 'js', 'png', 'jpeg', 'jpg', 'svg'];
 
-            // Match any URI with an http or https scheme
-            // and the same hostname as our base URL.
+        // Matches any path that has one of the html extensions.
+        $pimple['matcher.html'] = function () use ($pimple) {
             return Matcher::all()
-                ->schemeIs(['http', 'https'])
-                ->hostIs($uri->getHost());
+                ->pathExtensionIs($pimple['html_extensions']);
         };
 
-        // Configure an alternate matcher that only matches links
-        // that should contain HTML content.
-        // This matcher requires that the base matcher conditions are
-        // met, and that the file extension is one that we know contains
-        // HTML content.
-        $pimple['html_extensions'] = ['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm'];
-        $pimple['html_matcher'] = function () use ($pimple) {
-            $matcher = clone $pimple['matcher'];
-            $matcher->pathExtensionIs($pimple['html_extensions']);
+        // Matches any path that has one of the asset extensions.
+        $pimple['matcher.asset'] = function () use ($pimple) {
+            return Matcher::all()
+                ->pathExtensionIs($pimple['asset_extensions']);
+        };
 
-            return $matcher;
+        // Matches any path that is considered "internal" to the crawl.
+        $pimple['matcher.internal'] = function () use ($pimple) {
+            $uri = new Uri($pimple['base_url']);
+
+            return Matcher::all()
+                ->schemeIs($uri->getScheme())
+                ->hostIs($uri->getHost())
+                ->pathMatches('~^'.preg_quote($uri->getPath(), '~').'~');
+        };
+
+        // Matches any path that is both internal and HTML.
+        $pimple['matcher.internal_html'] = function () use ($pimple) {
+            return Matcher::all()
+                ->add($pimple['matcher.internal'])
+                ->add($pimple['matcher.html']);
+        };
+
+        // Matches any path that is both internal and an asset.
+        $pimple['matcher.internal_asset'] = function () use ($pimple) {
+            return Matcher::all()
+                ->add($pimple['matcher.internal'])
+                ->add($pimple['matcher.asset']);
         };
     }
 }

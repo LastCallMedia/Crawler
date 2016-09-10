@@ -2,54 +2,77 @@
 
 namespace LastCall\Crawler\Test\Configuration\ServiceProvider;
 
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
-use LastCall\Crawler\Uri\Matcher;
+use LastCall\Crawler\Uri\MatcherInterface;
 use Pimple\Container;
 
 class MatcherServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAddsMatcher()
+    public function testAddsMatchers()
     {
+        // Unfortunately, we can't do much to test that matchers are configured
+        // properly, since matchers can't be compared.
         $container = new Container();
         $container->register(new MatcherServiceProvider(), [
-            'base_url' => 'https://lastcallmedia.com',
+            'base_url' => 'https://lastcallmedia.com/foo',
         ]);
 
-        $expected = Matcher::all()
-            ->schemeIs(['http', 'https'])
-            ->hostIs('lastcallmedia.com');
+        $matchers = [
+            'matcher.internal',
+            'matcher.html',
+            'matcher.asset',
+            'matcher.internal_html',
+            'matcher.internal_asset',
+        ];
 
-        $this->assertEquals($expected, $container['matcher']);
+        foreach ($matchers as $matcher) {
+            $this->assertTrue(is_a($container[$matcher], MatcherInterface::class));
+        }
     }
 
-    public function testHasHtmlMatcher()
+    public function getMatcherTests()
     {
-        $container = new Container();
-        $container->register(new MatcherServiceProvider(), [
-            'base_url' => 'https://lastcallmedia.com',
-        ]);
+        return [
+            // Internal matcher
+            ['matcher.internal', true, 'https://lastcallmedia.com/foo'],
+            ['matcher.internal', true, 'https://lastcallmedia.com/foo/bar'],
+            ['matcher.internal', false, 'http://lastcallmedia.com/foo'],
+            ['matcher.internal', false, 'https://lastcallmedia.com'],
+            ['matcher.internal', false, 'https://lastcallmedia.com/bar/foo'],
 
-        $expected = Matcher::all()
-            ->schemeIs(['http', 'https'])
-            ->hostIs('lastcallmedia.com')
-            ->pathExtensionIs(['', 'html', 'htm', 'php', 'asp', 'aspx', 'cfm']);
+            // HTML Matcher
+            ['matcher.html', true, '/test'],
+            ['matcher.html', true, '/test.html'],
+            ['matcher.html', false, '/test.css'],
 
-        $this->assertEquals($expected, $container['html_matcher']);
+            // Asset matcher
+            ['matcher.asset', true, '/test.css'],
+            ['matcher.asset', true, '/test.jpg'],
+            ['matcher.asset', false, '/test'],
+
+            // Internal HTML matcher
+            ['matcher.internal_html', true, 'https://lastcallmedia.com/foo/test.html'],
+            ['matcher.internal_html', false, 'https://lastcallmedia.com/foo/test.css'],
+            ['matcher.internal_html', false, 'https://google.com/foo/test.html'],
+
+            // Internal asset matcher.
+            ['matcher.internal_asset', true, 'https://lastcallmedia.com/foo/test.css'],
+            ['matcher.internal_asset', false, 'https://lastcallmedia.com/foo/test.html'],
+            ['matcher.internal_asset', false, 'https://lastcallmedia.com/test.css'],
+        ];
     }
 
-    public function testCanOverrideHtmlMatches()
+    /**
+     * @dataProvider getMatcherTests
+     */
+    public function testMatcher($matcher, $expected, $url)
     {
         $container = new Container();
         $container->register(new MatcherServiceProvider(), [
-            'base_url' => 'https://lastcallmedia.com',
-            'html_extensions' => ['foo', 'bar'],
+            'base_url' => 'https://lastcallmedia.com/foo',
         ]);
-
-        $expected = Matcher::all()
-            ->schemeIs(['http', 'https'])
-            ->hostIs('lastcallmedia.com')
-            ->pathExtensionIs(['foo', 'bar']);
-
-        $this->assertEquals($expected, $container['html_matcher']);
+        $matches = $container[$matcher]->matches(new Uri($url));
+        $this->assertEquals($expected, $matches);
     }
 }
