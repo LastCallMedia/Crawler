@@ -33,15 +33,37 @@ There is no default value for the base_url.
 
 [Default html_extensions](../src/Configuration/ServiceProvider/MatcherServiceProvider.php)
 
+#### asset_extensions 
+
+`string[]` - An array containing the file extensions we assume contain asset content (CSS, images, files).
+
+[Default html_extensions](../src/Configuration/ServiceProvider/MatcherServiceProvider.php)
+
 Container Services
 ------------------
 The following services are registered with the container and can be replaced or extended.
 
-#### matcher 
+#### matcher.internal 
 
-`LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs discovered during processing responses should be included in the session.
+`LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs are considered within the scope of the current crawl.
 
-[Default matcher](../src/Configuration/ServiceProvider/MatcherServiceProvider.php)
+#### matcher.html 
+
+`LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs point to HTML content.
+
+#### matcher.asset 
+
+`LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs point to asset content.
+
+#### matcher.internal_html 
+
+`LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs point to HTML content within the scope of the current crawl.
+
+#### matcher.internal_html 
+
+`LastCall\Crawler\Uri\MatcherInterface` - The matcher is used to check whether URIs point to asset content within the scope of the current crawl.
+
+[Default matchers](../src/Configuration/ServiceProvider/MatcherServiceProvider.php)
 
 
 #### normalizer 
