@@ -4,6 +4,7 @@ namespace LastCall\Crawler\Handler\Discovery;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\Common\AddsRequests;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
@@ -19,20 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RedirectDiscoverer implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
-
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
-    /**
-     * @var NormalizerInterface
-     */
-    private $normalizer;
-
-    /**
-     * @var callable
-     */
-    private $requestFactory;
+    use AddsRequests;
 
     public static function getSubscribedEvents()
     {
@@ -46,31 +34,16 @@ class RedirectDiscoverer implements EventSubscriberInterface
         NormalizerInterface $normalizer,
         callable $requestFactory = null
     ) {
-        $this->matcher = $matcher;
-        $this->normalizer = $normalizer;
-        if (!$requestFactory) {
-            $requestFactory = function (UriInterface $uri) {
-                return new Request('GET', $uri);
-            };
-        }
-        $this->requestFactory = $requestFactory;
+        $this->setMatcher($matcher);
+        $this->setNormalizer($normalizer);
+        $this->setRequestFactory($requestFactory);
     }
 
     public function onResponse(CrawlerResponseEvent $event)
     {
         $response = $event->getResponse();
         if ($this->isRedirectResponse($response)) {
-            $request = $event->getRequest();
-            $resolve = Normalizations::resolve($request->getUri());
-            $factory = $this->requestFactory;
-
-            $location = new Uri($response->getHeaderLine('Location'));
-            $location = $resolve($location);
-            $location = $this->normalizer->normalize($location);
-
-            if ($this->matcher->matches($location) && $newRequest = $factory($location)) {
-                $event->addAdditionalRequest($newRequest);
-            }
+            $this->addRequests([$response->getHeaderLine('Location')], $event);
         }
     }
 }

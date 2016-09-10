@@ -2,18 +2,17 @@
 
 namespace LastCall\Crawler\Fragment\Processor;
 
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\Common\AddsRequests;
+use LastCall\Crawler\Uri\MatcherInterface;
+use LastCall\Crawler\Uri\NormalizerInterface;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\FragmentSubscription;
-use LastCall\Crawler\Uri\MatcherInterface;
-use LastCall\Crawler\Uri\Normalizations;
-use LastCall\Crawler\Uri\NormalizerInterface;
-use Psr\Http\Message\UriInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessor implements FragmentProcessorInterface
 {
+    use AddsRequests;
+
     public function getSubscribedMethods()
     {
         return [
@@ -22,34 +21,14 @@ class LinkProcessor implements FragmentProcessorInterface
         ];
     }
 
-    /**
-     * @var \LastCall\Crawler\Uri\MatcherInterface
-     */
-    private $matcher;
-
-    /**
-     * @var \LastCall\Crawler\Uri\NormalizerInterface
-     */
-    private $normalizer;
-
-    /**
-     * @var callable
-     */
-    private $requestFactory;
-
     public function __construct(
         MatcherInterface $matcher,
         NormalizerInterface $normalizer,
         callable $requestFactory = null
     ) {
-        $this->matcher = $matcher;
-        $this->normalizer = $normalizer;
-        if (!$requestFactory) {
-            $requestFactory = function (UriInterface $uri) {
-                return new Request('GET', $uri);
-            };
-        }
-        $this->requestFactory = $requestFactory;
+        $this->setMatcher($matcher);
+        $this->setNormalizer($normalizer);
+        $this->setRequestFactory($requestFactory);
     }
 
     public function processLinks(
@@ -57,19 +36,6 @@ class LinkProcessor implements FragmentProcessorInterface
         DomCrawler $crawler
     ) {
         $urls = array_unique($crawler->extract(['href']));
-
-        $request = $event->getRequest();
-        $resolve = Normalizations::resolve($request->getUri());
-        $factory = $this->requestFactory;
-
-        foreach ($urls as $url) {
-            $uri = new Uri($url);
-            $uri = $resolve($uri);
-            $uri = $this->normalizer->normalize($uri);
-
-            if ($this->matcher->matches($uri) && $newRequest = $factory($uri)) {
-                $event->addAdditionalRequest($newRequest);
-            }
-        }
+        $this->addRequests($urls, $event);
     }
 }
