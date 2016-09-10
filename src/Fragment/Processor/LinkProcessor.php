@@ -33,9 +33,12 @@ class LinkProcessor implements FragmentProcessorInterface
     ) {
         $this->matcher = $matcher;
         $this->normalizer = $normalizer;
-        $this->requestFactory = $requestFactory ?: function (UriInterface $uri) {
-            return new Request('GET', $uri);
-        };
+        if(!$requestFactory) {
+            $requestFactory = function (UriInterface $uri) {
+                return new Request('GET', $uri);
+            };
+        }
+        $this->requestFactory = $requestFactory;
     }
 
     public function processLinks(
