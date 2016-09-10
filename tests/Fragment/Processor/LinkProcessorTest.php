@@ -15,34 +15,9 @@ use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use ProcessesTestFragments;
+
     private static $stdHtml = '<html><a href="/foo"></a></html>';
-
-    private function doFireEvent(LinkProcessor $processor, RequestInterface $request, ResponseInterface $response)
-    {
-        $event = new CrawlerResponseEvent($request, $response);
-        $links = (new DomCrawler((string) $response->getBody()))
-            ->filterXPath('descendant-or-self::a[@href]');
-        $processor->processLinks($event, $links);
-
-        return $event;
-    }
-
-    public function testSubscribesToRightMethod()
-    {
-        $matcher = Matcher::all()->always();
-        $normalizer = new Normalizer();
-
-        $processor = new LinkProcessor($matcher, $normalizer);
-        $methods = $processor->getSubscribedMethods();
-        $this->assertCount(1, $methods);
-        /** @var \LastCall\Crawler\Fragment\FragmentSubscription $method */
-        $method = reset($methods);
-        $this->assertEquals('xpath', $method->getParserId());
-        $this->assertEquals('descendant-or-self::a[@href]',
-            $method->getSelector());
-        $this->assertEquals([$processor, 'processLinks'],
-            $method->getCallable());
-    }
 
     public function getInputs()
     {
@@ -65,11 +40,11 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessLinks($html, $expectedRequests)
     {
-        $matcher = Matcher::all()->always();
-        $normalizer = new Normalizer();
-        $processor = new LinkProcessor($matcher, $normalizer);
-
-        $event = $this->doFireEvent(
+        $processor = new LinkProcessor(
+            Matcher::all()->always(),
+            new Normalizer()
+        );
+        $event = $this->fireSuccess(
             $processor,
             new Request('GET', 'https://lastcallmedia.com'),
             new Response(200, [], $html)
@@ -104,7 +79,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new LinkProcessor($matcher, $normalizer, $factory);
 
-        $event = $this->doFireEvent(
+        $event = $this->fireSuccess(
             $processor,
             new Request('GET', 'https://lastcallmedia.com'),
             new Response(200, [], self::$stdHtml)
@@ -128,7 +103,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
         $normalizer = new Normalizer();
 
         $processor = new LinkProcessor($matcher, $normalizer);
-        $event = $this->doFireEvent(
+        $event = $this->fireSuccess(
             $processor,
             new Request('GET', 'https://lastcallmedia.com'),
             new Response(200, [], self::$stdHtml)
@@ -146,7 +121,7 @@ class LinkProcessorTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $processor = new LinkProcessor($matcher, $normalizer);
-        $event = $this->doFireEvent(
+        $event = $this->fireSuccess(
             $processor,
             new Request('GET', 'https://lastcallmedia.com'),
             new Response(200, [], self::$stdHtml)
