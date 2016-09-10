@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Configuration\ServiceProvider\FragmentServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\LinkServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
@@ -37,11 +38,9 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         };
         $this['output'] = false;
 
-        $this->register(new QueueServiceProvider());
-        $this->register(new MatcherServiceProvider());
-        $this->register(new NormalizerServiceProvider());
-        $this->register(new LoggerServiceProvider());
-        $this->register(new FragmentServiceProvider());
+        foreach($this->getProviders() as $provider) {
+            $this->register($provider);
+        }
 
         // On start, add the default request.
         $this->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
@@ -93,5 +92,16 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 
             return $subscribers;
         });
+    }
+
+    protected function getProviders() {
+        return [
+            'queue' => new QueueServiceProvider(),
+            'logger' => new LoggerServiceProvider(),
+            'matcher' => new MatcherServiceProvider(),
+            'normalizer' => new NormalizerServiceProvider(),
+            'fragment' => new FragmentServiceProvider(),
+            'link' => new LinkServiceProvider(),
+        ];
     }
 }
