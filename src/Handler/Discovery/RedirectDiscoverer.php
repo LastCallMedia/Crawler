@@ -10,6 +10,7 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Uri\MatcherInterface;
 use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\NormalizerInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -28,6 +29,11 @@ class RedirectDiscoverer implements EventSubscriberInterface
      */
     private $normalizer;
 
+    /**
+     * @var callable
+     */
+    private $requestFactory;
+
     public static function getSubscribedEvents()
     {
         return [
@@ -37,10 +43,17 @@ class RedirectDiscoverer implements EventSubscriberInterface
 
     public function __construct(
         MatcherInterface $matcher,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        callable $requestFactory = null
     ) {
         $this->matcher = $matcher;
         $this->normalizer = $normalizer;
+        if (!$requestFactory) {
+            $requestFactory = function (UriInterface $uri) {
+                return new Request('GET', $uri);
+            };
+        }
+        $this->requestFactory = $requestFactory;
     }
 
     public function onResponse(CrawlerResponseEvent $event)
@@ -49,14 +62,14 @@ class RedirectDiscoverer implements EventSubscriberInterface
         if ($this->isRedirectResponse($response)) {
             $request = $event->getRequest();
             $resolve = Normalizations::resolve($request->getUri());
+            $factory = $this->requestFactory;
 
             $location = new Uri($response->getHeaderLine('Location'));
             $location = $resolve($location);
             $location = $this->normalizer->normalize($location);
 
-            if ($this->matcher->matches($location)) {
-                $request = new Request('GET', $location);
-                $event->addAdditionalRequest($request);
+            if ($this->matcher->matches($location) && $newRequest = $factory($location)) {
+                $event->addAdditionalRequest($newRequest);
             }
         }
     }
