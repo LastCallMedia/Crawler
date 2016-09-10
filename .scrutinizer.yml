@@ -5,6 +5,9 @@ filter:
 checks:
     php: true
 coding_style:
-    php: {  }
+    php:
+      spaces:
+        before_parentheses:
+            closure_definition: true
 tools:
     external_code_coverage: true
