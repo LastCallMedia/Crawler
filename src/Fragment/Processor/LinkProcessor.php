@@ -8,7 +8,6 @@ use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\FragmentSubscription;
 use LastCall\Crawler\Uri\MatcherInterface;
 use LastCall\Crawler\Uri\Normalizations;
-use LastCall\Crawler\Uri\Normalizer;
 use LastCall\Crawler\Uri\NormalizerInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
@@ -23,8 +22,20 @@ class LinkProcessor implements FragmentProcessorInterface
         ];
     }
 
+    /**
+     * @var \LastCall\Crawler\Uri\MatcherInterface
+     */
     private $matcher;
+
+    /**
+     * @var \LastCall\Crawler\Uri\NormalizerInterface
+     */
     private $normalizer;
+
+    /**
+     * @var callable
+     */
+    private $requestFactory;
 
     public function __construct(
         MatcherInterface $matcher,
@@ -33,7 +44,7 @@ class LinkProcessor implements FragmentProcessorInterface
     ) {
         $this->matcher = $matcher;
         $this->normalizer = $normalizer;
-        if(!$requestFactory) {
+        if (!$requestFactory) {
             $requestFactory = function (UriInterface $uri) {
                 return new Request('GET', $uri);
             };
