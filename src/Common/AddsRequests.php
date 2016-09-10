@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Common;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
@@ -20,24 +18,28 @@ trait AddsRequests
 
     protected $requestFactory;
 
-    public function setMatcher(MatcherInterface $matcher) {
+    public function setMatcher(MatcherInterface $matcher)
+    {
         $this->matcher = $matcher;
     }
 
-    public function setNormalizer(NormalizerInterface $normalizer) {
+    public function setNormalizer(NormalizerInterface $normalizer)
+    {
         $this->normalizer = $normalizer;
     }
 
-    public function setRequestFactory(callable $requestFactory = null) {
-        if(!$requestFactory) {
-            $requestFactory = function(UriInterface $uri) {
+    public function setRequestFactory(callable $requestFactory = null)
+    {
+        if (!$requestFactory) {
+            $requestFactory = function (UriInterface $uri) {
                 return new Request('GET', $uri);
             };
         }
         $this->requestFactory = $requestFactory;
     }
 
-    protected function addRequests(array $urls, CrawlerRequestEvent $event) {
+    protected function addRequests(array $urls, CrawlerRequestEvent $event)
+    {
         $request = $event->getRequest();
         $resolve = Normalizations::resolve($request->getUri());
         $factory = $this->requestFactory;
@@ -52,5 +54,4 @@ trait AddsRequests
             }
         }
     }
-
 }

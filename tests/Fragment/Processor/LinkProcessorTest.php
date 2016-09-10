@@ -4,14 +4,10 @@ namespace LastCall\Crawler\Test\Fragment\Processor;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\Processor\LinkProcessor;
 use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Normalizer;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
-use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 class LinkProcessorTest extends \PHPUnit_Framework_TestCase
 {

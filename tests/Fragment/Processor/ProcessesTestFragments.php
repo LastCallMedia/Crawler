@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Fragment\Processor;
-
 
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Fragment\Parser\CSSSelectorParser;
@@ -14,14 +12,12 @@ use Psr\Http\Message\ResponseInterface;
 
 trait ProcessesTestFragments
 {
-
     public function fireSuccess(FragmentProcessorInterface $processor, RequestInterface $request, ResponseInterface $response)
     {
         $event = new CrawlerResponseEvent($request, $response);
         $fragment = new FragmentHandler([new XPathParser(), new CSSSelectorParser()], [$processor]);
         $fragment->onSuccess($event);
+
         return $event;
     }
-
-
 }

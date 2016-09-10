@@ -2,16 +2,12 @@
 
 namespace LastCall\Crawler\Handler\Discovery;
 
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\Common\AddsRequests;
 use LastCall\Crawler\Common\RedirectDetectionTrait;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Uri\MatcherInterface;
-use LastCall\Crawler\Uri\Normalizations;
 use LastCall\Crawler\Uri\NormalizerInterface;
-use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
