@@ -5,7 +5,6 @@ namespace LastCall\Crawler\Configuration;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
-use LastCall\Crawler\Configuration\ServiceProvider\FragmentServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
@@ -13,6 +12,7 @@ use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerStartEvent;
+use LastCall\Crawler\Handler\HtmlRedispatcher;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,7 +34,9 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return [];
         };
         $this['subscribers'] = function () {
-            return [];
+            return [
+                'html' => new HtmlRedispatcher(),
+            ];
         };
         $this['output'] = false;
 
@@ -101,7 +103,6 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             'logger' => new LoggerServiceProvider(),
             'matcher' => new MatcherServiceProvider(),
             'normalizer' => new NormalizerServiceProvider(),
-            'fragment' => new FragmentServiceProvider(),
             'link' => new RecursionServiceProvider(),
         ];
     }

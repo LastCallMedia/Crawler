@@ -4,99 +4,75 @@ namespace LastCall\Crawler\Test\Handler\Discovery;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Uri;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
+use LastCall\Crawler\Event\CrawlerUrisDiscoveredEvent;
 use LastCall\Crawler\Handler\Discovery\RedirectDiscoverer;
 use LastCall\Crawler\Test\Handler\HandlerTestTrait;
-use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Normalizer;
-use Psr\Http\Message\UriInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RedirectDiscovererTest extends \PHPUnit_Framework_TestCase
 {
     use HandlerTestTrait;
 
+    public function getDiscoversRedirectTests()
+    {
+        return [
+            [new Response(200), []],
+            [new Response(301), []],
+            [new Response(301, ['Location' => '/foo']), ['http://google.com/foo']],
+        ];
+    }
+
+    /**
+     * @dataProvider getDiscoversRedirectTests
+     */
+    public function testDiscoversRedirect($response, $expected)
+    {
+        $discoverer = new RedirectDiscoverer(new Normalizer());
+        $event = new CrawlerResponseEvent(new Request('GET', 'http://google.com'), $response);
+        $dispatcher = new EventDispatcher();
+
+        $bubbledDown = $bubbledUp = [];
+        $dispatcher->addListener(CrawlerEvents::URIS_DISCOVERED, function (CrawlerUrisDiscoveredEvent $e) use (&$bubbledDown) {
+            foreach ($e->getDiscoveredUris() as $uri) {
+                $bubbledDown[] = (string) $uri;
+                $e->addAdditionalRequest(new Request('GET', $uri));
+            }
+        });
+
+        $dispatcher->addSubscriber($discoverer);
+        $dispatcher->dispatch(CrawlerEvents::SUCCESS, $event);
+
+        foreach ($event->getAdditionalRequests() as $request) {
+            $bubbledUp[] = (string) $request->getUri();
+        }
+
+        $this->assertEquals($expected, $bubbledDown);
+        $this->assertEquals($expected, $bubbledUp);
+    }
+
     public function testNormalizer()
     {
         $normalizer = new Normalizer([
-            function (UriInterface $uri) {
-                return $uri->withFragment('test');
+            function () {
+                return new Uri('bar');
             },
         ]);
-        $matcher = Matcher::all()->always();
-        $request = new Request('GET', 'http://google.com');
-        $response = new Response(301, ['Location' => '/foo']);
-        $event = new CrawlerResponseEvent($request, $response);
+        $discoverer = new RedirectDiscoverer($normalizer);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($discoverer);
+        $dispatcher->addListener(CrawlerEvents::URIS_DISCOVERED, function (CrawlerUrisDiscoveredEvent $event) {
+            $this->assertEquals([new Uri('bar')], $event->getDiscoveredUris());
+        });
 
-        $handler = new RedirectDiscoverer($matcher, $normalizer);
-        $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
+        $event = new CrawlerResponseEvent(
+            new Request('GET', 'http://google.com'),
+            new Response(301, ['Location' => '/foo'])
+        );
 
-        $expectedRequests = [
-            new Request('GET', 'http://google.com/foo#test'),
-        ];
-
-        $added = $event->getAdditionalRequests();
-        $this->assertEquals($expectedRequests, $added);
-    }
-
-    public function getMatcherTests()
-    {
-        return [
-            [Matcher::all()->always(), [new Request('GET', 'http://google.com/foo')]],
-            [Matcher::all()->never(), []],
-        ];
-    }
-
-    /**
-     * @dataProvider getMatcherTests
-     */
-    public function testMatcher($matcher, $expectedRequests)
-    {
-        $normalizer = new Normalizer();
-
-        $request = new Request('GET', 'http://google.com');
-        $response = new Response(301, ['Location' => '/foo']);
-        $event = new CrawlerResponseEvent($request, $response);
-
-        $handler = new RedirectDiscoverer($matcher, $normalizer);
-        $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
-
-        $added = $event->getAdditionalRequests();
-        $this->assertEquals($expectedRequests, $added);
-    }
-
-    public function getFactoryTests()
-    {
-        return [
-            [
-                function () {
-                },
-                [],
-            ],
-            [
-                function () {
-                    return new Request('GET', 'foo');
-                },
-                [new Request('GET', 'foo')],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider getFactoryTests
-     */
-    public function testFactory($factory, $expectedRequests)
-    {
-        $matcher = Matcher::all()->always();
-        $normalizer = new Normalizer();
-
-        $request = new Request('GET', 'http://google.com');
-        $response = new Response(301, ['Location' => '/foo']);
-        $event = new CrawlerResponseEvent($request, $response);
-
-        $handler = new RedirectDiscoverer($matcher, $normalizer, $factory);
-        $this->invokeEvent($handler, CrawlerEvents::SUCCESS, $event);
-
-        $this->assertEquals($expectedRequests, $event->getAdditionalRequests());
+        $dispatcher->dispatch(CrawlerEvents::SUCCESS, $event);
     }
 }

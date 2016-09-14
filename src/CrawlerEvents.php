@@ -31,6 +31,15 @@ class CrawlerEvents
     const SUCCESS = 'request.success';
 
     /**
+     * A request has succeeded and an HTML response has been received.
+     *
+     * The listener method receives a CrawlerHtmlResponse instance.
+     *
+     * @Event
+     */
+    const SUCCESS_HTML = 'request.success.html';
+
+    /**
      * A request has failed and a response has been received.
      *
      * The listener method receives a CrawlerResponseEvent instance.
@@ -38,6 +47,24 @@ class CrawlerEvents
      * @Event
      */
     const FAILURE = 'request.failure';
+
+    /**
+     * A request has failed and an HTML response has been received.
+     *
+     * The listener method receives a CrawlerHtmlResponse instance.
+     *
+     * @Event
+     */
+    const FAILURE_HTML = 'request.success.html';
+
+    /**
+     * One or more URIs have been discovered from the response.
+     *
+     * The listener method receives a CrawlerUrisDiscovered instance.
+     *
+     * @Event
+     */
+    const URIS_DISCOVERED = 'crawler.uris_discovered';
 
     /**
      * Sending or processing a request has resulted in an exception.
