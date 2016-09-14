@@ -24,7 +24,7 @@ class UriRecursor implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CrawlerEvents::URIS_DISCOVERED => 'onDiscover',
+            CrawlerEvents::URIS_DISCOVERED => 'onDiscovery',
         ];
     }
 
@@ -39,7 +39,7 @@ class UriRecursor implements EventSubscriberInterface
         $this->requestFactory = $requestFactory;
     }
 
-    public function onUri(CrawlerUrisDiscoveredEvent $event)
+    public function onDiscovery(CrawlerUrisDiscoveredEvent $event)
     {
         $factory = $this->requestFactory;
 

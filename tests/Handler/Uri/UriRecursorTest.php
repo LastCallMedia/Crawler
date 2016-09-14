@@ -19,7 +19,7 @@ class UriRecursorTest extends \PHPUnit_Framework_TestCase
         $event->addAdditionalRequest(new Request('GET', new Uri('http://google.com')))->shouldBeCalled();
 
         $recurser = new UriRecursor(Matcher::all()->always());
-        $recurser->onUri($event->reveal());
+        $recurser->onDiscovery($event->reveal());
     }
 
     public function testUsesRequestFactory()
@@ -32,7 +32,7 @@ class UriRecursorTest extends \PHPUnit_Framework_TestCase
         $recursor = new UriRecursor(Matcher::all()->always(), function (UriInterface $uri) {
             return new Request('HEAD', $uri);
         });
-        $recursor->onUri($event->reveal());
+        $recursor->onDiscovery($event->reveal());
     }
 
     public function testUsesMatcher()
@@ -42,6 +42,6 @@ class UriRecursorTest extends \PHPUnit_Framework_TestCase
 
         $event->addAdditionalRequest()->shouldNotBeCalled();
         $recursor = new UriRecursor(Matcher::all()->never());
-        $recursor->onUri($event->reveal());
+        $recursor->onDiscovery($event->reveal());
     }
 }
