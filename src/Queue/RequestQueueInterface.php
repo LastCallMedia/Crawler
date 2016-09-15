@@ -5,13 +5,24 @@ namespace LastCall\Crawler\Queue;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * Interface for a queue that accepts requests and tracks completion of those
+ * Defines an object that accepts requests and tracks completion of those
  * requests.
  */
 interface RequestQueueInterface
 {
+    /**
+     * A request that is ready to be sent.
+     */
     const FREE = 1;
+
+    /**
+     * A request that is pending completion.
+     */
     const PENDING = 2;
+
+    /**
+     * A request that has been sent.
+     */
     const COMPLETE = 3;
 
     /**

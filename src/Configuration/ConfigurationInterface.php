@@ -5,7 +5,7 @@ namespace LastCall\Crawler\Configuration;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A single crawler configuration.
+ * Defines a configuration for the crawler.
  */
 interface ConfigurationInterface
 {

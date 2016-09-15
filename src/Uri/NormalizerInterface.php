@@ -5,7 +5,8 @@ namespace LastCall\Crawler\Uri;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Modifies a URI so it follows a standard format.
+ * Defines an object that performs transformations on a URI so it is consistent
+ * with other versions of the same URI.
  */
 interface NormalizerInterface
 {

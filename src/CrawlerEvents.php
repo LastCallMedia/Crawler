@@ -3,7 +3,7 @@
 namespace LastCall\Crawler;
 
 /**
- * Contains all events dispatched by the crawler.
+ * Defines names of events dispatched by the crawler.
  */
 class CrawlerEvents
 {
