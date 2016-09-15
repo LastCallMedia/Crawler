@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Works through a request queue, sending requests through a client, and
  * dispatching data through the dispatcher.
  */
-class Crawler
+final class Crawler
 {
     /**
      * @var \GuzzleHttp\ClientInterface
