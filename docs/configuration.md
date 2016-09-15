@@ -73,7 +73,7 @@ The following services are registered with the container and can be replaced or 
 [Default normalizer](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
 
 #### normalizations
-`array` - An array of normalizations that are performed by the normalizer.
+`callable[]` - An array of normalizations that are performed by the normalizer.
 
 [Default normalizations](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
 
@@ -82,18 +82,6 @@ The following services are registered with the container and can be replaced or 
 `LastCall\Crawler\Queue\RequestQueueInterface` - The queue is where requests are stored.  Initially, the queue only contains a request to the baseUrl, and the queue is filled by subscribers processing the page. 
 
 [Default queue](../src/Configuration/ServiceProvider/QueueServiceProvider.php)
-
-#### parsers
-
-`array` - An array of parsers that the FragmentHandler can use to break down content.
-
-[Default parsers](../src/Configuration/ServiceProvider/FragmentServiceProvider.php)
-
-#### processors
-
-`array` - An array of fragment processors that the FragmentHandler feeds HTML fragments to.
-
-[Default processors](../src/Configuration/ServiceProvider/FragmentServiceProvider.php)
 
 #### logger 
 
@@ -107,6 +95,6 @@ The following services are registered with the container and can be replaced or 
 
 There is no default doctrine definition.
 
+#### subscribers
 
-
-
+`Symfony\Component\EventDispatcher\EventSubscriberInterface[]` - An array of event subscriber objects that will be added to the dispatcher and used to handle events while crawling.
