@@ -23,5 +23,10 @@ interface ConfigurationInterface
      */
     public function getQueue();
 
+    /**
+     * Attach listeners to an event dispatcher.
+     *
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function attachToDispatcher(EventDispatcherInterface $dispatcher);
 }

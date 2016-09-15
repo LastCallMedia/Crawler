@@ -15,8 +15,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RequestLogger implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     private $logger;
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -46,6 +53,11 @@ class RequestLogger implements EventSubscriberInterface
         return $event->getResponse()->getHeaderLine('Location');
     }
 
+    /**
+     * Log requests as they are sent.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerRequestEvent $event
+     */
     public function onSending(CrawlerRequestEvent $event)
     {
         $uri = $this->getUri($event);
@@ -55,6 +67,11 @@ class RequestLogger implements EventSubscriberInterface
         ]);
     }
 
+    /**
+     * Log successful responses.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerResponseEvent $event
+     */
     public function onSuccess(CrawlerResponseEvent $event)
     {
         $uri = $this->getUri($event);
@@ -76,6 +93,11 @@ class RequestLogger implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Log failed responses.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerResponseEvent $event
+     */
     public function onFailure(CrawlerResponseEvent $event)
     {
         $uri = $this->getUri($event);

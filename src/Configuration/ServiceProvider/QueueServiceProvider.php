@@ -9,6 +9,12 @@ use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
+/**
+ * Provides a request queue for the crawler.
+ *
+ * If a Doctrine connection has been defined, a database backed queue
+ * will be used.  Otherwise, an in-memory array queue will be used instead.
+ */
 class QueueServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)

@@ -11,6 +11,13 @@ use Pimple\ServiceProviderInterface;
 use Pimple\Container;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Provides "recursion" services for the crawler.
+ *
+ * This service provider adds URL discovery subscribers and URL recursion
+ * subscribers to respond to crawler events and add discovered URLs back into
+ * the queue.
+ */
 class RecursionServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)

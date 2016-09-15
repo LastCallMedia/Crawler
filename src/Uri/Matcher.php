@@ -45,6 +45,13 @@ class Matcher implements MatcherInterface
         $this->mode = $mode;
     }
 
+    /**
+     * Check whether the URI matches the conditions.
+     *
+     * @param \Psr\Http\Message\UriInterface $uri
+     *
+     * @return bool
+     */
     public function __invoke(UriInterface $uri)
     {
         return $this->matches($uri);

@@ -4,6 +4,9 @@ namespace LastCall\Crawler\Configuration\Loader;
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 
+/**
+ * A configuration loader that `require`'s a PHP file.
+ */
 class PHPConfigurationLoader implements ConfigurationLoaderInterface
 {
     public function loadFile($filename)

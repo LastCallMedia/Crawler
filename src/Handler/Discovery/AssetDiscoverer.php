@@ -7,8 +7,14 @@ use LastCall\Crawler\Event\CrawlerHtmlResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Discovers asset (CSS/JS/image) URLs in an HTML response.
+ */
 class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -25,6 +31,13 @@ class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInter
         ];
     }
 
+    /**
+     * Discover image URLs.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerHtmlResponseEvent            $event
+     * @param                                                             $eventName
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function discoverImages(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $crawler = $event->getDomCrawler();
@@ -33,6 +46,13 @@ class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInter
         $this->processUris($event, $dispatcher, $urls);
     }
 
+    /**
+     * Discover stylesheet URLs.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerHtmlResponseEvent            $event
+     * @param                                                             $eventName
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function discoverStylesheets(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $crawler = $event->getDomCrawler();
@@ -41,6 +61,13 @@ class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInter
         $this->processUris($event, $dispatcher, $urls);
     }
 
+    /**
+     * Discover script URLs.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerHtmlResponseEvent            $event
+     * @param                                                             $eventName
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function discoverScripts(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $crawler = $event->getDomCrawler();

@@ -4,6 +4,9 @@ namespace LastCall\Crawler\Configuration\Loader;
 
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 
+/**
+ * Defines a configuration file loader.
+ */
 interface ConfigurationLoaderInterface
 {
     /**

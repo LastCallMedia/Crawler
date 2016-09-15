@@ -11,6 +11,9 @@ use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Database backed request queue.
+ */
 class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterface
 {
     use DoctrineSetupTeardownTrait;

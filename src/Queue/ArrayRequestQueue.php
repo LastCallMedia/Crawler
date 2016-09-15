@@ -4,6 +4,9 @@ namespace LastCall\Crawler\Queue;
 
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * In-memory request queue.
+ */
 class ArrayRequestQueue implements RequestQueueInterface
 {
     private $incomplete = [];

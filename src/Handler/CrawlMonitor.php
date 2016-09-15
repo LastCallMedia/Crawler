@@ -2,13 +2,17 @@
 
 namespace LastCall\Crawler\Handler;
 
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Queue\RequestQueueInterface;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CrawlMonitor implements EventSubscriberInterface
+/**
+ * Watches and reports on a crawler session.
+ */
+class CrawlMonitor implements EventSubscriberInterface, SetupTeardownInterface
 {
     /**
      * @var \Symfony\Component\Console\Style\OutputStyle
@@ -35,6 +39,9 @@ class CrawlMonitor implements EventSubscriberInterface
      */
     private $indicator;
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -65,41 +72,61 @@ class CrawlMonitor implements EventSubscriberInterface
         $this->io->success('Teardown complete');
     }
 
+    /**
+     * Execute startup tasks.
+     */
     public function onStart()
     {
         $this->getIndicator();
     }
 
+    /**
+     * Execute finish tasks.
+     */
     public function onFinish()
     {
         $this->getIndicator()->finish('Complete');
     }
 
+    /**
+     * Execute sending tasks.
+     */
     public function onSending()
     {
         ++$this->stats['sent'];
         $this->report($this->stats);
     }
 
+    /**
+     * Update the statistics to note a request success.
+     */
     public function onSuccess()
     {
         ++$this->stats['success'];
     }
 
+    /**
+     * Update the statistics to note a request failure.
+     */
     public function onFailure()
     {
         ++$this->stats['failure'];
     }
 
+    /**
+     * Update the statistics to note an exception.
+     */
     public function onException()
     {
         ++$this->stats['exception'];
     }
 
     /**
+     * Get the progress indicator.
+     *
      * @return \Symfony\Component\Console\Helper\ProgressIndicator
      */
-    public function getIndicator()
+    private function getIndicator()
     {
         if (!$this->indicator) {
             $this->indicator = new ProgressIndicator($this->io);
@@ -109,7 +136,12 @@ class CrawlMonitor implements EventSubscriberInterface
         return $this->indicator;
     }
 
-    public function report(array $stats)
+    /**
+     * Report statistics to the console output.
+     *
+     * @param array $stats
+     */
+    private function report(array $stats)
     {
         $indicator = $this->getIndicator();
         $indicator->advance();

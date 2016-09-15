@@ -9,12 +9,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Add in URLs that are redirected to, as long as they are matched.
+ * Discovers URLs that are redirected to.
  */
 class RedirectDiscoverer extends AbstractDiscoverer implements EventSubscriberInterface
 {
     use RedirectDetectionTrait;
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -22,6 +25,13 @@ class RedirectDiscoverer extends AbstractDiscoverer implements EventSubscriberIn
         ];
     }
 
+    /**
+     * Discover a URL from a location header.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerResponseEvent                $event
+     * @param                                                             $eventName
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function onResponse(CrawlerResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $response = $event->getResponse();

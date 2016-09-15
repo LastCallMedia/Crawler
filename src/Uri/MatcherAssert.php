@@ -4,6 +4,9 @@ namespace LastCall\Crawler\Uri;
 
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Assertions for the URI matcher.
+ */
 class MatcherAssert
 {
     /**
@@ -18,6 +21,13 @@ class MatcherAssert
         };
     }
 
+    /**
+     * Require the inverse of any assertion.
+     *
+     * @param callable $assert
+     *
+     * @return \Closure
+     */
     public static function not(callable $assert)
     {
         return function (UriInterface $uri) use ($assert) {
@@ -152,6 +162,13 @@ class MatcherAssert
         };
     }
 
+    /**
+     * Match an explicit file extension.
+     *
+     * @param string|string[] $extensions
+     *
+     * @return \Closure
+     */
     public static function pathExtensionIs($extensions)
     {
         $extensions = self::convertToKeyedArray($extensions);

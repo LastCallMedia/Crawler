@@ -4,6 +4,9 @@ namespace LastCall\Crawler\Common;
 
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Common methods for objects that can bubble up additional requests.
+ */
 trait HasAdditionalRequests
 {
     /**

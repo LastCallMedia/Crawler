@@ -6,6 +6,9 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
+/**
+ * Wraps data for request/response cycle that contains HTML.
+ */
 class CrawlerHtmlResponseEvent extends CrawlerResponseEvent
 {
     private $crawler;
@@ -17,6 +20,11 @@ class CrawlerHtmlResponseEvent extends CrawlerResponseEvent
         parent::__construct($request, $response);
     }
 
+    /**
+     * Get a Symfony Crawler for the HTML response body.
+     *
+     * @return \Symfony\Component\DomCrawler\Crawler
+     */
     public function getDomCrawler()
     {
         if (!$this->crawler) {

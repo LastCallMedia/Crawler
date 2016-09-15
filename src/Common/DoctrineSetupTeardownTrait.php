@@ -10,6 +10,9 @@ use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
  */
 trait DoctrineSetupTeardownTrait
 {
+    /**
+     * Execute setup tasks.
+     */
     public function onSetup()
     {
         $connection = $this->getConnection();
@@ -20,15 +23,22 @@ trait DoctrineSetupTeardownTrait
     }
 
     /**
+     * Get the Doctrine connection used by this object.
+     *
      * @return \Doctrine\DBAL\Connection
      */
     abstract protected function getConnection();
 
     /**
+     * Get the schema definition used by this object.
+     *
      * @return \Doctrine\DBAL\Schema\Schema
      */
     abstract protected function getSchema();
 
+    /**
+     * Execute teardown tasks.
+     */
     public function onTeardown()
     {
         $connection = $this->getConnection();

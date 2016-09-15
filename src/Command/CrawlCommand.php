@@ -7,15 +7,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * Console command to initiate a crawl
+ */
 class CrawlCommand extends CrawlerCommand
 {
-    public function __construct($name = 'crawl')
-    {
-        parent::__construct($name);
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function configure()
     {
+        if(null === $this->getName()) {
+            $this->setName('crawl');
+        }
         $this->setDescription('Execute a crawler session on a configuration.');
         $this->setHelp('Pass in the name of a PHP file that contains the crawler configuration.');
         $this->addArgument('filename', InputArgument::OPTIONAL, 'Path to a configuration file.', 'crawler.php');
@@ -24,6 +28,9 @@ class CrawlCommand extends CrawlerCommand
         parent::configure();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getConfiguration($input->getArgument('filename'));

@@ -6,6 +6,11 @@ use LastCall\Crawler\CrawlerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Prepares and removes log directories.
+ *
+ * @todo: Is this even needed?
+ */
 class LogSetup implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()

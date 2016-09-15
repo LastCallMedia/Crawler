@@ -7,6 +7,9 @@ use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
+/**
+ * Provides URL normalization services for the crawler.
+ */
 class NormalizerServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)

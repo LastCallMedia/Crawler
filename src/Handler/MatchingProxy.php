@@ -38,6 +38,9 @@ class MatchingProxy implements EventSubscriberInterface
         $this->dispatcher->addSubscriber($subscriber);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [

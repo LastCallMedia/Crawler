@@ -7,6 +7,9 @@ use LastCall\Crawler\Uri\Matcher;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
+/**
+ * Provides URL matching services for the crawler.
+ */
 class MatcherServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)

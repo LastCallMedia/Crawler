@@ -16,8 +16,8 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Works through a request queue, dispatching requests to the client,
- * and responses to the session.
+ * Works through a request queue, sending requests through a client, and
+ * dispatching data through the dispatcher.
  */
 class Crawler
 {
@@ -39,8 +39,9 @@ class Crawler
     /**
      * Crawler constructor.
      *
-     * @param EventDispatcherInterface    $dispatcher
-     * @param \GuzzleHttp\ClientInterface $client
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param \GuzzleHttp\ClientInterface                                 $client
+     * @param \LastCall\Crawler\Queue\RequestQueueInterface               $queue
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -88,11 +89,17 @@ class Crawler
         return $outer->promise()->then($finish, $finish);
     }
 
+    /**
+     * Execute all registered setup tasks.
+     */
     public function setup()
     {
         $this->dispatchSetup();
     }
 
+    /**
+     * Execute all registered teardown tasks.
+     */
     public function teardown()
     {
         $this->dispatchTeardown();

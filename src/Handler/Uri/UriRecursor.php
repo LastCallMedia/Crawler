@@ -9,6 +9,10 @@ use LastCall\Crawler\Uri\MatcherInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Detect discovered URLs that match certain conditions, and add them back
+ * into the crawler queue.
+ */
 class UriRecursor implements EventSubscriberInterface
 {
     /**
@@ -21,6 +25,9 @@ class UriRecursor implements EventSubscriberInterface
      */
     private $requestFactory;
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -39,6 +46,11 @@ class UriRecursor implements EventSubscriberInterface
         $this->requestFactory = $requestFactory;
     }
 
+    /**
+     * Act on a URL discovery event.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerUrisDiscoveredEvent $event
+     */
     public function onDiscovery(CrawlerUrisDiscoveredEvent $event)
     {
         $factory = $this->requestFactory;

@@ -8,6 +8,9 @@ use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * Provides logging services for the crawler.
+ */
 class LoggerServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)

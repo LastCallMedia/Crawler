@@ -10,8 +10,14 @@ use LastCall\Crawler\Event\CrawlerUrisDiscoveredEvent;
 use GuzzleHttp\Psr7\Uri;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Common methods for URL discovery handlers.
+ */
 abstract class AbstractDiscoverer
 {
+    /**
+     * @var \LastCall\Crawler\Uri\NormalizerInterface
+     */
     protected $normalizer;
 
     public function __construct(NormalizerInterface $normalizer)
@@ -19,6 +25,13 @@ abstract class AbstractDiscoverer
         $this->normalizer = $normalizer;
     }
 
+    /**
+     * Normalize and dispatch a discovery event for an array of URIs.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerResponseEvent                $event
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param string[]                                                    $urls
+     */
     protected function processUris(CrawlerResponseEvent $event, EventDispatcherInterface $dispatcher, array $urls)
     {
         $resolve = Normalizations::resolve($event->getRequest()->getUri());

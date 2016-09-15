@@ -5,6 +5,9 @@ namespace LastCall\Crawler\Uri;
 use Psr\Http\Message\UriInterface;
 use GuzzleHttp\Psr7\Uri;
 
+/**
+ * Predefined normalizations for use with the normalizer.
+ */
 class Normalizations
 {
     /**

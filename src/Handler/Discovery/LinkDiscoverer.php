@@ -7,8 +7,14 @@ use LastCall\Crawler\Event\CrawlerHtmlResponseEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Discovers link URLs in an HTML response.
+ */
 class LinkDiscoverer extends AbstractDiscoverer implements EventSubscriberInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -17,6 +23,13 @@ class LinkDiscoverer extends AbstractDiscoverer implements EventSubscriberInterf
         ];
     }
 
+    /**
+     * Discover link URLS from anchor tags.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerHtmlResponseEvent            $event
+     * @param                                                             $eventName
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function discoverLinks(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $crawler = $event->getDomCrawler();

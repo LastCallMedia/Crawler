@@ -77,6 +77,13 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         }
     }
 
+    /**
+     * Adds an event listener function to the configuration.
+     *
+     * @param          $eventName
+     * @param callable $callback
+     * @param int      $priority
+     */
     public function addListener($eventName, callable $callback, $priority = 0)
     {
         $this->extend('listeners',
@@ -87,6 +94,11 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             });
     }
 
+    /**
+     * Adds an event subscriber object to the configuration.
+     *
+     * @param \Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber
+     */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         $this->extend('subscribers', function (array $subscribers) use ($subscriber) {
@@ -96,6 +108,11 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         });
     }
 
+    /**
+     * Gets a list of Pimple service providers this configuration will add.
+     *
+     * @return array
+     */
     protected function getProviders()
     {
         return [

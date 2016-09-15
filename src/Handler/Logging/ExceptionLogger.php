@@ -17,6 +17,9 @@ class ExceptionLogger implements EventSubscriberInterface
      */
     private $logger;
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -29,6 +32,11 @@ class ExceptionLogger implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
+    /**
+     * Log exception events.
+     *
+     * @param \LastCall\Crawler\Event\CrawlerExceptionEvent $event
+     */
     public function onCrawlerException(CrawlerExceptionEvent $event)
     {
         $this->logger->critical($event->getException(), [
