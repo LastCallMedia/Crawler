@@ -2,71 +2,48 @@
 
 namespace LastCall\Crawler\Test\Command;
 
+use GuzzleHttp\ClientInterface;
 use LastCall\Crawler\Command\SetupTeardownCommand;
-use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Queue\RequestQueueInterface;
 use Prophecy\Argument;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
 {
-    public function getCommands()
-    {
+    public function getCommandTests() {
         return [
-            [SetupTeardownCommand::setup(), false, true],
-            [SetupTeardownCommand::teardown(), true, false],
-            [SetupTeardownCommand::reset(), true, true],
+            [SetupTeardownCommand::setup(), 1, 0],
+            [SetupTeardownCommand::teardown(), 0, 1],
+            [SetupTeardownCommand::reset(), 1, 1],
         ];
     }
 
-    private function getDummyLoader($config)
-    {
+    /**
+     * @dataProvider getCommandTests
+     */
+    public function testCommand($command, $expectedSetup, $expectedTeardown) {
+        $setup = $teardown = 0;
+        $config = $this->prophesize(ConfigurationInterface::class);
+        $config->getClient()->willReturn($this->prophesize(ClientInterface::class));
+        $config->getQueue()->willReturn($this->prophesize(RequestQueueInterface::class));
+        $config->attachToDispatcher(Argument::type(EventDispatcherInterface::class))
+            ->will(function($args) use (&$setup, &$teardown) {
+                $args[0]->addListener(CrawlerEvents::SETUP, function() use (&$setup) {
+                    $setup++;
+                });
+                $args[0]->addListener(CrawlerEvents::TEARDOWN, function() use (&$teardown) {
+                    $teardown++;
+                });
+            });
         $loader = $this->prophesize(ConfigurationLoaderInterface::class);
         $loader->loadFile(Argument::any())->willReturn($config);
-
-        return $loader->reveal();
-    }
-
-    public function testSetup()
-    {
-        $config = new Configuration('https://lastcallmedia.com');
-        $command = SetupTeardownCommand::setup();
-        $command->setLoader($this->getDummyLoader($config));
-        $this->assertCommandSetupTeardown($config, $command, true, false);
-    }
-
-    public function testTeardown()
-    {
-        $config = new Configuration('https://lastcallmedia.com');
-        $command = SetupTeardownCommand::teardown();
-        $command->setLoader($this->getDummyLoader($config));
-        $this->assertCommandSetupTeardown($config, $command, false, true);
-    }
-
-    public function testReset()
-    {
-        $config = new Configuration('https://lastcallmedia.com');
-        $command = SetupTeardownCommand::reset();
-        $command->setLoader($this->getDummyLoader($config));
-        $this->assertCommandSetupTeardown($config, $command, true, true);
-    }
-
-    protected function assertCommandSetupTeardown(ConfigurationInterface $configuration, SetupTeardownCommand $command, $setupExpected, $teardownExpected)
-    {
-        $setupCalled = $teardownCalled = false;
-        $setupListener = function () use (&$setupCalled) {
-            $setupCalled = true;
-        };
-        $teardownListener = function () use (&$teardownCalled) {
-            $teardownCalled = true;
-        };
-        $configuration->addListener(CrawlerEvents::SETUP, $setupListener);
-        $configuration->addListener(CrawlerEvents::TEARDOWN, $teardownListener);
-        $tester = new CommandTester($command);
-        $tester->execute([]);
-        $this->assertEquals($setupExpected, $setupCalled);
-        $this->assertEquals($teardownExpected, $teardownCalled);
+        $command->setLoader($loader->reveal());
+        (new CommandTester($command))->execute([]);
+        $this->assertEquals($expectedSetup, $setup);
+        $this->assertEquals($expectedTeardown, $teardown);
     }
 }
