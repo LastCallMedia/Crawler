@@ -14,42 +14,41 @@ class LoggerServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testHasLogger()
     {
         $container = new Container();
-        $container['subscribers'] = function () {
-            return [];
-        };
         $container->register(new LoggerServiceProvider());
 
         $this->assertEquals(new NullLogger(), $container['logger']);
     }
 
-    public function testAddsSubscribers()
-    {
-        $container = new Container();
-        $container['subscribers'] = function () {
-            return [];
-        };
-        $container->register(new LoggerServiceProvider());
-        $expected = [
-            'requestLogger' => new RequestLogger(new NullLogger()),
-            'exceptionLogger' => new ExceptionLogger(new NullLogger()),
+    public function getLoggerTests() {
+        return [
+            [new NullLogger()],
+            [$this->getMock(LoggerInterface::class)]
         ];
-        $this->assertEquals($expected, $container['subscribers']);
     }
 
-    public function testOverriddenLoggerIsUsed()
-    {
+    /**
+     * @dataProvider getLoggerTests
+     */
+    public function testHasRequestLogger($logger) {
         $container = new Container();
-        $container['subscribers'] = function () {
-            return [];
-        };
-        $container->register(new LoggerServiceProvider());
-        $logger = $this->prophesize(LoggerInterface::class)->reveal();
-        $container['logger'] = $logger;
+        $container->register(new LoggerServiceProvider(), [
+            'logger' => $logger
+        ]);
 
-        $expected = [
-            'requestLogger' => new RequestLogger($logger),
-            'exceptionLogger' => new ExceptionLogger($logger),
-        ];
-        $this->assertEquals($expected, $container['subscribers']);
+        $expected = new RequestLogger($container['logger']);
+        $this->assertEquals($expected, $container['subscriber.request_logger']);
+    }
+
+    /**
+     * @dataProvider getLoggerTests
+     */
+    public function testHasExceptionLogger($logger) {
+        $container = new Container();
+        $container->register(new LoggerServiceProvider(), [
+            'logger' => $logger
+        ]);
+
+        $expected = new ExceptionLogger($logger);
+        $this->assertEquals($expected, $container['subscriber.exception_logger']);
     }
 }

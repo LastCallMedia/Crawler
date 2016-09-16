@@ -20,12 +20,13 @@ class LoggerServiceProvider implements ServiceProviderInterface
             return new NullLogger();
         };
 
-        // Add logging subscribers
-        $pimple->extend('subscribers', function (array $subscribers) use ($pimple) {
-            $subscribers['requestLogger'] = new RequestLogger($pimple['logger']);
-            $subscribers['exceptionLogger'] = new ExceptionLogger($pimple['logger']);
+        // Logs requests/responses as they happen.
+        $pimple['subscriber.request_logger'] = function() use ($pimple) {
+            return new RequestLogger($pimple['logger']);
+        };
 
-            return $subscribers;
-        });
+        $pimple['subscriber.exception_logger'] = function() use ($pimple) {
+            return new ExceptionLogger($pimple['logger']);
+        };
     }
 }

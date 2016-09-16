@@ -5,6 +5,7 @@ namespace LastCall\Crawler\Configuration;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
+use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
@@ -13,6 +14,9 @@ use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Handler\HtmlRedispatcher;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
+use LastCall\Crawler\Queue\DoctrineRequestQueue;
+use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -47,6 +51,17 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         // On start, add the default request.
         $this->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
             $event->addAdditionalRequest(new Request('GET', $this['base_url']));
+        });
+
+        $this->addListener(CrawlerEvents::SETUP, function() {
+            if($this['queue'] instanceof SetupTeardownInterface) {
+                $this['queue']->onSetup();
+            }
+        });
+        $this->addListener(CrawlerEvents::TEARDOWN, function() {
+            if($this['queue'] instanceof SetupTeardownInterface) {
+                $this['queue']->onTeardown();
+            }
         });
     }
 

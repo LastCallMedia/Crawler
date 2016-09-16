@@ -41,25 +41,4 @@ class QueueServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(new DoctrineRequestQueue($connection), $container['queue']);
     }
-
-    public function testRegistersSetupTeardownListeners()
-    {
-        $container = new Container();
-        $container['listeners'] = function () {
-            return [];
-        };
-        $container->register(new QueueServiceProvider());
-
-        $queue = $this->prophesize(DoctrineRequestQueue::class);
-        $queue->onSetup()->shouldBeCalled();
-        $queue->onTeardown()->shouldBeCalled();
-        $container['queue'] = $queue->reveal();
-
-        $this->assertTrue(is_callable($container['listeners'][CrawlerEvents::SETUP]['queue.setup'][0]));
-        $this->assertTrue(is_callable($container['listeners'][CrawlerEvents::TEARDOWN]['queue.teardown'][0]));
-        $setup = $container['listeners'][CrawlerEvents::SETUP]['queue.setup'][0];
-        $teardown = $container['listeners'][CrawlerEvents::TEARDOWN]['queue.teardown'][0];
-        $setup();
-        $teardown();
-    }
 }

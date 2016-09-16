@@ -28,21 +28,5 @@ class QueueServiceProvider implements ServiceProviderInterface
             // Fall back to the simple array queue if it is not.
             return new ArrayRequestQueue();
         };
-
-        // Register the queue setup and teardown listeners.
-        $pimple->extend('listeners', function (array $listeners) use ($pimple) {
-            $listeners[CrawlerEvents::SETUP]['queue.setup'] = [function () use ($pimple) {
-                if ($pimple['queue'] instanceof SetupTeardownInterface) {
-                    $pimple['queue']->onSetup();
-                }
-            }, 0];
-            $listeners[CrawlerEvents::TEARDOWN]['queue.teardown'] = [function () use ($pimple) {
-                if ($pimple['queue'] instanceof SetupTeardownInterface) {
-                    $pimple['queue']->onTeardown();
-                }
-            }, 0];
-
-            return $listeners;
-        });
     }
 }
