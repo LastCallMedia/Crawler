@@ -3,45 +3,58 @@
 namespace LastCall\Crawler\Test\Handler\Uri;
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerUrisDiscoveredEvent;
 use LastCall\Crawler\Handler\Uri\UriRecursor;
 use LastCall\Crawler\Uri\Matcher;
 use Psr\Http\Message\UriInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class UriRecursorTest extends \PHPUnit_Framework_TestCase
 {
     public function testReaddsUrisOnUri()
     {
-        $event = $this->prophesize(CrawlerUrisDiscoveredEvent::class);
-        $event->getDiscoveredUris()->willReturn([new Uri('http://google.com')]);
-
-        $event->addAdditionalRequest(new Request('GET', new Uri('http://google.com')))->shouldBeCalled();
-
-        $recurser = new UriRecursor(Matcher::all()->always());
-        $recurser->onDiscovery($event->reveal());
+        $dispatcher = new EventDispatcher();
+        $event = new CrawlerUrisDiscoveredEvent(
+            new Request('GET', 'http://google.com'),
+            new Response(200),
+            [new Uri('http://google.com')]
+        );
+        $recursor = new UriRecursor(Matcher::all()->always());
+        $dispatcher->addSubscriber($recursor);
+        $dispatcher->dispatch(CrawlerEvents::URIS_DISCOVERED, $event);
+        $this->assertEquals([new Request('GET', 'http://google.com')], $event->getAdditionalRequests());
     }
 
     public function testUsesRequestFactory()
     {
-        $event = $this->prophesize(CrawlerUrisDiscoveredEvent::class);
-        $event->getDiscoveredUris()->willReturn([new Uri('http://google.com')]);
-
-        $event->addAdditionalRequest(new Request('HEAD', 'http://google.com'))->shouldBeCalled();
-
+        $dispatcher = new EventDispatcher();
+        $event = new CrawlerUrisDiscoveredEvent(
+            new Request('GET', 'http://google.com'),
+            new Response(200),
+            [new Uri('http://google.com')]
+        );
         $recursor = new UriRecursor(Matcher::all()->always(), function (UriInterface $uri) {
             return new Request('HEAD', $uri);
         });
-        $recursor->onDiscovery($event->reveal());
+        $dispatcher->addSubscriber($recursor);
+        $dispatcher->dispatch(CrawlerEvents::URIS_DISCOVERED, $event);
+        $this->assertEquals([new Request('HEAD', 'http://google.com')], $event->getAdditionalRequests());
     }
 
     public function testUsesMatcher()
     {
-        $event = $this->prophesize(CrawlerUrisDiscoveredEvent::class);
-        $event->getDiscoveredUris()->willReturn([new Uri('http://google.com')]);
-
-        $event->addAdditionalRequest()->shouldNotBeCalled();
+        $dispatcher = new EventDispatcher();
+        $event = new CrawlerUrisDiscoveredEvent(
+            new Request('GET', 'http://google.com'),
+            new Response(200),
+            [new Uri('http://google.com')]
+        );
         $recursor = new UriRecursor(Matcher::all()->never());
-        $recursor->onDiscovery($event->reveal());
+        $dispatcher->addSubscriber($recursor);
+        $dispatcher->dispatch(CrawlerEvents::URIS_DISCOVERED, $event);
+        $this->assertEquals([], $event->getAdditionalRequests());
     }
 }

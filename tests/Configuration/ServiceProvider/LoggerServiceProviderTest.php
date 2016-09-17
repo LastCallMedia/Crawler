@@ -11,44 +11,39 @@ use Psr\Log\LoggerInterface;
 
 class LoggerServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHasLogger()
+    public function getLoggerTests()
     {
-        $container = new Container();
-        $container->register(new LoggerServiceProvider());
-
-        $this->assertEquals(new NullLogger(), $container['logger']);
-    }
-
-    public function getLoggerTests() {
         return [
             [new NullLogger()],
-            [$this->getMock(LoggerInterface::class)]
+            [$this->getMock(LoggerInterface::class)],
         ];
     }
 
     /**
      * @dataProvider getLoggerTests
      */
-    public function testHasRequestLogger($logger) {
+    public function testHasRequestLogger($logger)
+    {
         $container = new Container();
         $container->register(new LoggerServiceProvider(), [
-            'logger' => $logger
+            'logger' => $logger,
         ]);
 
         $expected = new RequestLogger($container['logger']);
-        $this->assertEquals($expected, $container['subscriber.request_logger']);
+        $this->assertEquals($expected, $container['logger.request']);
     }
 
     /**
      * @dataProvider getLoggerTests
      */
-    public function testHasExceptionLogger($logger) {
+    public function testHasExceptionLogger($logger)
+    {
         $container = new Container();
         $container->register(new LoggerServiceProvider(), [
-            'logger' => $logger
+            'logger' => $logger,
         ]);
 
         $expected = new ExceptionLogger($logger);
-        $this->assertEquals($expected, $container['subscriber.exception_logger']);
+        $this->assertEquals($expected, $container['logger.exception']);
     }
 }

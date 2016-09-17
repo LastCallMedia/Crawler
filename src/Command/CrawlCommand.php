@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Console command to initiate a crawl
+ * Console command to initiate a crawl.
  */
 class CrawlCommand extends CrawlerCommand
 {
@@ -17,7 +17,7 @@ class CrawlCommand extends CrawlerCommand
      */
     public function configure()
     {
-        if(null === $this->getName()) {
+        if (null === $this->getName()) {
             $this->setName('crawl');
         }
         $this->setDescription('Execute a crawler session on a configuration.');

@@ -2,13 +2,20 @@
 
 namespace LastCall\Crawler\Test\Configuration;
 
+use Doctrine\DBAL\Connection;
 use GuzzleHttp\ClientInterface;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerStartEvent;
+use LastCall\Crawler\Queue\ArrayRequestQueue;
+use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -19,33 +26,118 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ClientInterface::class, $config->getClient());
     }
 
-    public function testHasListenersArray()
+    public function testHasQueue()
     {
         $config = new Configuration();
-        $this->assertTrue(is_array($config['listeners']));
+        $this->assertEquals(new ArrayRequestQueue(), $config->getQueue());
     }
 
-    public function testHasSubscribersArray()
+    public function testUsesDoctrineQueue()
     {
-        $config = new Configuration();
-        $this->assertTrue(is_array($config['subscribers']));
+        $connection = $this->prophesize(Connection::class)->reveal();
+        $config = new Configuration('', [
+            'doctrine' => $connection,
+        ]);
+        $this->assertEquals(new DoctrineRequestQueue($connection), $config->getQueue());
     }
 
-    public function testAddListener()
+    public function testHasLogger()
     {
-        $fn = function () {
-        };
         $config = new Configuration();
-        $config->addListener('foo.bar', $fn, 5);
-        $this->assertEquals([[$fn, 5]], $config['listeners']['foo.bar']);
+        $this->assertInstanceOf(LoggerInterface::class, $config['logger']);
     }
 
-    public function testAddSubscriber()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unknown logger: foo
+     */
+    public function testThrowsExceptionOnInvalidLogger()
     {
-        $subscriber = $this->prophesize(EventSubscriberInterface::class)->reveal();
-        $config = new Configuration();
-        $config->addSubscriber($subscriber);
-        $this->assertTrue(in_array($subscriber, $config['subscribers']));
+        $config = new Configuration('', ['loggers' => ['foo']]);
+        $config->attachToDispatcher($this->prophesize(EventDispatcherInterface::class)->reveal());
+    }
+
+    public function testAddsValidLogger()
+    {
+        $logger = $this->prophesize(EventSubscriberInterface::class);
+
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->addListener(Argument::type('string'), Argument::any())
+            ->will(function () {
+            });
+        $dispatcher->addSubscriber(Argument::type(EventSubscriberInterface::class))
+            ->will(function () {
+            });
+        $dispatcher->addSubscriber($logger)->shouldBeCalled();
+
+        $config = new Configuration('', [
+            'loggers' => ['foo'],
+            'logger.foo' => $logger->reveal(),
+        ]);
+
+        $config->attachToDispatcher($dispatcher->reveal());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unknown discoverer: foo
+     */
+    public function testThrowsExceptionOnInvalidDiscoverer()
+    {
+        $config = new Configuration('', ['discoverers' => ['foo']]);
+        $config->attachToDispatcher($this->prophesize(EventDispatcherInterface::class)->reveal());
+    }
+
+    public function testAddsValidDiscoverer()
+    {
+        $discoverer = $this->prophesize(EventSubscriberInterface::class);
+
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->addListener(Argument::type('string'), Argument::any())
+            ->will(function () {
+            });
+        $dispatcher->addSubscriber(Argument::type(EventSubscriberInterface::class))
+            ->will(function () {
+            });
+        $dispatcher->addSubscriber($discoverer)->shouldBeCalled();
+
+        $config = new Configuration('', [
+            'discoverers' => ['foo'],
+            'discoverer.foo' => $discoverer->reveal(),
+        ]);
+
+        $config->attachToDispatcher($dispatcher->reveal());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unknown recursor: foo
+     */
+    public function testThrowsExceptionOnInvalidRecursor()
+    {
+        $config = new Configuration('', ['recursors' => ['foo']]);
+        $config->attachToDispatcher($this->prophesize(EventDispatcherInterface::class)->reveal());
+    }
+
+    public function testAddsValidRecursor()
+    {
+        $recursor = $this->prophesize(EventSubscriberInterface::class);
+
+        $dispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $dispatcher->addListener(Argument::type('string'), Argument::any())
+            ->will(function () {
+            });
+        $dispatcher->addSubscriber(Argument::type(EventSubscriberInterface::class))
+            ->will(function () {
+            });
+        $dispatcher->addSubscriber($recursor)->shouldBeCalled();
+
+        $config = new Configuration('', [
+            'recursors' => ['foo'],
+            'recursor.foo' => $recursor->reveal(),
+        ]);
+
+        $config->attachToDispatcher($dispatcher->reveal());
     }
 
     public function testAddsInitialRequestOnStart()
@@ -74,5 +166,13 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $config->attachToDispatcher($dispatcher);
         $dispatcher->dispatch(CrawlerEvents::SETUP);
         $dispatcher->dispatch(CrawlerEvents::TEARDOWN);
+    }
+
+    public function testSetsOutput()
+    {
+        $output = $this->prophesize(OutputInterface::class)->reveal();
+        $config = new Configuration();
+        $config->setOutput($output);
+        $this->assertEquals($output, $config['output']);
     }
 }

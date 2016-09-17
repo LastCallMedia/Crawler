@@ -19,8 +19,9 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
     private function createContainer($values = [])
     {
         $container = new Container();
-        $container['matcher.internal_html'] = $container->protect(Matcher::all());
-        $container['matcher.internal_asset'] = $container->protect(Matcher::all());
+        $container['matcher.internal'] = $container->protect(Matcher::all());
+        $container['matcher.html'] = $container->protect(Matcher::all());
+        $container['matcher.asset'] = $container->protect(Matcher::all());
         $container['normalizer'] = new Normalizer();
         $container->register(new RecursionServiceProvider(), $values);
 
@@ -31,7 +32,7 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [new Normalizer()],
-            [$this->getMock(NormalizerInterface::class)]
+            [$this->getMock(NormalizerInterface::class)],
         ];
     }
 
@@ -39,7 +40,18 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->createContainer();
         $expected = new RedirectDiscoverer($container['normalizer']);
-        $this->assertEquals($expected, $container['subscribers.discovery.redirect']);
+        $this->assertEquals($expected, $container['discoverer.redirect']);
+    }
+
+    public function testRedirectDiscovererNormalizerIsOverrideable()
+    {
+        $normalizer = new Normalizer([function () {
+        }]);
+        $container = $this->createContainer([
+            'normalizer.redirect' => $normalizer,
+        ]);
+        $expected = new RedirectDiscoverer($normalizer);
+        $this->assertEquals($expected, $container['discoverer.redirect']);
     }
 
     public function testAddsAssetDiscoverer()
@@ -47,7 +59,18 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
         $container = $this->createContainer();
 
         $expected = new AssetDiscoverer($container['normalizer']);
-        $this->assertEquals($expected, $container['subscribers.discovery.asset']);
+        $this->assertEquals($expected, $container['discoverer.asset']);
+    }
+
+    public function testAssetDiscovererNormalizerIsOverrideable()
+    {
+        $normalizer = new Normalizer([function () {
+        }]);
+        $container = $this->createContainer([
+            'normalizer.asset' => $normalizer,
+        ]);
+        $expected = new AssetDiscoverer($normalizer);
+        $this->assertEquals($expected, $container['discoverer.asset']);
     }
 
     public function testAddsLinkDiscoverer()
@@ -55,7 +78,18 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
         $container = $this->createContainer();
 
         $expected = new LinkDiscoverer($container['normalizer']);
-        $this->assertEquals($expected, $container['subscribers.discovery.link']);
+        $this->assertEquals($expected, $container['discoverer.link']);
+    }
+
+    public function testLinkDiscovererNormalizerIsOverrideable()
+    {
+        $normalizer = new Normalizer([function () {
+        }]);
+        $container = $this->createContainer([
+            'normalizer.link' => $normalizer,
+        ]);
+        $expected = new LinkDiscoverer($normalizer);
+        $this->assertEquals($expected, $container['discoverer.link']);
     }
 
     public function testAddsInternalHtmlUriRecursor()
@@ -63,7 +97,7 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
         $container = $this->createContainer();
 
         $expected = new UriRecursor($container['matcher.internal_html'], $container['request_factory.internal_html']);
-        $this->assertEquals($expected, $container['subscribers.uri_recursor.internal_html']);
+        $this->assertEquals($expected, $container['recursor.internal_html']);
     }
 
     public function testAddsInternalAssetUriRecursor()
@@ -71,7 +105,7 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
         $container = $this->createContainer();
 
         $expected = new UriRecursor($container['matcher.internal_asset'], $container['request_factory.internal_asset']);
-        $this->assertEquals($expected, $container['subscribers.uri_recursor.internal_asset']);
+        $this->assertEquals($expected, $container['recursor.internal_asset']);
     }
 
     public function testAddsInternalHtmlRequestFactory()

@@ -6,20 +6,18 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Common\OutputAwareInterface;
 use LastCall\Crawler\Common\SetupTeardownInterface;
-use LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
-use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
-use LastCall\Crawler\Configuration\ServiceProvider\QueueServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider;
+use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Handler\HtmlRedispatcher;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
-use LastCall\Crawler\Uri\Normalizer;
 use Pimple\Container;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -27,42 +25,39 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Configuration extends Container implements ConfigurationInterface, OutputAwareInterface
 {
-    public function __construct($baseUrl = null)
+    public function __construct($baseUrl = null, array $config = array())
     {
         parent::__construct();
         $this['base_url'] = $baseUrl;
+        $this['output'] = null;
         $this['client'] = function () {
             return new Client(['allow_redirects' => false]);
         };
-        $this['listeners'] = function () {
-            return [];
+
+        $this['queue'] = function () {
+            if (isset($this['doctrine'])) {
+                return new DoctrineRequestQueue($this['doctrine']);
+            }
+
+            return new ArrayRequestQueue();
         };
-        $this['subscribers'] = function () {
-            return [
-                'html' => new HtmlRedispatcher(),
-            ];
+        $this['logger'] = function () {
+            return new NullLogger();
         };
-        $this['output'] = false;
+        $this['redispatcher'] = function () {
+            return new HtmlRedispatcher();
+        };
+        $this['loggers'] = [];
+        $this['discoverers'] = [];
+        $this['recursors'] = [];
 
         foreach ($this->getProviders() as $provider) {
             $this->register($provider);
         }
 
-        // On start, add the default request.
-        $this->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
-            $event->addAdditionalRequest(new Request('GET', $this['base_url']));
-        });
-
-        $this->addListener(CrawlerEvents::SETUP, function() {
-            if($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onSetup();
-            }
-        });
-        $this->addListener(CrawlerEvents::TEARDOWN, function() {
-            if($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onTeardown();
-            }
-        });
+        foreach ($config as $key => $value) {
+            $this[$key] = $value;
+        }
     }
 
     public function setOutput(OutputInterface $output)
@@ -82,45 +77,30 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 
     public function attachToDispatcher(EventDispatcherInterface $dispatcher)
     {
-        foreach ($this['subscribers'] as $subscriber) {
-            $dispatcher->addSubscriber($subscriber);
-        }
-        foreach ($this['listeners'] as $eventName => $listeners) {
-            foreach ($listeners as $listener) {
-                $dispatcher->addListener($eventName, $listener[0], $listener[1]);
+        $dispatcher->addSubscriber($this['redispatcher']);
+        $dispatcher->addListener(CrawlerEvents::SETUP, function () {
+            if ($this['queue'] instanceof SetupTeardownInterface) {
+                $this['queue']->onSetup();
             }
-        }
-    }
-
-    /**
-     * Adds an event listener function to the configuration.
-     *
-     * @param          $eventName
-     * @param callable $callback
-     * @param int      $priority
-     */
-    public function addListener($eventName, callable $callback, $priority = 0)
-    {
-        $this->extend('listeners',
-            function (array $listeners) use ($eventName, $callback, $priority) {
-                $listeners[$eventName][] = [$callback, $priority];
-
-                return $listeners;
-            });
-    }
-
-    /**
-     * Adds an event subscriber object to the configuration.
-     *
-     * @param \Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber
-     */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
-    {
-        $this->extend('subscribers', function (array $subscribers) use ($subscriber) {
-            $subscribers[] = $subscriber;
-
-            return $subscribers;
         });
+        $dispatcher->addListener(CrawlerEvents::TEARDOWN, function () {
+            if ($this['queue'] instanceof SetupTeardownInterface) {
+                $this['queue']->onTeardown();
+            }
+        });
+        // Add the initial request to the queue.
+        $dispatcher->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
+            $event->addAdditionalRequest(new Request('GET', $this['base_url']));
+        });
+        foreach ($this->getLoggers() as $logger) {
+            $dispatcher->addSubscriber($logger);
+        }
+        foreach ($this->getDiscoverers() as $discoverer) {
+            $dispatcher->addSubscriber($discoverer);
+        }
+        foreach ($this->getRecursors() as $recursor) {
+            $dispatcher->addSubscriber($recursor);
+        }
     }
 
     /**
@@ -131,11 +111,49 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
     protected function getProviders()
     {
         return [
-            'queue' => new QueueServiceProvider(),
             'logger' => new LoggerServiceProvider(),
-            'matcher' => new MatcherServiceProvider(),
             'normalizer' => new NormalizerServiceProvider(),
-            'link' => new RecursionServiceProvider(),
+            'matcher' => new MatcherServiceProvider(),
+            'recursion' => new RecursionServiceProvider(),
         ];
+    }
+
+    private function getLoggers()
+    {
+        return array_map([$this, 'getLogger'], $this['loggers']);
+    }
+
+    private function getDiscoverers()
+    {
+        return array_map([$this, 'getDiscoverer'], $this['discoverers']);
+    }
+
+    private function getRecursors()
+    {
+        return array_map([$this, 'getRecursor'], $this['recursors']);
+    }
+
+    private function getLogger($id)
+    {
+        if (isset($this['logger.'.$id])) {
+            return $this['logger.'.$id];
+        }
+        throw new \InvalidArgumentException(sprintf('Unknown logger: %s', $id));
+    }
+
+    private function getDiscoverer($id)
+    {
+        if (isset($this['discoverer.'.$id])) {
+            return $this['discoverer.'.$id];
+        }
+        throw new \InvalidArgumentException(sprintf('Unknown discoverer: %s', $id));
+    }
+
+    private function getRecursor($id)
+    {
+        if (isset($this['recursor.'.$id])) {
+            return $this['recursor.'.$id];
+        }
+        throw new \InvalidArgumentException(sprintf('Unknown recursor: %s', $id));
     }
 }

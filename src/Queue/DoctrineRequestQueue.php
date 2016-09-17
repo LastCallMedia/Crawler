@@ -38,12 +38,14 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
         return $request->getMethod().$request->getUri();
     }
 
-    private function lockHint() {
-        if(!$this->lockHint) {
+    private function lockHint()
+    {
+        if (!$this->lockHint) {
             $this->lockHint = $this->connection->getDatabasePlatform()
                 ->appendLockHint($this->table,
                     LockMode::PESSIMISTIC_READ);
         }
+
         return $this->lockHint;
     }
 

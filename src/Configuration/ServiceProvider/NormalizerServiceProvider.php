@@ -14,16 +14,14 @@ class NormalizerServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $pimple)
     {
+        // Transforms URLs into a standard form.
         $pimple['normalizer'] = function () use ($pimple) {
-            return new Normalizer($pimple['normalizations']);
-        };
-        $pimple['normalizations'] = function () {
-            return [
-                'lowercaseHostname' => Normalizations::lowercaseHostname(),
-                'capitalizeEscaped' => Normalizations::capitalizeEscaped(),
-                'decodeUnreserved' => Normalizations::decodeUnreserved(),
-                'dropFragment' => Normalizations::dropFragment(),
-            ];
+            return new Normalizer([
+                Normalizations::lowercaseHostname(),
+                Normalizations::capitalizeEscaped(),
+                Normalizations::decodeUnreserved(),
+                Normalizations::dropFragment(),
+            ]);
         };
     }
 }

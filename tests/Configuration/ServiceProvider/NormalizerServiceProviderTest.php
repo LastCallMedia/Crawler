@@ -15,24 +15,10 @@ class NormalizerServiceProviderTest extends \PHPUnit_Framework_TestCase
         $container->register(new NormalizerServiceProvider());
 
         $expected = new Normalizer([
-            'lowercaseHostname' => Normalizations::lowercaseHostname(),
-            'capitalizeEscaped' => Normalizations::capitalizeEscaped(),
-            'decodeUnreserved' => Normalizations::decodeUnreserved(),
-            'dropFragment' => Normalizations::dropFragment(),
-        ]);
-        $this->assertEquals($expected, $container['normalizer']);
-    }
-
-    public function testOverrideNormalizations()
-    {
-        $container = new Container();
-        $container->register(new NormalizerServiceProvider());
-
-        $fn = function () {
-        };
-        $container['normalizations'] = ['foo' => $fn];
-        $expected = new Normalizer([
-            'foo' => $fn,
+            Normalizations::lowercaseHostname(),
+            Normalizations::capitalizeEscaped(),
+            Normalizations::decodeUnreserved(),
+            Normalizations::dropFragment(),
         ]);
         $this->assertEquals($expected, $container['normalizer']);
     }

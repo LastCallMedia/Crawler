@@ -72,11 +72,6 @@ The following services are registered with the container and can be replaced or 
 
 [Default normalizer](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
 
-#### normalizations
-`callable[]` - An array of normalizations that are performed by the normalizer.
-
-[Default normalizations](../src/Configuration/ServiceProvider/NormalizerServiceProvider.php)
-
 #### queue 
 
 `LastCall\Crawler\Queue\RequestQueueInterface` - The queue is where requests are stored.  Initially, the queue only contains a request to the baseUrl, and the queue is filled by subscribers processing the page. 
@@ -95,6 +90,14 @@ The following services are registered with the container and can be replaced or 
 
 There is no default doctrine definition.
 
-#### subscribers
+#### loggers
 
-`Symfony\Component\EventDispatcher\EventSubscriberInterface[]` - An array of event subscriber objects that will be added to the dispatcher and used to handle events while crawling.
+`string[]` - An array of names of logging subscribers that should be activated.  Logging subscribers must be available on the container at `logger.ID`, where ID is the name that is used to activate the subscriber.
+
+#### discoverers
+
+`string[]` - An array of names of URL discovery subscribers that should be activated.  Discovery subscribers must be available on the container at `discovery.ID`, where ID is the name that is used to activate the subscriber.
+
+#### recursors
+
+`string[]` - An array of names of recursor subscribers that should be activated.  Recursor subscribers must be available on the container at `recursor.ID`, where ID is the name that is used to activate the subscriber.
