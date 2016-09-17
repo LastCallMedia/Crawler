@@ -31,14 +31,20 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     {
         $this->connection = $connection;
         $this->table = $table;
-        $this->lockHint = $this->connection->getDatabasePlatform()
-            ->appendLockHint($this->table,
-                LockMode::PESSIMISTIC_READ);
     }
 
     private function getKey(RequestInterface $request)
     {
         return $request->getMethod().$request->getUri();
+    }
+
+    private function lockHint() {
+        if(!$this->lockHint) {
+            $this->lockHint = $this->connection->getDatabasePlatform()
+                ->appendLockHint($this->table,
+                    LockMode::PESSIMISTIC_READ);
+        }
+        return $this->lockHint;
     }
 
     public function push(RequestInterface $request)
@@ -92,7 +98,7 @@ class DoctrineRequestQueue implements RequestQueueInterface, SetupTeardownInterf
     public function pop($leaseTime = 30)
     {
         $conn = $this->connection;
-        $sql = 'SELECT * FROM '.$this->lockHint.' WHERE status = 1 AND expire <= '.time().' LIMIT 1';
+        $sql = 'SELECT * FROM '.$this->lockHint().' WHERE status = 1 AND expire <= '.time().' LIMIT 1';
 
         $return = null;
 
