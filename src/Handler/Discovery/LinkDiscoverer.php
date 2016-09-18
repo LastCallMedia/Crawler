@@ -36,6 +36,6 @@ class LinkDiscoverer extends AbstractDiscoverer implements EventSubscriberInterf
 
         $nodes = $crawler->filterXPath('descendant-or-self::a[@href]');
         $urls = array_unique($nodes->extract('href'));
-        $this->processUris($event, $dispatcher, $urls);
+        $this->processUris($event, $dispatcher, $urls, 'link');
     }
 }

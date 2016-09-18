@@ -30,10 +30,14 @@ abstract class AbstractDiscoverer
      *
      * @param \LastCall\Crawler\Event\CrawlerResponseEvent                $event
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param string                                                      $context
      * @param string[]                                                    $urls
      */
-    protected function processUris(CrawlerResponseEvent $event, EventDispatcherInterface $dispatcher, array $urls)
+    protected function processUris(CrawlerResponseEvent $event, EventDispatcherInterface $dispatcher, array $urls, $context = 'unknown')
     {
+        if(empty($urls)) {
+            return;
+        }
         $resolve = Normalizations::resolve($event->getRequest()->getUri());
 
         $uris = [];
@@ -45,7 +49,7 @@ abstract class AbstractDiscoverer
         }
         $uris = array_values($uris);
 
-        $discoveryEvent = new CrawlerUrisDiscoveredEvent($event->getRequest(), $event->getResponse(), $uris);
+        $discoveryEvent = new CrawlerUrisDiscoveredEvent($event->getRequest(), $event->getResponse(), $uris, $context);
         $dispatcher->dispatch(CrawlerEvents::URIS_DISCOVERED, $discoveryEvent);
         foreach ($discoveryEvent->getAdditionalRequests() as $request) {
             $event->addAdditionalRequest($request);

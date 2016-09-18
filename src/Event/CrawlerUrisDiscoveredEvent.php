@@ -19,17 +19,28 @@ class CrawlerUrisDiscoveredEvent extends CrawlerResponseEvent
      */
     private $discoveredUris = [];
 
+    /**
+     * @var string
+     */
+    private $context;
+
     public function __construct(
         RequestInterface $request,
         ResponseInterface $response,
-        array $discoveredUris
+        array $discoveredUris,
+        $context = 'unknown'
     ) {
         parent::__construct($request, $response);
         $this->discoveredUris = $discoveredUris;
+        $this->context = $context;
     }
 
     public function getDiscoveredUris()
     {
         return $this->discoveredUris;
+    }
+
+    public function getContext() {
+        return $this->context;
     }
 }

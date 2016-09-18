@@ -43,7 +43,7 @@ class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInter
         $crawler = $event->getDomCrawler();
         $nodes = $crawler->filterXPath('descendant-or-self::img[@src]');
         $urls = $nodes->extract('src');
-        $this->processUris($event, $dispatcher, $urls);
+        $this->processUris($event, $dispatcher, $urls, 'image');
     }
 
     /**
@@ -58,7 +58,7 @@ class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInter
         $crawler = $event->getDomCrawler();
         $nodes = $crawler->filterXPath('descendant-or-self::link[@rel = "stylesheet" and (@href)]');
         $urls = $nodes->extract('href');
-        $this->processUris($event, $dispatcher, $urls);
+        $this->processUris($event, $dispatcher, $urls, 'stylesheet');
     }
 
     /**
@@ -73,6 +73,6 @@ class AssetDiscoverer extends AbstractDiscoverer implements EventSubscriberInter
         $crawler = $event->getDomCrawler();
         $nodes = $crawler->filterXPath('descendant-or-self::script[@type = "text/javascript" and (@src)]');
         $urls = $nodes->extract('src');
-        $this->processUris($event, $dispatcher, $urls);
+        $this->processUris($event, $dispatcher, $urls, 'script');
     }
 }

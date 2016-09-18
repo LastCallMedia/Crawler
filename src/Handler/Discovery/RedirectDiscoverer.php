@@ -36,7 +36,7 @@ class RedirectDiscoverer extends AbstractDiscoverer implements EventSubscriberIn
     {
         $response = $event->getResponse();
         if ($this->isRedirectResponse($response)) {
-            $this->processUris($event, $dispatcher, [$response->getHeaderLine('Location')]);
+            $this->processUris($event, $dispatcher, [$response->getHeaderLine('Location')], 'redirect');
         }
     }
 }
