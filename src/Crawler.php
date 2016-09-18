@@ -143,7 +143,7 @@ final class Crawler
     {
         return function ($reason) use ($request) {
             $this->queue->complete($request);
-            // Delegate processing of the item out to the session.
+            // Delegate processing of the item out to the dispatcher.
             if ($reason instanceof BadResponseException) {
                 $response = $reason->getResponse();
 

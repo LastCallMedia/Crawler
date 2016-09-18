@@ -51,13 +51,7 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['discoverers'] = [];
         $this['recursors'] = [];
 
-        foreach ($this->getProviders() as $provider) {
-            $this->register($provider);
-        }
-
-        foreach ($config as $key => $value) {
-            $this[$key] = $value;
-        }
+        $this->configure($config);
     }
 
     public function setOutput(OutputInterface $output)
@@ -100,6 +94,22 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         }
         foreach ($this->getRecursors() as $recursor) {
             $dispatcher->addSubscriber($recursor);
+        }
+    }
+
+    /**
+     * Configure additional services required for the configuration before
+     * layering in the passed in configuration.
+     *
+     * @param array $config
+     */
+    protected function configure(array $config = array())
+    {
+        foreach ($this->getProviders() as $provider) {
+            $this->register($provider);
+        }
+        foreach ($config as $key => $value) {
+            $this[$key] = $value;
         }
     }
 
