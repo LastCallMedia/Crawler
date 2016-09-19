@@ -5,14 +5,18 @@ Handlers are responsible for processing the responses received by the crawler.  
 
 Adding Handlers
 ---------------
-Handlers can be added to the configuration like so:
+Handlers are added to the configuration by making them available on the container, then specifying that they should be used.  In the base configuration, there are three types of supported handlers: loggers, discoverers, and recursors.  Loggers log messages about events as they are fired.  Discoverers search the response for new URIs.  Recursors take discoverered URIs and add them back into the queue as requests if they match certain conditions.
 
 ```php
 $config = new Configuration();
 
-$config->extend('subscribers', function(array $subscribers) {
-    $subscribers['myhandler'] = new MyHandler();
-});
+// Make a new logger handler available by adding it under the "logger" prefix.
+$config['logger.myawesomelogger'] = function() use ($config) {
+    return new MyAwesomeLogger($config['logger']);
+}
+
+// Use the logger in the configuration.  The name here is whatever follows the word "logger" in the service ID.
+$config['loggers'][] = 'myawesomelogger';
 ```
 
 Packaged Handlers
@@ -31,8 +35,10 @@ Logging:
 Discovery:
 
 * [LinkDiscoverer](../src/Handler/Discovery/LinkDiscoverer.php)
-* [AssetDiscoverer](../src/Handler/Discovery/AssetDiscoverer.php)
 * [RedirectDiscoverer](../src/Handler/Discovery/RedirectDiscoverer.php)
+* [ImageDiscoverer](../src/Handler/Discovery/ImageDiscoverer.php)
+* [ScriptDiscoverer](../src/Handler/Discovery/ScriptDiscoverer.php)
+* [StylesheetDiscoverer](../src/Handler/Discovery/StylesheetDiscoverer.php)
 
 Uri:
 

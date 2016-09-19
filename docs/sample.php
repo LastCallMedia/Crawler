@@ -24,14 +24,16 @@ $config = new Configuration('http://localhost/lcmscaffold/docroot/', [
     // @see LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider
     'discoverers' => [
         'link',
-        'asset',
         'redirect',
+        // 'image',
+        // 'script',
+        // 'stylesheet',
     ],
     // Specify which recursors are active.
     // @see LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider
     'recursors' => [
         'internal_html',
-        'internal_asset',
+        // 'internal_asset',
     ],
     // Use a custom normalizer to transform URLs to a consistent state.
     'normalizer' => new Normalizer([
