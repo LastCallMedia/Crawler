@@ -35,7 +35,7 @@ abstract class AbstractDiscoverer
      */
     protected function processUris(CrawlerResponseEvent $event, EventDispatcherInterface $dispatcher, array $urls, $context = 'unknown')
     {
-        if(empty($urls)) {
+        if (empty($urls)) {
             return;
         }
         $resolve = Normalizations::resolve($event->getRequest()->getUri());

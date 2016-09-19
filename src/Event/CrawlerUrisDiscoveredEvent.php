@@ -40,7 +40,8 @@ class CrawlerUrisDiscoveredEvent extends CrawlerResponseEvent
         return $this->discoveredUris;
     }
 
-    public function getContext() {
+    public function getContext()
+    {
         return $this->context;
     }
 }

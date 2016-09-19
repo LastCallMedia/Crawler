@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Discovery;
-
 
 use LastCall\Crawler\Handler\Discovery\StylesheetDiscoverer;
 use LastCall\Crawler\Uri\NormalizerInterface;
@@ -23,5 +21,4 @@ class StylesheetDiscovererTest extends AbstractDiscovererTest
     {
         return new StylesheetDiscoverer($normalizer);
     }
-
 }

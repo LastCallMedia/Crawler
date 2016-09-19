@@ -1,11 +1,9 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Discovery;
 
 use LastCall\Crawler\Handler\Discovery\ScriptDiscoverer;
 use LastCall\Crawler\Uri\NormalizerInterface;
-
 
 class ScriptDiscovererTest extends AbstractDiscovererTest
 {
@@ -23,5 +21,4 @@ class ScriptDiscovererTest extends AbstractDiscovererTest
     {
         return new ScriptDiscoverer($normalizer);
     }
-
 }

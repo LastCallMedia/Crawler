@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Handler\Discovery;
-
 
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Event\CrawlerHtmlResponseEvent;
@@ -19,11 +17,11 @@ class StylesheetDiscoverer extends AbstractDiscoverer implements EventSubscriber
         ];
     }
 
-    public function onHtmlResponse(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher) {
+    public function onHtmlResponse(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
         $crawler = $event->getDomCrawler();
         $nodes = $crawler->filterXPath('descendant-or-self::link[@rel = "stylesheet" and (@href)]');
         $urls = $nodes->extract('href');
         $this->processUris($event, $dispatcher, $urls, 'stylesheet');
     }
-
 }

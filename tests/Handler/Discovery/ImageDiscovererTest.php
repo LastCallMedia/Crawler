@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Discovery;
-
 
 use LastCall\Crawler\Handler\Discovery\ImageDiscoverer;
 use LastCall\Crawler\Uri\NormalizerInterface;
@@ -19,7 +17,8 @@ class ImageDiscovererTest extends AbstractDiscovererTest
         ];
     }
 
-    public function getDiscoverer(NormalizerInterface $normalizer) {
+    public function getDiscoverer(NormalizerInterface $normalizer)
+    {
         return new ImageDiscoverer($normalizer);
     }
 }

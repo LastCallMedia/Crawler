@@ -3,7 +3,6 @@
 namespace LastCall\Crawler\Configuration\ServiceProvider;
 
 use GuzzleHttp\Psr7\Request;
-use LastCall\Crawler\Handler\Discovery\AssetDiscoverer;
 use LastCall\Crawler\Handler\Discovery\ImageDiscoverer;
 use LastCall\Crawler\Handler\Discovery\LinkDiscoverer;
 use LastCall\Crawler\Handler\Discovery\RedirectDiscoverer;
@@ -29,7 +28,7 @@ class RecursionServiceProvider implements ServiceProviderInterface
         $pimple['normalizer.link'] = function () use ($pimple) {
             return $pimple['normalizer'];
         };
-        $pimple['normalizer.image'] = function() use ($pimple) {
+        $pimple['normalizer.image'] = function () use ($pimple) {
             return $pimple['normalizer'];
         };
         $pimple['normalizer.redirect'] = function () use ($pimple) {

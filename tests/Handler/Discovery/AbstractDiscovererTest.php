@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LastCall\Crawler\Test\Handler\Discovery;
-
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -16,16 +14,15 @@ use LastCall\Crawler\Uri\NormalizerInterface;
 
 abstract class AbstractDiscovererTest extends \PHPUnit_Framework_TestCase
 {
+    abstract public function getDiscoveryTests();
 
-    abstract function getDiscoveryTests();
-
-    abstract function getDiscoverer(NormalizerInterface $normalizer);
-
+    abstract public function getDiscoverer(NormalizerInterface $normalizer);
 
     /**
      * @dataProvider getDiscoveryTests
      */
-    public function testDiscovery($html, $expectedUris, $expectedContext) {
+    public function testDiscovery($html, $expectedUris, $expectedContext)
+    {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getDiscoverer(new Normalizer());
 
@@ -59,9 +56,9 @@ abstract class AbstractDiscovererTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getDiscoverer(new Normalizer([
-            function() {
+            function () {
                 return new Uri('foo');
-            }
+            },
         ]));
 
         $bubbledDown = $bubbledUp = [];
@@ -90,5 +87,4 @@ abstract class AbstractDiscovererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedNormalizedUris, $bubbledDown);
         $this->assertEquals($expectedNormalizedUris, $bubbledUp);
     }
-
 }
