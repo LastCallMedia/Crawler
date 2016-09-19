@@ -4,10 +4,14 @@ namespace LastCall\Crawler\Test\Configuration\ServiceProvider;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
+use LastCall\Crawler\Configuration\Configuration;
 use LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider;
 use LastCall\Crawler\Handler\Discovery\AssetDiscoverer;
+use LastCall\Crawler\Handler\Discovery\ImageDiscoverer;
 use LastCall\Crawler\Handler\Discovery\LinkDiscoverer;
 use LastCall\Crawler\Handler\Discovery\RedirectDiscoverer;
+use LastCall\Crawler\Handler\Discovery\ScriptDiscoverer;
+use LastCall\Crawler\Handler\Discovery\StylesheetDiscoverer;
 use LastCall\Crawler\Handler\Uri\UriRecursor;
 use LastCall\Crawler\Uri\Matcher;
 use LastCall\Crawler\Uri\Normalizer;
@@ -28,67 +32,53 @@ class RecursionServiceProviderTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 
-    public function getNormalizers()
-    {
-        return [
-            [new Normalizer()],
-            [$this->getMock(NormalizerInterface::class)],
-        ];
+    public function testAddsNormalizers() {
+        $container = $this->createContainer();
+        $this->assertEquals($container['normalizer'], $container['normalizer.link']);
+        $this->assertEquals($container['normalizer'], $container['normalizer.redirect']);
+        $this->assertEquals($container['normalizer'], $container['normalizer.image']);
+        $this->assertEquals($container['normalizer'], $container['normalizer.script']);
+        $this->assertEquals($container['normalizer'], $container['normalizer.stylesheet']);
     }
 
     public function testAddsRedirectDiscoverer()
     {
-        $container = $this->createContainer();
-        $expected = new RedirectDiscoverer($container['normalizer']);
+        $container = $this->createContainer([
+            'normalizer.redirect' => $this->prophesize(NormalizerInterface::class)->reveal()
+        ]);
+        $expected = new RedirectDiscoverer($container['normalizer.redirect']);
         $this->assertEquals($expected, $container['discoverer.redirect']);
     }
 
-    public function testRedirectDiscovererNormalizerIsOverrideable()
-    {
-        $normalizer = new Normalizer([function () {
-        }]);
+    public function testAddsImageDiscoverer() {
         $container = $this->createContainer([
-            'normalizer.redirect' => $normalizer,
+            'normalizer.image' => $this->prophesize(NormalizerInterface::class)->reveal()
         ]);
-        $expected = new RedirectDiscoverer($normalizer);
-        $this->assertEquals($expected, $container['discoverer.redirect']);
+        $expected = new ImageDiscoverer($container['normalizer.image']);
+        $this->assertEquals($expected, $container['discoverer.image']);
     }
 
-    public function testAddsAssetDiscoverer()
-    {
-        $container = $this->createContainer();
-
-        $expected = new AssetDiscoverer($container['normalizer']);
-        $this->assertEquals($expected, $container['discoverer.asset']);
-    }
-
-    public function testAssetDiscovererNormalizerIsOverrideable()
-    {
-        $normalizer = new Normalizer([function () {
-        }]);
+    public function testAddsScriptDiscoverer() {
         $container = $this->createContainer([
-            'normalizer.asset' => $normalizer,
+            'normalizer.script' => $this->prophesize(NormalizerInterface::class)->reveal()
         ]);
-        $expected = new AssetDiscoverer($normalizer);
-        $this->assertEquals($expected, $container['discoverer.asset']);
+        $expected = new ScriptDiscoverer($container['normalizer.script']);
+        $this->assertEquals($expected, $container['discoverer.script']);
     }
 
-    public function testAddsLinkDiscoverer()
-    {
-        $container = $this->createContainer();
-
-        $expected = new LinkDiscoverer($container['normalizer']);
-        $this->assertEquals($expected, $container['discoverer.link']);
-    }
-
-    public function testLinkDiscovererNormalizerIsOverrideable()
-    {
-        $normalizer = new Normalizer([function () {
-        }]);
+    public function testAddsStylesheetDiscoverer() {
         $container = $this->createContainer([
-            'normalizer.link' => $normalizer,
+            'normalizer.stylesheet' => $this->prophesize(NormalizerInterface::class)->reveal()
         ]);
-        $expected = new LinkDiscoverer($normalizer);
+        $expected = new StylesheetDiscoverer($container['normalizer.stylesheet']);
+        $this->assertEquals($expected, $container['discoverer.stylesheet']);
+    }
+
+    public function testAddsLinkDiscoverer() {
+        $container = $this->createContainer([
+            'normalizer.link' => $this->prophesize(NormalizerInterface::class)->reveal()
+        ]);
+        $expected = new LinkDiscoverer($container['normalizer.link']);
         $this->assertEquals($expected, $container['discoverer.link']);
     }
 

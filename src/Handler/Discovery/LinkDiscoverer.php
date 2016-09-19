@@ -18,8 +18,8 @@ class LinkDiscoverer extends AbstractDiscoverer implements EventSubscriberInterf
     public static function getSubscribedEvents()
     {
         return [
-            CrawlerEvents::SUCCESS_HTML => 'discoverLinks',
-            CrawlerEvents::FAILURE_HTML => 'discoverLinks',
+            CrawlerEvents::SUCCESS_HTML => 'onHtmlResponse',
+            CrawlerEvents::FAILURE_HTML => 'onHtmlResponse',
         ];
     }
 
@@ -30,7 +30,7 @@ class LinkDiscoverer extends AbstractDiscoverer implements EventSubscriberInterf
      * @param                                                             $eventName
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
-    public function discoverLinks(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function onHtmlResponse(CrawlerHtmlResponseEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $crawler = $event->getDomCrawler();
 

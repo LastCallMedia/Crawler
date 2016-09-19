@@ -4,8 +4,11 @@ namespace LastCall\Crawler\Configuration\ServiceProvider;
 
 use GuzzleHttp\Psr7\Request;
 use LastCall\Crawler\Handler\Discovery\AssetDiscoverer;
+use LastCall\Crawler\Handler\Discovery\ImageDiscoverer;
 use LastCall\Crawler\Handler\Discovery\LinkDiscoverer;
 use LastCall\Crawler\Handler\Discovery\RedirectDiscoverer;
+use LastCall\Crawler\Handler\Discovery\ScriptDiscoverer;
+use LastCall\Crawler\Handler\Discovery\StylesheetDiscoverer;
 use LastCall\Crawler\Handler\Uri\UriRecursor;
 use LastCall\Crawler\Uri\Matcher;
 use Pimple\ServiceProviderInterface;
@@ -26,18 +29,30 @@ class RecursionServiceProvider implements ServiceProviderInterface
         $pimple['normalizer.link'] = function () use ($pimple) {
             return $pimple['normalizer'];
         };
-        $pimple['normalizer.asset'] = function () use ($pimple) {
+        $pimple['normalizer.image'] = function() use ($pimple) {
             return $pimple['normalizer'];
         };
         $pimple['normalizer.redirect'] = function () use ($pimple) {
+            return $pimple['normalizer'];
+        };
+        $pimple['normalizer.script'] = function () use ($pimple) {
+            return $pimple['normalizer'];
+        };
+        $pimple['normalizer.stylesheet'] = function () use ($pimple) {
             return $pimple['normalizer'];
         };
 
         $pimple['discoverer.link'] = function () use ($pimple) {
             return new LinkDiscoverer($pimple['normalizer.link']);
         };
-        $pimple['discoverer.asset'] = function () use ($pimple) {
-            return new AssetDiscoverer($pimple['normalizer.asset']);
+        $pimple['discoverer.image'] = function () use ($pimple) {
+            return new ImageDiscoverer($pimple['normalizer.image']);
+        };
+        $pimple['discoverer.script'] = function () use ($pimple) {
+            return new ScriptDiscoverer($pimple['normalizer.script']);
+        };
+        $pimple['discoverer.stylesheet'] = function () use ($pimple) {
+            return new StylesheetDiscoverer($pimple['normalizer.stylesheet']);
         };
         $pimple['discoverer.redirect'] = function () use ($pimple) {
             return new RedirectDiscoverer($pimple['normalizer.redirect']);
