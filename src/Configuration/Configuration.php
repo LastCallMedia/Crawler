@@ -10,9 +10,9 @@ use LastCall\Crawler\Configuration\ServiceProvider\LoggerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\NormalizerServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\RecursionServiceProvider;
 use LastCall\Crawler\Configuration\ServiceProvider\MatcherServiceProvider;
-use LastCall\Crawler\CrawlerEvents;
-use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Handler\HtmlRedispatcher;
+use LastCall\Crawler\Handler\InitialRequestSubscriber;
+use LastCall\Crawler\Handler\Setup\SetupTeardownWrapper;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use Pimple\Container;
@@ -47,6 +47,11 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         $this['redispatcher'] = function () {
             return new HtmlRedispatcher();
         };
+        $this['initial_requests'] = function () {
+            return [
+                new Request('GET', $this['base_url']),
+            ];
+        };
         $this['loggers'] = [];
         $this['discoverers'] = [];
         $this['recursors'] = [];
@@ -72,20 +77,10 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
     public function attachToDispatcher(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->addSubscriber($this['redispatcher']);
-        $dispatcher->addListener(CrawlerEvents::SETUP, function () {
-            if ($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onSetup();
-            }
-        });
-        $dispatcher->addListener(CrawlerEvents::TEARDOWN, function () {
-            if ($this['queue'] instanceof SetupTeardownInterface) {
-                $this['queue']->onTeardown();
-            }
-        });
-        // Add the initial request to the queue.
-        $dispatcher->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
-            $event->addAdditionalRequest(new Request('GET', $this['base_url']));
-        });
+        if ($this['queue'] instanceof SetupTeardownInterface) {
+            $dispatcher->addSubscriber(new SetupTeardownWrapper($this['queue']));
+        }
+        $dispatcher->addSubscriber(new InitialRequestSubscriber($this['initial_requests']));
         foreach ($this->getLoggers() as $logger) {
             $dispatcher->addSubscriber($logger);
         }
