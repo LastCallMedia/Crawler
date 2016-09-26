@@ -86,7 +86,7 @@ class SetupTeardownCommand extends CrawlerCommand
         $dispatcher = new EventDispatcher();
         $this->prepareDispatcher($config, $dispatcher, $input, $output);
 
-        $crawler = new Crawler($dispatcher, $config->getClient(), $config->getQueue());
+        $crawler = $this->getCrawler($config, $dispatcher);
 
         if ($this->tearsDown) {
             $crawler->teardown();
