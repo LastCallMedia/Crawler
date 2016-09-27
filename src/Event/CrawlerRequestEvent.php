@@ -18,6 +18,8 @@ class CrawlerRequestEvent extends Event
      */
     private $request;
 
+    private $data = [];
+
     public function __construct(
         RequestInterface $request
     ) {
@@ -32,5 +34,13 @@ class CrawlerRequestEvent extends Event
     public function getRequest()
     {
         return $this->request;
+    }
+
+    public function addData($key, $value) {
+        $this->data[$key] = $value;
+    }
+
+    public function getData() {
+        return $this->data;
     }
 }

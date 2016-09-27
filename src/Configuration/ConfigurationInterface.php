@@ -2,6 +2,7 @@
 
 namespace LastCall\Crawler\Configuration;
 
+use LastCall\LinkChecker\Store\RequestDataStore;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -24,9 +25,18 @@ interface ConfigurationInterface
     public function getQueue();
 
     /**
+     * Get the datastore to be used with this configuration.
+     *
+     * @return RequestDataStore
+     */
+    public function getDataStore();
+
+    /**
      * Attach listeners to an event dispatcher.
      *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
     public function attachToDispatcher(EventDispatcherInterface $dispatcher);
+
+
 }

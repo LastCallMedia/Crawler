@@ -11,6 +11,9 @@ use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\RequestData\ArrayRequestDataStore;
+use LastCall\Crawler\RequestData\DoctrineRequestDataStore;
+use LastCall\Crawler\RequestData\RequestDataStore;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,6 +42,19 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
             'doctrine' => $connection,
         ]);
         $this->assertEquals(new DoctrineRequestQueue($connection), $config->getQueue());
+    }
+
+    public function testHasDataStore() {
+        $config = new Configuration();
+        $this->assertEquals(new ArrayRequestDataStore(), $config->getDataStore());
+    }
+
+    public function testUsesDoctrineDataStore() {
+        $connection = $this->prophesize(Connection::class)->reveal();
+        $config = new Configuration('', [
+            'doctrine' => $connection,
+        ]);
+        $this->assertEquals(new DoctrineRequestDataStore($connection), $config->getDataStore());
     }
 
     public function testHasLogger()
@@ -162,6 +178,20 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $queue->onTeardown()->shouldBeCalled();
 
         $config['queue'] = $queue->reveal();
+        $dispatcher = new EventDispatcher();
+        $config->attachToDispatcher($dispatcher);
+        $dispatcher->dispatch(CrawlerEvents::SETUP);
+        $dispatcher->dispatch(CrawlerEvents::TEARDOWN);
+    }
+
+    public function testSetsUpAndTearsDownDataStore() {
+        $config = new Configuration();
+        $store = $this->prophesize(RequestDataStore::class);
+        $store->willImplement(SetupTeardownInterface::class);
+        $store->onSetup()->shouldBeCalled();
+        $store->onTeardown()->shouldBeCalled();
+
+        $config['datastore'] = $store->reveal();
         $dispatcher = new EventDispatcher();
         $config->attachToDispatcher($dispatcher);
         $dispatcher->dispatch(CrawlerEvents::SETUP);

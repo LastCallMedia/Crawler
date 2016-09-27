@@ -112,6 +112,6 @@ abstract class CrawlerCommand extends Command
      */
     protected function getCrawler(ConfigurationInterface $configuration, EventDispatcherInterface $dispatcher)
     {
-        return new Crawler($dispatcher, $configuration->getClient(), $configuration->getQueue());
+        return new Crawler($dispatcher, $configuration->getClient(), $configuration->getQueue(), $configuration->getDataStore());
     }
 }

@@ -5,11 +5,13 @@ namespace LastCall\Crawler;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\EachPromise;
+use LastCall\Crawler\Event\CrawlerFinishEvent;
 use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\RequestData\RequestDataStore;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -46,11 +48,13 @@ final class Crawler
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ClientInterface $client,
-        RequestQueueInterface $queue
+        RequestQueueInterface $queue,
+        RequestDataStore $dataStore
     ) {
         $this->dispatcher = $dispatcher;
         $this->client = $client;
         $this->queue = $queue;
+        $this->dataStore = $dataStore;
     }
 
     /**
@@ -178,7 +182,7 @@ final class Crawler
 
     private function dispatchFinish()
     {
-        $event = new Event();
+        $event = new CrawlerFinishEvent($this->dataStore);
         $this->dispatcher->dispatch(CrawlerEvents::FINISH, $event);
     }
 
@@ -187,6 +191,7 @@ final class Crawler
         $event = new CrawlerRequestEvent($request);
         $this->dispatcher->dispatch(CrawlerEvents::SENDING, $event);
         $this->enqueue($event->getAdditionalRequests());
+        $this->dataStore->merge((string)$request->getUri(), $event->getData());
     }
 
     private function dispatchSuccess(RequestInterface $request, ResponseInterface $response)
@@ -194,6 +199,7 @@ final class Crawler
         $event = new CrawlerResponseEvent($request, $response);
         $this->dispatcher->dispatch(CrawlerEvents::SUCCESS, $event);
         $this->enqueue($event->getAdditionalRequests());
+        $this->dataStore->merge((string)$request->getUri(), $event->getData());
     }
 
     private function dispatchFailure(RequestInterface $request, ResponseInterface $response)
@@ -201,6 +207,7 @@ final class Crawler
         $event = new CrawlerResponseEvent($request, $response);
         $this->dispatcher->dispatch(CrawlerEvents::FAILURE, $event);
         $this->enqueue($event->getAdditionalRequests());
+        $this->dataStore->merge((string)$request->getUri(), $event->getData());
     }
 
     private function dispatchException(RequestInterface $request, \Exception $e, ResponseInterface $response = null)

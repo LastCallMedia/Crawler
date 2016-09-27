@@ -8,6 +8,7 @@ use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\RequestData\RequestDataStore;
 use Prophecy\Argument;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -35,6 +36,7 @@ class SetupTeardownCommandTest extends \PHPUnit_Framework_TestCase
         $config = $this->prophesize(ConfigurationInterface::class);
         $config->getClient()->willReturn($this->prophesize(ClientInterface::class));
         $config->getQueue()->willReturn($this->prophesize(RequestQueueInterface::class));
+        $config->getDataStore()->willReturn($this->prophesize(RequestDataStore::class));
         $config->attachToDispatcher(Argument::type(EventDispatcherInterface::class))
             ->will(function ($args) use (&$setup, &$teardown) {
                 $args[0]->addListener(CrawlerEvents::SETUP, function () use (&$setup) {

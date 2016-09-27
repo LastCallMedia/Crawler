@@ -9,12 +9,14 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LastCall\Crawler\Crawler;
 use LastCall\Crawler\CrawlerEvents;
+use LastCall\Crawler\Event\CrawlerFinishEvent;
 use LastCall\Crawler\Event\CrawlerRequestEvent;
 use LastCall\Crawler\Event\CrawlerExceptionEvent;
 use LastCall\Crawler\Event\CrawlerResponseEvent;
 use LastCall\Crawler\Event\CrawlerStartEvent;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\RequestQueueInterface;
+use LastCall\Crawler\RequestData\RequestDataStore;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -34,7 +36,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::SETUP)->shouldBeCalled();
         $queue = $this->prophesize(RequestQueueInterface::class);
-        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal());
+        $store = $this->prophesize(RequestDataStore::class);
+        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal(), $store->reveal());
         $crawler->setup();
     }
 
@@ -43,7 +46,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
         $dispatcher->dispatch(CrawlerEvents::TEARDOWN)->shouldBeCalled();
         $queue = $this->prophesize(RequestQueueInterface::class);
-        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal());
+        $store = $this->prophesize(RequestDataStore::class);
+        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal(), $store->reveal());
         $crawler->teardown();
     }
 
@@ -53,7 +57,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch(CrawlerEvents::START, Argument::type(CrawlerStartEvent::class))->shouldBeCalled();
         $dispatcher->dispatch(CrawlerEvents::FINISH, Argument::type(Event::class))->shouldBeCalled();
         $queue = $this->prophesize(RequestQueueInterface::class);
-        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal());
+        $store = $this->prophesize(RequestDataStore::class);
+        $crawler = new Crawler($dispatcher->reveal(), $this->mockClient([]), $queue->reveal(), $store->reveal());
         $crawler->start()->wait();
     }
 
@@ -62,12 +67,13 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue = new ArrayRequestQueue();
         $client = $this->mockClient([new Response(200)]);
         $dispatcher = new EventDispatcher();
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher->addListener(CrawlerEvents::START, function (CrawlerStartEvent $event) {
             $event->addAdditionalRequest(new Request('GET', 'start'));
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start()->wait();
 
         $this->assertEquals(0, $queue->count($queue::FREE));
@@ -81,6 +87,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue->push(new Request('GET', 'success'));
         $client = $this->mockClient([new Response(200), new Response(200)]);
         $dispatcher = new EventDispatcher();
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerResponseEvent $event) {
             if ($event->getRequest()->getUri() == 'success') {
@@ -88,7 +95,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             }
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start(1)->wait();
         $this->assertEquals(0, $queue->count($queue::FREE));
         $this->assertEquals(0, $queue->count($queue::PENDING));
@@ -101,6 +108,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue->push(new Request('GET', 'failure'));
         $client = $this->mockClient([new Response(400), new Response(400)]);
         $dispatcher = new EventDispatcher();
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher->addListener(CrawlerEvents::FAILURE, function (CrawlerResponseEvent $event) {
             if ($event->getRequest()->getUri() == 'failure') {
@@ -108,7 +116,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             }
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start(1)->wait();
 
         $this->assertEquals(0, $queue->count($queue::FREE));
@@ -122,6 +130,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue->push(new Request('GET', 'sendingexception'));
         $dispatcher = new EventDispatcher();
         $client = $this->mockClient([new Response(200), new Response(200)]);
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher->addListener(CrawlerEvents::SENDING, function (CrawlerRequestEvent $event) {
             if ($event->getRequest()->getUri() == 'sendingexception') {
@@ -132,7 +141,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             $event->addAdditionalRequest(new Request('GET', 'sendingexception2'));
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start(1)->wait();
 
         $this->assertEquals(0, $queue->count($queue::FREE));
@@ -146,6 +155,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue->push(new Request('GET', 'successexception'));
         $dispatcher = new EventDispatcher();
         $client = $this->mockClient([new Response(200), new Response(200)]);
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerResponseEvent $event) {
             if ($event->getRequest()->getUri() == 'successexception') {
@@ -156,7 +166,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             $event->addAdditionalRequest(new Request('GET', 'successexception2'));
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start(1)->wait();
 
         $this->assertEquals(0, $queue->count($queue::FREE));
@@ -170,6 +180,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue->push(new Request('GET', 'failureexception'));
         $dispatcher = new EventDispatcher();
         $client = $this->mockClient([new Response(400), new Response(400)]);
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher->addListener(CrawlerEvents::FAILURE, function (CrawlerResponseEvent $event) {
             if ($event->getRequest()->getUri() == 'failureexception') {
@@ -180,12 +191,55 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             $event->addAdditionalRequest(new Request('GET', 'failureexception2'));
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start(1)->wait();
 
         $this->assertEquals(0, $queue->count($queue::FREE));
         $this->assertEquals(0, $queue->count($queue::PENDING));
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
+    }
+
+    public function testDataLogged() {
+        $queue = new ArrayRequestQueue();
+        $queue->push(new Request('GET', 'success'));
+        $queue->push(new Request('GET', 'failure'));
+        $client = $this->mockClient([new Response(200), new Response(400)]);
+        $dispatcher = new EventDispatcher();
+        $store = $this->prophesize(RequestDataStore::class);
+
+        $dispatcher->addListener(CrawlerEvents::SENDING, function(CrawlerRequestEvent $event) {
+            $event->addData('sent', 1);
+        });
+        $dispatcher->addListener(CrawlerEvents::SUCCESS, function(CrawlerRequestEvent $event) {
+            $event->addData('success', 1);
+        });
+        $dispatcher->addListener(CrawlerEvents::FAILURE, function(CrawlerRequestEvent $event) {
+            $event->addData('failure', 1);
+        });
+
+        $store->merge('success', ['sent' => 1])->shouldBeCalledTimes(1);
+        $store->merge('success', ['success' => 1])->shouldBeCalledTimes(1);
+        $store->merge('failure', ['sent' => 1])->shouldBeCalledTimes(1);
+        $store->merge('failure', ['failure' => 1])->shouldBeCalledTimes(1);
+
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
+        $crawler->start(1)->wait();
+    }
+
+    public function testCallsCrawlerFinish() {
+        $queue = new ArrayRequestQueue();
+        $client = $this->mockClient([new Response(200), new Response(400)]);
+        $dispatcher = new EventDispatcher();
+        $store = $this->prophesize(RequestDataStore::class)->reveal();
+
+        $called = false;
+        $dispatcher->addListener(CrawlerEvents::FINISH, function(CrawlerFinishEvent $event) use ($store, &$called) {
+            $this->assertEquals($store, $event->getDataStore());
+            $called = true;
+        });
+        $crawler = new Crawler($dispatcher, $client, $queue, $store);
+        $crawler->start()->wait();
+        $this->assertTrue($called);
     }
 
     public function testQueueIsWorkedUntilEmpty()
@@ -195,6 +249,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $queue = new ArrayRequestQueue();
         $queue->push(new Request('GET', '1'));
         $client = $this->mockClient([new Response(200), new Response(200)]);
+        $store = $this->prophesize(RequestDataStore::class);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerResponseEvent $event) use ($queue, &$count) {
@@ -204,7 +259,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
             }
         });
 
-        $crawler = new Crawler($dispatcher, $client, $queue);
+        $crawler = new Crawler($dispatcher, $client, $queue, $store->reveal());
         $crawler->start(5)->wait();
 
         $this->assertEquals(0, $queue->count($queue::FREE));

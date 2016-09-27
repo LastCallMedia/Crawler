@@ -9,6 +9,7 @@ use LastCall\Crawler\Configuration\ConfigurationInterface;
 use LastCall\Crawler\Configuration\Loader\ConfigurationLoaderInterface;
 use LastCall\Crawler\CrawlerEvents;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
+use LastCall\Crawler\RequestData\RequestDataStore;
 use Prophecy\Argument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -20,9 +21,11 @@ class CrawlCommandTest extends \PHPUnit_Framework_TestCase
     {
         $started = $finished = 0;
         $client = $this->prophesize(ClientInterface::class);
+        $dataStore = $this->prophesize(RequestDataStore::class);
         $config = $this->prophesize(ConfigurationInterface::class);
         $config->getQueue()->willReturn(new ArrayRequestQueue());
         $config->getClient()->willReturn($client);
+        $config->getDataStore()->willReturn($dataStore);
         $config->attachToDispatcher(Argument::type(EventDispatcherInterface::class))
             ->will(function ($args) use (&$started, &$finished) {
                 $args[0]->addListener(CrawlerEvents::START, function () use (&$started) {
@@ -48,8 +51,10 @@ class CrawlCommandTest extends \PHPUnit_Framework_TestCase
     public function testExecutesReset()
     {
         $client = $this->prophesize(ClientInterface::class);
+        $dataStore = $this->prophesize(RequestDataStore::class);
         $config = $this->prophesize(ConfigurationInterface::class);
         $config->getClient()->willReturn($client->reveal());
+        $config->getDataStore()->willReturn($dataStore);
         $config->getQueue()->willReturn(new ArrayRequestQueue());
         $config->attachToDispatcher(Argument::type(EventDispatcherInterface::class))
             ->will(function ($args) use (&$setup, &$teardown) {
@@ -76,11 +81,13 @@ class CrawlCommandTest extends \PHPUnit_Framework_TestCase
     public function testAttachesOutput()
     {
         $client = $this->prophesize(ClientInterface::class);
+        $dataStore = $this->prophesize(RequestDataStore::class);
 
         $config = $this->prophesize(ConfigurationInterface::class);
         $config->willImplement(OutputAwareInterface::class);
         $config->getQueue()->willReturn(new ArrayRequestQueue());
         $config->getClient()->willReturn($client);
+        $config->getDataStore()->willReturn($dataStore);
         $config->attachToDispatcher(Argument::any())->shouldBeCalled();
 
         $config->setOutput(Argument::type(OutputInterface::class))

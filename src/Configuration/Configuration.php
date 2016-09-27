@@ -15,6 +15,8 @@ use LastCall\Crawler\Handler\InitialRequestSubscriber;
 use LastCall\Crawler\Handler\Setup\SetupTeardownWrapper;
 use LastCall\Crawler\Queue\ArrayRequestQueue;
 use LastCall\Crawler\Queue\DoctrineRequestQueue;
+use LastCall\Crawler\RequestData\DoctrineRequestDataStore;
+use LastCall\Crawler\RequestData\ArrayRequestDataStore;
 use Pimple\Container;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,6 +43,15 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
 
             return new ArrayRequestQueue();
         };
+
+        $this['datastore'] = function() {
+            if(isset($this['doctrine'])) {
+                return new DoctrineRequestDataStore($this['doctrine']);
+            }
+
+            return new ArrayRequestDataStore();
+        };
+
         $this['logger'] = function () {
             return new NullLogger();
         };
@@ -74,6 +85,10 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         return $this['client'];
     }
 
+    public function getDataStore() {
+        return $this['datastore'];
+    }
+
     public function attachToDispatcher(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->addSubscriber($this['redispatcher']);
@@ -81,6 +96,9 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             $dispatcher->addSubscriber(new SetupTeardownWrapper($this['queue']));
         }
         $dispatcher->addSubscriber(new InitialRequestSubscriber($this['initial_requests']));
+        if ($this['datastore'] instanceof SetupTeardownInterface) {
+            $dispatcher->addSubscriber(new SetupTeardownWrapper($this['datastore']));
+        }
         foreach ($this->getLoggers() as $logger) {
             $dispatcher->addSubscriber($logger);
         }
