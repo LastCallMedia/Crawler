@@ -253,7 +253,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $category
     ) {
         $dispatcher = new EventDispatcher();
-        $crawler = new Crawler($dispatcher, $configuration->getClient(), $configuration->getQueue());
+        $crawler = new Crawler($dispatcher, $configuration->getClient(), $configuration->getQueue(), $configuration->getDataStore());
         $stopwatch = new Stopwatch();
         $stopwatch->start(__FUNCTION__, $category);
         $promise = $crawler->start();
