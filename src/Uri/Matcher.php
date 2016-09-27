@@ -40,7 +40,7 @@ class Matcher implements MatcherInterface
      *
      * @param $mode
      */
-    private function __construct($mode)
+    protected function __construct($mode)
     {
         $this->mode = $mode;
     }
