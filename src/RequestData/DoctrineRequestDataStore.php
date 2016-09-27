@@ -1,16 +1,14 @@
 <?php
 
-
 namespace LastCall\Crawler\RequestData;
-
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use LastCall\Crawler\Common\DoctrineSetupTeardownTrait;
 use LastCall\Crawler\Common\SetupTeardownInterface;
 
-class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterface {
-
+class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterface
+{
     use DoctrineSetupTeardownTrait;
 
     /**
@@ -20,16 +18,19 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
 
     private $table;
 
-    public function __construct(Connection $connection, $table = 'request_data') {
+    public function __construct(Connection $connection, $table = 'request_data')
+    {
         $this->connection = $connection;
         $this->table = $table;
     }
 
-    protected function getConnection() {
+    protected function getConnection()
+    {
         return $this->connection;
     }
 
-    protected function getSchema() {
+    protected function getSchema()
+    {
         $schema = new Schema();
         $table = $schema->createTable($this->table);
         $table->addColumn('uri', 'binary');
@@ -39,16 +40,16 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
         return $schema;
     }
 
-    public function merge($uri, array $data) {
+    public function merge($uri, array $data)
+    {
         $existing = $this->fetch($uri);
-        if(null !== $existing) {
+        if (null !== $existing) {
             $this->connection->update($this->table, [
                 'data' => serialize($data + $existing),
             ], [
-                'uri' => $uri
+                'uri' => $uri,
             ]);
-        }
-        else {
+        } else {
             $this->connection->insert($this->table, [
                 'uri' => $uri,
                 'data' => serialize($data),
@@ -56,7 +57,8 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
         }
     }
 
-    public function fetch($uri) {
+    public function fetch($uri)
+    {
         $stmt = $this->connection->createQueryBuilder()
             ->select('data')
             ->from($this->table)
@@ -64,24 +66,26 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
             ->setParameter('uri', $uri)
             ->execute();
 
-
         $data = $stmt->fetchColumn();
-        if($data !== FALSE) {
+        if ($data !== false) {
             return unserialize($data);
         }
+
         return null;
     }
 
-    public function fetchAll() {
+    public function fetchAll()
+    {
         $stmt = $this->connection->createQueryBuilder()
             ->select('uri, data')
             ->from($this->table)
             ->execute();
 
         $res = [];
-        while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $res[$row['uri']] = unserialize($row['data']);
         }
+
         return $res;
     }
 }

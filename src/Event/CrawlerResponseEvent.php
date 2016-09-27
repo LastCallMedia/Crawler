@@ -32,5 +32,4 @@ class CrawlerResponseEvent extends CrawlerRequestEvent
     {
         return $this->response;
     }
-
 }

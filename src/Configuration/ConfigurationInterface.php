@@ -37,6 +37,4 @@ interface ConfigurationInterface
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
     public function attachToDispatcher(EventDispatcherInterface $dispatcher);
-
-
 }

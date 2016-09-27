@@ -199,7 +199,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $queue->count($queue::COMPLETE));
     }
 
-    public function testDataLogged() {
+    public function testDataLogged()
+    {
         $queue = new ArrayRequestQueue();
         $queue->push(new Request('GET', 'success'));
         $queue->push(new Request('GET', 'failure'));
@@ -207,13 +208,13 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $store = $this->prophesize(RequestDataStore::class);
 
-        $dispatcher->addListener(CrawlerEvents::SENDING, function(CrawlerRequestEvent $event) {
+        $dispatcher->addListener(CrawlerEvents::SENDING, function (CrawlerRequestEvent $event) {
             $event->addData('sent', 1);
         });
-        $dispatcher->addListener(CrawlerEvents::SUCCESS, function(CrawlerRequestEvent $event) {
+        $dispatcher->addListener(CrawlerEvents::SUCCESS, function (CrawlerRequestEvent $event) {
             $event->addData('success', 1);
         });
-        $dispatcher->addListener(CrawlerEvents::FAILURE, function(CrawlerRequestEvent $event) {
+        $dispatcher->addListener(CrawlerEvents::FAILURE, function (CrawlerRequestEvent $event) {
             $event->addData('failure', 1);
         });
 
@@ -226,14 +227,15 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->start(1)->wait();
     }
 
-    public function testCallsCrawlerFinish() {
+    public function testCallsCrawlerFinish()
+    {
         $queue = new ArrayRequestQueue();
         $client = $this->mockClient([new Response(200), new Response(400)]);
         $dispatcher = new EventDispatcher();
         $store = $this->prophesize(RequestDataStore::class)->reveal();
 
         $called = false;
-        $dispatcher->addListener(CrawlerEvents::FINISH, function(CrawlerFinishEvent $event) use ($store, &$called) {
+        $dispatcher->addListener(CrawlerEvents::FINISH, function (CrawlerFinishEvent $event) use ($store, &$called) {
             $this->assertEquals($store, $event->getDataStore());
             $called = true;
         });

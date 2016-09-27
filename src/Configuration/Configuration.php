@@ -44,8 +44,8 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
             return new ArrayRequestQueue();
         };
 
-        $this['datastore'] = function() {
-            if(isset($this['doctrine'])) {
+        $this['datastore'] = function () {
+            if (isset($this['doctrine'])) {
                 return new DoctrineRequestDataStore($this['doctrine']);
             }
 
@@ -85,7 +85,8 @@ class Configuration extends Container implements ConfigurationInterface, OutputA
         return $this['client'];
     }
 
-    public function getDataStore() {
+    public function getDataStore()
+    {
         return $this['datastore'];
     }
 

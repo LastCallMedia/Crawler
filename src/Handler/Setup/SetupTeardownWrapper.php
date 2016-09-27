@@ -12,6 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SetupTeardownWrapper implements EventSubscriberInterface
 {
+    /**
+     * @var \LastCall\Crawler\Common\SetupTeardownInterface
+     */
+    private $wrapped;
+
     public static function getSubscribedEvents()
     {
         return [

@@ -44,12 +44,14 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new DoctrineRequestQueue($connection), $config->getQueue());
     }
 
-    public function testHasDataStore() {
+    public function testHasDataStore()
+    {
         $config = new Configuration();
         $this->assertEquals(new ArrayRequestDataStore(), $config->getDataStore());
     }
 
-    public function testUsesDoctrineDataStore() {
+    public function testUsesDoctrineDataStore()
+    {
         $connection = $this->prophesize(Connection::class)->reveal();
         $config = new Configuration('', [
             'doctrine' => $connection,
@@ -184,7 +186,8 @@ class ContainerConfigurationTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch(CrawlerEvents::TEARDOWN);
     }
 
-    public function testSetsUpAndTearsDownDataStore() {
+    public function testSetsUpAndTearsDownDataStore()
+    {
         $config = new Configuration();
         $store = $this->prophesize(RequestDataStore::class);
         $store->willImplement(SetupTeardownInterface::class);

@@ -36,11 +36,13 @@ class CrawlerRequestEvent extends Event
         return $this->request;
     }
 
-    public function addData($key, $value) {
+    public function addData($key, $value)
+    {
         $this->data[$key] = $value;
     }
 
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 }

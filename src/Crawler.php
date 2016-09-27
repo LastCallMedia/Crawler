@@ -14,7 +14,6 @@ use LastCall\Crawler\Queue\RequestQueueInterface;
 use LastCall\Crawler\RequestData\RequestDataStore;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -37,6 +36,11 @@ final class Crawler
      * @var EventDispatcherInterface
      */
     private $dispatcher;
+
+    /**
+     * @var \LastCall\Crawler\RequestData\RequestDataStore
+     */
+    private $dataStore;
 
     /**
      * Crawler constructor.
@@ -191,7 +195,7 @@ final class Crawler
         $event = new CrawlerRequestEvent($request);
         $this->dispatcher->dispatch(CrawlerEvents::SENDING, $event);
         $this->enqueue($event->getAdditionalRequests());
-        $this->dataStore->merge((string)$request->getUri(), $event->getData());
+        $this->dataStore->merge((string) $request->getUri(), $event->getData());
     }
 
     private function dispatchSuccess(RequestInterface $request, ResponseInterface $response)
@@ -199,7 +203,7 @@ final class Crawler
         $event = new CrawlerResponseEvent($request, $response);
         $this->dispatcher->dispatch(CrawlerEvents::SUCCESS, $event);
         $this->enqueue($event->getAdditionalRequests());
-        $this->dataStore->merge((string)$request->getUri(), $event->getData());
+        $this->dataStore->merge((string) $request->getUri(), $event->getData());
     }
 
     private function dispatchFailure(RequestInterface $request, ResponseInterface $response)
@@ -207,7 +211,7 @@ final class Crawler
         $event = new CrawlerResponseEvent($request, $response);
         $this->dispatcher->dispatch(CrawlerEvents::FAILURE, $event);
         $this->enqueue($event->getAdditionalRequests());
-        $this->dataStore->merge((string)$request->getUri(), $event->getData());
+        $this->dataStore->merge((string) $request->getUri(), $event->getData());
     }
 
     private function dispatchException(RequestInterface $request, \Exception $e, ResponseInterface $response = null)
