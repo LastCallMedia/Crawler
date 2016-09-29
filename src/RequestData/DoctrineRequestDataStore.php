@@ -42,8 +42,13 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
 
     public function merge($uri, array $data)
     {
-        $existing = $this->fetch($uri);
+        $existing = $this->prepareRowForWrite($this->fetch($uri));
+        $data = $this->prepareRowForWrite($data);
+
         if (null !== $existing) {
+            if($data === $existing) {
+                return;
+            }
             $this->connection->update($this->table, [
                 'data' => serialize($data + $existing),
             ], [
@@ -57,7 +62,14 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
         }
     }
 
-    private function prepareRow($uri, $data)
+    private function prepareRowForWrite($data) {
+        if(is_array($data) && isset($data['uri'])) {
+            unset($data['uri']);
+        }
+        return $data;
+    }
+
+    private function prepareRowForRead($uri, $data)
     {
         return ['uri' => $uri] + unserialize($data);
     }
@@ -73,7 +85,7 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
 
         $data = $stmt->fetchColumn();
         if ($data !== false) {
-            return $this->prepareRow($uri, $data);
+            return $this->prepareRowForRead($uri, $data);
         }
 
         return null;
@@ -86,7 +98,7 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
             ->from($this->table)
             ->execute();
         foreach ($stmt as $item) {
-            yield $item['uri'] => $this->prepareRow($item['uri'], $item['data']);
+            yield $item['uri'] => $this->prepareRowForRead($item['uri'], $item['data']);
         }
     }
 }
