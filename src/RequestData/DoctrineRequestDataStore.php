@@ -57,6 +57,11 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
         }
     }
 
+    private function prepareRow($uri, $data)
+    {
+        return ['uri' => $uri] + unserialize($data);
+    }
+
     public function fetch($uri)
     {
         $stmt = $this->connection->createQueryBuilder()
@@ -68,7 +73,7 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
 
         $data = $stmt->fetchColumn();
         if ($data !== false) {
-            return unserialize($data);
+            return $this->prepareRow($uri, $data);
         }
 
         return null;
@@ -80,12 +85,8 @@ class DoctrineRequestDataStore implements RequestDataStore, SetupTeardownInterfa
             ->select('uri, data')
             ->from($this->table)
             ->execute();
-
-        $res = [];
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $res[$row['uri']] = unserialize($row['data']);
+        foreach ($stmt as $item) {
+            yield $item['uri'] => $this->prepareRow($item['uri'], $item['data']);
         }
-
-        return $res;
     }
 }

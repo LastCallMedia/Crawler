@@ -18,12 +18,19 @@ class ArrayRequestDataStore implements RequestDataStore
     public function fetch($url)
     {
         return isset($this->data[$url])
-            ? $this->data[$url]
+            ? $this->prepareRow($url, $this->data[$url])
             : null;
     }
 
     public function fetchAll()
     {
-        return $this->data;
+        foreach ($this->data as $uri => $row) {
+            yield $uri => $this->prepareRow($uri, $row);
+        }
+    }
+
+    protected function prepareRow($uri, $row)
+    {
+        return ['uri' => $uri] + $row;
     }
 }
