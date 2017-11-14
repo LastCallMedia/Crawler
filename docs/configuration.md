@@ -10,7 +10,7 @@ Creating a new configuration is easy:
 # myconfig.php
 use LastCall\Crawler\Configuration\Configuration;
 
-return new Configuration('http://url.for/my/site);
+return new Configuration('http://url.for/my/site');
 ```
 
 Configurations are [Pimple](http://pimple.sensiolabs.org/) dependency injection containers.  You can use array syntax to extend, redefine, or extend services on the configuration.  See the [Pimple docs](http://pimple.sensiolabs.org/) for more information on how to use the container. 
